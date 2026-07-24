@@ -1,0 +1,6 @@
+Here are the streamlined principles:
+1. **Radical Transparency:** Explicitly state your business model to address the inevitable "catch" upfront. By openly defining the upsell (human-led re-engineering) and clarifying that the operational insights are genuinely free, you disarm the natural skepticism of a technical audience.
+2. **Verifiable Privacy:** Explain the technical mechanism of your privacy rather than using corporate boilerplate. Highlighting that the tool runs entirely locally, can be used offline, and never transmits sensitive metadata proves it is secure by design.
+3. **Zero-Friction Autonomy:** Eliminate all gated entry. Emphasize that there is no registration, no contact collection, and that all communication is strictly initiated by the user, respecting their time and independence.
+4. **Strict Delineation of Outcomes:** Draw a clear line between the two types of findings. Position the tool as a diagnostic instrument that identifies immediate operational fixes for their internal IT team to handle, while separately flagging structural issues that might warrant your paid expertise.
+5. **Technical Pragmatism:** Avoid marketing fluff and superlatives. Use concise, utilitarian language to state exactly what the tool does, what data it needs, and what actionable output it produces.
