@@ -6,11 +6,18 @@
   var mount = document.querySelector("[data-scan-app]");
   if (!mount) return;
 
+  // Resolve scan.js relative to THIS script's own URL, so it works whether the
+  // site is served from a domain root or a project subpath (e.g. /flsnl/).
+  // A dynamic import() in a classic script otherwise resolves against the
+  // document URL, which differs between / and /azure/.
+  var self = document.currentScript || document.querySelector('script[src$="/boot.js"]');
+  var scanUrl = new URL("scan.js", self.src).href;
+
   var loaded = false;
   function load() {
     if (loaded) return;
     loaded = true;
-    import("/assets/js/scan.js")
+    import(scanUrl)
       .then(function (mod) { mod.init(mount); })
       .catch(function (err) {
         var status = mount.querySelector("[data-status]");
