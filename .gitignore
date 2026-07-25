@@ -1,1 +1,7 @@
 .claude/
+
+# Real customer billing exports — local sample data only. Kept out of the
+# repo entirely (they contain billing-account IDs and customer names), even
+# though _meta/ is already excluded from the deployed site.
+_meta/csv/
+*.csv
