@@ -22,13 +22,15 @@ steps:
 why:
   heading: Waarom dit anders is
   items:
+    - strong: Gratis, en gericht op je AI-budget.
+      text: Dit doorzoekt je Azure-factuur-CSV op uitgaven die hun geld niet waard zijn, zodat je ze kunt omleiden — naar AI, of waar het écht nodig is.
     - strong: Niets verlaat je browser.
-      text: De analyse draait via WebAssembly op je eigen scherm. Deze pagina heeft geen server om iets naartoe te sturen — het staat letterlijk in het beveiligingsbeleid (connect-src 'none'), na te kijken door iedereen die de broncode leest. Zet gerust je wifi uit zodra de pagina geladen is.
-    - strong: We kijken ín de werklast.
-      text: Niet alleen naar de rekening zelf, maar naar de patronen erachter — de plekken waar geld weglekt zonder dat iemand het merkt.
-    - strong: Eerlijke uitkomst.
-      text: "De patronen in het rapport zijn compleet en van jou. En soms is de conclusie: je rekening is schoon. Dat zeggen we er dan gewoon bij."
-  trustLine: Geen account, geen cookies, geen tracking. Wat je hier krijgt is een eerlijk beeld — geen verkooptruc verpakt als gratis tool.
+      text: De analyse draait op je eigen scherm. Deze pagina heeft geen server om iets naartoe te sturen — na te kijken door iedereen die de broncode leest. Zet gerust je wifi uit zodra de pagina geladen is.
+    - strong: Twee soorten verspilling, en we maken onderscheid.
+      text: Een deel van wat we vinden zijn resources die je niet nodig hebt — een configuratiewijziging, uit te voeren door je eigen IT-team, zonder hulp van buitenaf. Een ander deel zit ingebakken in hoe de applicatie zelf gebouwd is, en dat is een ander soort probleem.
+    - strong: Het tweede soort krijgt een suggestie, geen verkooppraatje.
+      text: Als de scan genoeg architecturale verspilling vindt, staat dat gewoon in het rapport, met de opmerking dat een human-led, AI-assisted audit een manier is om dat verder uit te zoeken. Daarna gebeurt er niets, tenzij jij dat zelf in gang zet.
+  trustLine: Geen account, geen cookies, geen tracking, niets geüpload — dus je bent nergens iets aan verplicht. Los het zelf op, bel ons, of doe geen van beide. Wij weten niet wat je kiest, en het verandert niets aan wat het rapport je vertelde.
 export:
   heading: Zo exporteer je je verbruik
   intro: "Dit duurt ongeveer twee minuten. Je hebt geen toegang tot productieomgevingen nodig en je deelt niets dat Microsoft je niet toch al elke maand stuurt: het verbruiksoverzicht van je facturatie."

@@ -51,7 +51,7 @@ const azure = defineCollection({
     }),
     why: z.object({
       heading: z.string(),
-      items: z.array(z.object({ strong: z.string(), text: z.string() })).length(3),
+      items: z.array(z.object({ strong: z.string(), text: z.string() })).length(4),
       trustLine: z.string(),
     }),
     export: z.object({

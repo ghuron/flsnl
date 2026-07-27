@@ -14,7 +14,6 @@
   --blue: #0f62fe;
   --blue-dark: #0052ec;
   --purple: #6c43ff;
-  --green: #02e98d;
   --ink: #0e0e2a;
   --ink-dim: #475569;
   --paper: #ffffff;
@@ -102,7 +101,7 @@ header.topbar .contact-link:hover { border-color: #fff; background: rgba(255,255
 section.hero {
   background:
     radial-gradient(55% 60% at 85% 0%, rgba(15,98,254,.30) 0%, rgba(15,98,254,0) 60%),
-    radial-gradient(45% 50% at 10% 100%, rgba(2,233,141,.12) 0%, rgba(2,233,141,0) 60%),
+    radial-gradient(45% 50% at 10% 100%, rgba(108,67,255,.18) 0%, rgba(108,67,255,0) 60%),
     var(--navy);
   color: #fff;
   padding: 5.5rem 0;
@@ -116,7 +115,7 @@ section.hero {
 }
 .eyebrow {
   display: inline-block;
-  color: var(--green);
+  color: var(--blue);
   font-weight: 800;
   font-size: 0.8rem;
   letter-spacing: 0.08em;
@@ -129,7 +128,7 @@ section.hero h1 {
 }
 section.hero h1 em {
   font-style: italic;
-  color: var(--green);
+  color: var(--blue);
 }
 section.hero .lede {
   font-weight: 300;
@@ -250,14 +249,14 @@ section.why h2 { font-size: 1.8rem; margin: 0 0 2.25rem; max-width: 600px; }
   height: 8px;
   margin-top: 0.5em;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--blue);
 }
 .why-list strong { color: #fff; }
 .trust-line {
   max-width: 640px;
   font-size: 0.98rem;
   color: #b9bac1;
-  border-left: 3px solid var(--green);
+  border-left: 3px solid var(--blue);
   padding-left: 1rem;
 }
 
@@ -311,6 +310,7 @@ ul.checks li::marker { color: var(--blue); }
 footer.site { background: var(--navy-deep); color: #8891a5; margin-top: 5rem; }
 footer.site .wrap { padding: 2rem 1.75rem 2.5rem; font-size: 0.85rem; }
 footer.site a { color: #b9bac1; }
+footer.site .copyright { margin-top: 0.5rem; opacity: 0.75; }
 
 @media (max-width: 720px) {
   .steps-grid { grid-template-columns: 1fr; }
@@ -344,7 +344,7 @@ footer.site a { color: #b9bac1; }
   border-radius: 12px;
   background:
     radial-gradient(60% 70% at 70% 20%, rgba(15,98,254,.35), rgba(15,98,254,0) 65%),
-    radial-gradient(50% 60% at 20% 90%, rgba(2,233,141,.25), rgba(2,233,141,0) 65%),
+    radial-gradient(50% 60% at 20% 90%, rgba(108,67,255,.3), rgba(108,67,255,0) 65%),
     var(--navy);
 }
 @media (max-width: 720px) { .promo { grid-template-columns: 1fr; } .promo-visual { display: none; } }

@@ -41,7 +41,10 @@ const csp = `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsa
 <slot />
 
 <footer class="site">
-  <div class="wrap"><slot name="footer" /></div>
+  <div class="wrap">
+    <slot name="footer" />
+    <p class="copyright">Copyright © 2026 First Line Software B.V. (KVK 58362126)</p>
+  </div>
 </footer>
 
 <slot name="scripts" />
