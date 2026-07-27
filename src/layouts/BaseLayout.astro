@@ -1,0 +1,50 @@
+---
+import { withBase } from "../lib/url";
+
+interface Props {
+  lang: string;
+  title: string;
+  description: string;
+  scriptSrc: "'none'" | "'self'";
+  nav: { contactLabel: string; contactHref: string };
+}
+
+const { lang, title, description, scriptSrc, nav } = Astro.props;
+const csp = `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'none'; img-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'none'`;
+---
+<!doctype html>
+<html lang={lang}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content={csp}>
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="icon" href={withBase("/favicon.ico")} sizes="any">
+<link rel="icon" type="image/svg+xml" href={withBase("/assets/icons/favicon.svg")}>
+<link rel="icon" type="image/png" sizes="32x32" href={withBase("/assets/icons/favicon-32x32.png")}>
+<link rel="icon" type="image/png" sizes="16x16" href={withBase("/assets/icons/favicon-16x16.png")}>
+<link rel="apple-touch-icon" sizes="180x180" href={withBase("/assets/icons/apple-touch-icon.png")}>
+<link rel="manifest" href={withBase("/assets/icons/site.webmanifest")}>
+<meta name="theme-color" content="#0e0e2a">
+<link rel="stylesheet" href={withBase("/assets/css/site.css")}>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="bar">
+    <a class="brand" href={withBase("/")}><img class="logo" src={withBase("/assets/img/logo-fls-white.png")} alt="First Line Software"></a>
+    <a class="contact-link" href={nav.contactHref}>{nav.contactLabel}</a>
+  </div>
+</header>
+
+<slot />
+
+<footer class="site">
+  <div class="wrap"><slot name="footer" /></div>
+</footer>
+
+<slot name="scripts" />
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+meta:
+  title: Azure Waste Scan — draai de scan in je eigen browser
+  description: Open je Azure-verbruiksbestand, analyseer het en genereer een rapport — volledig in je browser. Geen account, geen upload, geen server.
+hero:
+  eyebrow: Geen account. Geen upload.
+  headlinePre: "Zie je Azure-verspilling. Deel er "
+  headlineEm: niets
+  headlinePost: " voor."
+  lede: Eén verbruiksbestand, twee minuten, nul data die je scherm verlaat. De scan draait volledig in je eigen browser.
+  ctaPrimary:
+    label: Start de analyse
+    href: "#scan"
+  ctaGhost:
+    label: Zo exporteer je je verbruik
+    href: "#export"
+steps:
+  heading: Drie stappen, twee minuten
+  items:
+    - Haal je maandelijkse verbruiksbestand op bij Microsoft.
+    - Open het hier — de scan draait lokaal, in je browser.
+    - "Lees het rapport: wat opvalt, en wat het je kost om het te laten liggen."
+why:
+  heading: Waarom dit anders is
+  items:
+    - strong: Niets verlaat je browser.
+      text: De analyse draait via WebAssembly op je eigen scherm. Deze pagina heeft geen server om iets naartoe te sturen — het staat letterlijk in het beveiligingsbeleid (connect-src 'none'), na te kijken door iedereen die de broncode leest. Zet gerust je wifi uit zodra de pagina geladen is.
+    - strong: We kijken ín de werklast.
+      text: Niet alleen naar de rekening zelf, maar naar de patronen erachter — de plekken waar geld weglekt zonder dat iemand het merkt.
+    - strong: Eerlijke uitkomst.
+      text: "De patronen in het rapport zijn compleet en van jou. En soms is de conclusie: je rekening is schoon. Dat zeggen we er dan gewoon bij."
+  trustLine: Geen account, geen cookies, geen tracking. Wat je hier krijgt is een eerlijk beeld — geen verkooptruc verpakt als gratis tool.
+export:
+  heading: Zo exporteer je je verbruik
+  intro: "Dit duurt ongeveer twee minuten. Je hebt geen toegang tot productieomgevingen nodig en je deelt niets dat Microsoft je niet toch al elke maand stuurt: het verbruiksoverzicht van je facturatie."
+  direct:
+    heading: Rechtstreeks bij Microsoft (pay-as-you-go / Microsoft Customer Agreement)
+    steps:
+      - Log in op portal.azure.com.
+      - "Ga naar Cost Management + Billing → Invoices."
+      - Download bij de meest recente factuur het maandoverzicht als CSV.
+    noteMonthly: Kies het maandoverzicht, niet het overzicht per uur. Dat laatste is groter, gedetailleerder dan nodig, en bevat niets dat de analyse beter maakt.
+    multiMonth: Meerdere maanden? Download ze allemaal — je kunt straks meerdere CSV-bestanden tegelijk openen en samen laten analyseren.
+    noteCSP: Betaal je via een reseller (CSP) of een Enterprise Agreement? Dan loopt de export net even anders. Die routes voegen we binnenkort toe — voor nu richt de scan zich op de rechtstreekse Microsoft-facturatie hierboven.
+app:
+  heading: De scan
+  intro: Open je verbruiksbestand(en) en druk op analyseren. Alles gebeurt hier, op je scherm — er wordt niets verzonden.
+  dropzone:
+    title: Kies je CSV-bestand(en)
+    suffix: of sleep ze hierheen
+    hint: Eén of meerdere Azure-verbruiksbestanden — .csv
+    ariaLabel: Kies of sleep je CSV-bestanden
+  analyzeLabel: Analyseer
+  saveLabel: Rapport opslaan
+  noscript: De scan draait op JavaScript in je eigen browser (er wordt nog steeds niets verzonden). Zet JavaScript aan om je bestand te analyseren.
+footer:
+  text: First Line Software — de Azure Waste Scan draait volledig in je browser. Geen tracking, geen cookies, geen externe requests.
+  backLink:
+    label: Terug naar home
+    href: "/"

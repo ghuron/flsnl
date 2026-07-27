@@ -1,0 +1,110 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { withBase } from "../../lib/url";
+
+const nav = (await getEntry("common", "nl"))!.data.nav;
+const azure = (await getEntry("azure", "nl"))!.data;
+---
+<BaseLayout lang="nl" title={azure.meta.title} description={azure.meta.description} scriptSrc="'self'" nav={nav}>
+
+<!-- 1. Very short brief + two CTAs -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-content">
+      <span class="eyebrow">{azure.hero.eyebrow}</span>
+      <h1>{azure.hero.headlinePre}<em>{azure.hero.headlineEm}</em>{azure.hero.headlinePost}</h1>
+      <p class="lede">{azure.hero.lede}</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href={withBase(azure.hero.ctaPrimary.href)}>{azure.hero.ctaPrimary.label}</a>
+        <a class="btn btn-ghost-dark" href={withBase(azure.hero.ctaGhost.href)}>{azure.hero.ctaGhost.label}</a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="plane plane-1"></div>
+      <div class="plane plane-2"></div>
+      <div class="plane plane-3"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Longer convincing text — how it works -->
+<section class="steps" id="hoe-het-werkt">
+  <div class="wrap">
+    <h2>{azure.steps.heading}</h2>
+    <ul class="steps-grid">
+      {azure.steps.items.map((item) => <li><p>{item}</p></li>)}
+    </ul>
+  </div>
+</section>
+
+<section class="why">
+  <div class="wrap">
+    <h2>{azure.why.heading}</h2>
+    <ul class="why-list">
+      {azure.why.items.map((item) => (
+        <li><span><strong>{item.strong}</strong> {item.text}</span></li>
+      ))}
+    </ul>
+    <p class="trust-line">{azure.why.trustLine}</p>
+  </div>
+</section>
+
+<div class="wrap">
+<main class="prose">
+
+  <!-- 3. Export explanation — Direct vanuit Microsoft -->
+  <section class="content" id="export">
+    <h2>{azure.export.heading}</h2>
+    <p class="intro">{azure.export.intro}</p>
+
+    <h3>{azure.export.direct.heading}</h3>
+    <ol>
+      {azure.export.direct.steps.map((step) => <li>{step}</li>)}
+    </ol>
+    <div class="note">{azure.export.direct.noteMonthly}</div>
+    <p>{azure.export.direct.multiMonth}</p>
+
+    <div class="note">{azure.export.direct.noteCSP}</div>
+  </section>
+
+</main>
+</div>
+
+<!-- 4. The app -->
+<div class="wrap">
+<section class="app" id="scan">
+  <h2>{azure.app.heading}</h2>
+  <p class="intro">{azure.app.intro}</p>
+
+  <div id="scan-app" data-scan-app>
+    <div class="dropzone" data-dropzone tabindex="0" role="button" aria-label={azure.app.dropzone.ariaLabel}>
+      <p><strong>{azure.app.dropzone.title}</strong> {azure.app.dropzone.suffix}</p>
+      <p class="hint">{azure.app.dropzone.hint}</p>
+      <input type="file" accept=".csv,text/csv" multiple hidden data-file-input>
+    </div>
+
+    <ul class="filelist" data-filelist hidden></ul>
+
+    <div class="app-actions">
+      <button class="btn btn-primary" type="button" data-analyze disabled>{azure.app.analyzeLabel}</button>
+      <button class="btn btn-ghost" type="button" data-save hidden>{azure.app.saveLabel}</button>
+      <span class="app-status" data-status role="status" aria-live="polite"></span>
+    </div>
+
+    <div class="results" data-results hidden></div>
+
+    <noscript>
+      <div class="note">{azure.app.noscript}</div>
+    </noscript>
+  </div>
+</section>
+</div>
+
+<Fragment slot="footer">
+  {azure.footer.text} <a href={withBase(azure.footer.backLink.href)}>{azure.footer.backLink.label}</a>
+</Fragment>
+<Fragment slot="scripts">
+  <script src={withBase("/assets/js/boot.js")} defer></script>
+</Fragment>
+</BaseLayout>

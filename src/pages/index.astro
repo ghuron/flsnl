@@ -1,0 +1,42 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../lib/url";
+
+const nav = (await getEntry("common", "nl"))!.data.nav;
+const home = (await getEntry("home", "nl"))!.data;
+---
+<BaseLayout lang="nl" title={home.meta.title} description={home.meta.description} scriptSrc="'none'" nav={nav}>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-content">
+      <span class="eyebrow">{home.hero.eyebrow}</span>
+      <h1>{home.hero.headlinePre}<em>{home.hero.headlineEm}</em>{home.hero.headlinePost}</h1>
+      <p class="lede">{home.hero.lede}</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href={withBase(home.hero.ctaPrimary.href)}>{home.hero.ctaPrimary.label}</a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="plane plane-1"></div>
+      <div class="plane plane-2"></div>
+      <div class="plane plane-3"></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="promo">
+    <div>
+      <span class="tag">{home.promo.tag}</span>
+      <h2>{home.promo.heading}</h2>
+      <p>{home.promo.body}</p>
+      <a class="btn btn-primary" href={withBase(home.promo.cta.href)}>{home.promo.cta.label}</a>
+    </div>
+    <div class="promo-visual" aria-hidden="true"></div>
+  </div>
+</div>
+
+<Fragment slot="footer">{home.footer.text}</Fragment>
+</BaseLayout>

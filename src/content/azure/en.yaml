@@ -1,0 +1,59 @@
+meta:
+  title: Azure Waste Scan — run the scan in your own browser
+  description: Open your Azure usage file, analyze it, and generate a report — entirely in your browser. No account, no upload, no server.
+hero:
+  eyebrow: No account. No upload.
+  headlinePre: "See your Azure waste. Share "
+  headlineEm: nothing
+  headlinePost: " to do it."
+  lede: One usage file, two minutes, zero data leaving your screen. The scan runs entirely in your own browser.
+  ctaPrimary:
+    label: Start the analysis
+    href: "#scan"
+  ctaGhost:
+    label: How to export your usage
+    href: "#export"
+steps:
+  heading: Three steps, two minutes
+  items:
+    - Get your monthly usage file from Microsoft.
+    - Open it here — the scan runs locally, in your browser.
+    - "Read the report: what stands out, and what it costs you to leave it be."
+why:
+  heading: Why this is different
+  items:
+    - strong: Nothing leaves your browser.
+      text: The analysis runs via WebAssembly on your own screen. This page has no server to send anything to — it's literally in the security policy (connect-src 'none'), checkable by anyone who reads the source. Feel free to turn off your wifi once the page has loaded.
+    - strong: We look inside the workload.
+      text: Not just at the bill itself, but at the patterns behind it — the places where money leaks without anyone noticing.
+    - strong: An honest outcome.
+      text: The patterns in the report are complete, and yours. And sometimes the conclusion is that your bill is clean. We'll just say so.
+  trustLine: No account, no cookies, no tracking. What you get here is an honest picture — not a sales pitch dressed up as a free tool.
+export:
+  heading: How to export your usage
+  intro: "This takes about two minutes. You don't need access to production environments, and you're not sharing anything Microsoft doesn't already send you every month: your billing usage overview."
+  direct:
+    heading: Directly from Microsoft (pay-as-you-go / Microsoft Customer Agreement)
+    steps:
+      - Log in at portal.azure.com.
+      - "Go to Cost Management + Billing → Invoices."
+      - Download the monthly summary as CSV from the most recent invoice.
+    noteMonthly: Choose the monthly summary, not the hourly one. The hourly one is bigger, more detailed than needed, and adds nothing the analysis can use.
+    multiMonth: Multiple months? Download them all — you'll be able to open several CSV files at once and have them analyzed together.
+    noteCSP: Paying through a reseller (CSP) or an Enterprise Agreement? The export works a bit differently. We'll add those paths soon — for now the scan is built around direct Microsoft billing as described above.
+app:
+  heading: The scan
+  intro: Open your usage file(s) and hit analyze. Everything happens here, on your screen — nothing is sent anywhere.
+  dropzone:
+    title: Choose your CSV file(s)
+    suffix: or drag them here
+    hint: One or more Azure usage files — .csv
+    ariaLabel: Choose or drag your CSV files
+  analyzeLabel: Analyze
+  saveLabel: Save report
+  noscript: The scan runs on JavaScript in your own browser (still nothing is sent anywhere). Turn on JavaScript to analyze your file.
+footer:
+  text: First Line Software — the Azure Waste Scan runs entirely in your browser. No tracking, no cookies, no external requests.
+  backLink:
+    label: Back to home
+    href: "/"

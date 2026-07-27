@@ -1,0 +1,5 @@
+# Term -> approved NL translation, for the future automated EN->NL translation pass.
+# Empty for now; the current nl.yaml content was translated by hand. Populate this
+# as terms recur across pages so translations stay consistent (product names,
+# recurring phrases like "usage file" / "verbruiksbestand", etc.).
+terms: []

@@ -1,0 +1,21 @@
+meta:
+  title: First Line Software — practical tools for your cloud bill
+  description: First Line Software builds practical tools for your Azure environment. Start with the Azure Waste Scan — find waste without sharing anything.
+hero:
+  eyebrow: First Line Software
+  headlinePre: "Practical tools for your "
+  headlineEm: cloud bill
+  headlinePost: "."
+  lede: We build small, honest tools you can use right away — no account, no handing over your data. The first one is ready below.
+  ctaPrimary:
+    label: Go to the Azure Waste Scan
+    href: /azure/
+promo:
+  tag: Available now
+  heading: Azure Waste Scan
+  body: Open your monthly Azure usage file and see within two minutes where money is leaking. The analysis runs entirely in your own browser — no account, no upload, no server. This page simply cannot see your bill.
+  cta:
+    label: Start the scan
+    href: /azure/
+footer:
+  text: First Line Software — no tracking, no cookies, no external requests.

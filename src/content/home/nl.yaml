@@ -1,0 +1,21 @@
+meta:
+  title: First Line Software — praktische tools voor je cloudrekening
+  description: "First Line Software bouwt praktische tools voor je Azure-omgeving. Begin met de Azure Waste Scan: vind verspilling zonder iets te delen."
+hero:
+  eyebrow: First Line Software
+  headlinePre: "Praktische tools voor je "
+  headlineEm: cloudrekening
+  headlinePost: "."
+  lede: We bouwen kleine, eerlijke tools die je meteen kunt gebruiken — zonder account, zonder je data uit handen te geven. De eerste staat hieronder klaar.
+  ctaPrimary:
+    label: Naar de Azure Waste Scan
+    href: /azure/
+promo:
+  tag: Nu beschikbaar
+  heading: Azure Waste Scan
+  body: Open je maandelijkse Azure-verbruiksbestand en zie binnen twee minuten waar geld weglekt. De analyse draait volledig in je eigen browser — geen account, geen upload, geen server. Deze pagina kan je factuur domweg niet zien.
+  cta:
+    label: Start de scan
+    href: /azure/
+footer:
+  text: First Line Software — geen tracking, geen cookies, geen externe requests.
