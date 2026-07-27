@@ -1,3 +1,5 @@
 nav:
   contactLabel: Contact ons
   contactHref: https://firstlinesoftware.com/contact-us/
+a11y:
+  newTab: opent in een nieuw tabblad

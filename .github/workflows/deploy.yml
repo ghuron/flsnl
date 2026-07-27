@@ -24,7 +24,7 @@ jobs:
         uses: withastro/action@v3
         env:
           # Project-page deploy at https://ghuron.github.io/flsnl/ — drop this
-          # once the custom domain (firstlinesoftware.nl, see _meta/ARCHITECTURE.md)
+          # once the custom domain (firstlinesoftware.nl, see src/docs/ARCHITECTURE.md)
           # is wired up and Pages serves from the root.
           SITE_BASE: /flsnl/
 

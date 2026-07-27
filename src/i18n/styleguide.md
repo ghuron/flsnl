@@ -1,7 +1,7 @@
 # NL translation styleguide
 
 For the future automated EN → NL translation step to follow. Pulled from
-`_meta/OFFERING.md` §2 and the existing live copy — not yet enforced by tooling.
+`../docs/OFFERING.md` §2 and the existing live copy — not yet enforced by tooling.
 
 - Register: informal "je" (never "u"), consistent with nl.firstlinesoftware.com.
 - Never brand this as cost-cutting; frame is optimize-to-fund-AI.

@@ -31,6 +31,9 @@ why:
     - strong: The second kind gets a suggestion, not a sale.
       text: If the scan turns up enough architectural waste, the report says so, and mentions that a human-led, AI-assisted audit is one way to dig into it further. Nothing happens after that unless you make it happen.
   trustLine: No account, no cookies, no tracking, nothing uploaded — so this comes with nothing to owe. Fix it yourself, call us, or do neither. We won't know which, and it won't change what the report told you.
+connectivity:
+  online: Online
+  offline: Airplane mode
 export:
   heading: How to export your usage
   intro: "This takes about two minutes. You don't need access to production environments, and you're not sharing anything Microsoft doesn't already send you every month: your billing usage overview."

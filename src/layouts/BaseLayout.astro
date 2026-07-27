@@ -1,5 +1,9 @@
 ---
 import { withBase } from "../lib/url";
+// Processed by Vite: minified, content-hashed, base-path aware. The @font-face
+// URL inside resolves relative to the stylesheet, so the woff2 is emitted as a
+// hashed asset too — no third-party font request either way.
+import "../assets/css/site.css";
 
 interface Props {
   lang: string;
@@ -27,14 +31,18 @@ const csp = `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsa
 <link rel="apple-touch-icon" sizes="180x180" href={withBase("/assets/icons/apple-touch-icon.png")}>
 <link rel="manifest" href={withBase("/assets/icons/site.webmanifest")}>
 <meta name="theme-color" content="#0e0e2a">
-<link rel="stylesheet" href={withBase("/assets/css/site.css")}>
 </head>
 <body>
 
 <header class="topbar">
   <div class="bar">
     <a class="brand" href={withBase("/")}><img class="logo" src={withBase("/assets/img/logo-fls-white.png")} alt="First Line Software"></a>
-    <a class="contact-link" href={nav.contactHref}>{nav.contactLabel}</a>
+    <!-- Right-hand cluster: page-supplied status/actions sit on the same baseline as the
+         contact button, and a future nav menu drops into the same row. -->
+    <div class="bar-end">
+      <slot name="topbar-actions" />
+      <a class="contact-link" href={nav.contactHref}>{nav.contactLabel}</a>
+    </div>
   </div>
 </header>
 
@@ -46,8 +54,6 @@ const csp = `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsa
     <p class="copyright">Copyright © 2026 First Line Software B.V. (KVK 58362126)</p>
   </div>
 </footer>
-
-<slot name="scripts" />
 
 </body>
 </html>

@@ -31,6 +31,9 @@ why:
     - strong: Het tweede soort krijgt een suggestie, geen verkooppraatje.
       text: Als de scan genoeg architecturale verspilling vindt, staat dat gewoon in het rapport, met de opmerking dat een human-led, AI-assisted audit een manier is om dat verder uit te zoeken. Daarna gebeurt er niets, tenzij jij dat zelf in gang zet.
   trustLine: Geen account, geen cookies, geen tracking, niets geüpload — dus je bent nergens iets aan verplicht. Los het zelf op, bel ons, of doe geen van beide. Wij weten niet wat je kiest, en het verandert niets aan wat het rapport je vertelde.
+connectivity:
+  online: Online
+  offline: Vliegtuigmodus
 export:
   heading: Zo exporteer je je verbruik
   intro: "Dit duurt ongeveer twee minuten. Je hebt geen toegang tot productieomgevingen nodig en je deelt niets dat Microsoft je niet toch al elke maand stuurt: het verbruiksoverzicht van je facturatie."

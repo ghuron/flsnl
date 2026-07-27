@@ -1,12 +1,43 @@
 ---
 import { getEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProseText from "../../components/ProseText.astro";
 import { withBase } from "../../lib/url";
 
-const nav = (await getEntry("common", "nl"))!.data.nav;
+const common = (await getEntry("common", "nl"))!.data;
 const azure = (await getEntry("azure", "nl"))!.data;
 ---
-<BaseLayout lang="nl" title={azure.meta.title} description={azure.meta.description} scriptSrc="'self'" nav={nav}>
+<BaseLayout lang="nl" title={azure.meta.title} description={azure.meta.description} scriptSrc="'self'" nav={common.nav}>
+
+<!-- 0. Connectivity indicator — sits in the sticky topbar next to the contact button, so it
+     stays visible while the reader scrolls through the export steps and into the scan. Labels
+     are passed as data attributes rather than define:vars, which would force an inline script
+     and break the CSP. Rendered without data-state: the stylesheet keeps it hidden until the
+     script sets one. -->
+<Fragment slot="topbar-actions">
+  <span
+    class="connectivity"
+    role="status"
+    data-connectivity
+    data-label-online={azure.connectivity.online}
+    data-label-offline={azure.connectivity.offline}
+  >
+    <!-- Both icons ship in the markup and CSS reveals one, so no client code builds DOM and
+         nothing is fetched. Outline globe = connected, stated neutrally; solid airplane =
+         the reader has cut the network and the scan carries on regardless. -->
+    <svg class="ci ci-online" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"
+      fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <circle cx="12" cy="12" r="9" />
+      <ellipse cx="12" cy="12" rx="4" ry="9" />
+      <path d="M3 12h18" />
+    </svg>
+    <svg class="ci ci-offline" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"
+      fill="currentColor">
+      <path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+    </svg>
+    <span class="connectivity-label" data-connectivity-text></span>
+  </span>
+</Fragment>
 
 <!-- 1. Very short brief + two CTAs -->
 <section class="hero">
@@ -60,7 +91,9 @@ const azure = (await getEntry("azure", "nl"))!.data;
 
     <h3>{azure.export.direct.heading}</h3>
     <ol>
-      {azure.export.direct.steps.map((step) => <li>{step}</li>)}
+      {azure.export.direct.steps.map((step) => (
+        <li><ProseText text={step} newTabLabel={common.a11y.newTab} /></li>
+      ))}
     </ol>
     <div class="note">{azure.export.direct.noteMonthly}</div>
     <p>{azure.export.direct.multiMonth}</p>
@@ -104,7 +137,64 @@ const azure = (await getEntry("azure", "nl"))!.data;
 <Fragment slot="footer">
   {azure.footer.text} <a href={withBase(azure.footer.backLink.href)}>{azure.footer.backLink.label}</a>
 </Fragment>
-<Fragment slot="scripts">
-  <script src={withBase("/assets/js/boot.js")} defer></script>
-</Fragment>
+<script>
+  // Vite code-splits the dynamic import below into its own hashed chunk and resolves the URL
+  // against the configured base, so this works from a domain root or a project subpath
+  // (e.g. /flsnl/) with no manual URL handling.
+  import { initConnectivity } from "../../scripts/connectivity.js";
+
+  initConnectivity(document.querySelector("[data-connectivity]"));
+
+  const mount = document.querySelector("[data-scan-app]");
+
+  if (mount) {
+    let pending = false;
+    let loaded = false;
+    let dead = false;
+
+    const load = () => {
+      if (pending || loaded || dead) return;
+      // Do not attempt a fetch that is guaranteed to fail. The browser caches a failed module
+      // load in its module map, so a rejected import() of this specifier stays rejected for
+      // the life of the document — one doomed attempt while offline would permanently poison
+      // the retry below. Skipping instead leaves the first real attempt for the `online` event.
+      if (!navigator.onLine) return;
+      pending = true;
+      import("../../scripts/scan.js")
+        .then((mod) => {
+          pending = false;
+          loaded = true;
+          mod.init(mount);
+        })
+        .catch((err) => {
+          // An attempt was made and failed while online. Per the note above, the module map
+          // has cached that rejection, so retrying this specifier can never succeed — stop
+          // trying and tell the reader to reload.
+          pending = false;
+          dead = true;
+          const status = mount.querySelector("[data-status]");
+          if (status) {
+            status.textContent = "De scanner kon niet laden. Ververs de pagina en probeer opnieuw.";
+            status.classList.add("error");
+          }
+          // Surface the real cause in the console for debugging.
+          console.error("scan.js failed to load", err);
+        });
+    };
+
+    // Fetch eagerly, but off the critical path. This deliberately replaces the earlier
+    // load-on-scroll: the connectivity strip invites the reader to switch on airplane mode as
+    // soon as it says "ready", and a scanner that only downloads once #scan nears the viewport
+    // would then fail to arrive. Idle time costs ~7 KB gzip after first paint and buys a page
+    // that genuinely works end-to-end with the network off.
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(load, { timeout: 2000 });
+    } else {
+      setTimeout(load, 200);
+    }
+
+    // Recover without a reload if the page was opened offline.
+    window.addEventListener("online", load);
+  }
+</script>
 </BaseLayout>

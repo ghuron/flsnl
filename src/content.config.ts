@@ -7,6 +7,7 @@ const common = defineCollection({
   loader: glob({ pattern: "*.yaml", base: "./src/content/common" }),
   schema: z.object({
     nav: z.object({ contactLabel: z.string(), contactHref: z.string() }),
+    a11y: z.object({ newTab: z.string() }),
   }),
 });
 
@@ -53,6 +54,10 @@ const azure = defineCollection({
       heading: z.string(),
       items: z.array(z.object({ strong: z.string(), text: z.string() })).length(4),
       trustLine: z.string(),
+    }),
+    connectivity: z.object({
+      online: z.string(),
+      offline: z.string(),
     }),
     export: z.object({
       heading: z.string(),

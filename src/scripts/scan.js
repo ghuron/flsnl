@@ -129,6 +129,28 @@ function monthLabel(key) {
   var p = key.split("-");
   return p.length === 2 ? MONTH_NL[parseInt(p[1], 10)] + " " + p[0] : key;
 }
+// Which months a single parsed file actually covers, oldest first. The date-column fallback
+// mirrors buildModel exactly, so what the file list promises and what the report totals can
+// never disagree.
+function datasetMonths(ds) {
+  var dateCol = ds.cols.date !== -1 ? ds.cols.date : ds.cols.period;
+  if (dateCol === -1) return [];
+  var seen = Object.create(null);
+  for (var r = 0; r < ds.rows.length; r++) {
+    var mk = monthKeyOf(ds.rows[r][dateCol]);
+    if (mk) seen[mk] = true;
+  }
+  return Object.keys(seen).sort();
+}
+
+// "mei 2026", "apr 2026 + mei 2026", or a range once it stops being worth spelling out.
+function monthsSummary(keys) {
+  if (!keys.length) return "";
+  if (keys.length === 1) return monthLabel(keys[0]);
+  if (keys.length === 2) return monthLabel(keys[0]) + " + " + monthLabel(keys[1]);
+  return monthLabel(keys[0]) + " – " + monthLabel(keys[keys.length - 1]) + " · " + keys.length + " maanden";
+}
+
 function norm2(s) { return String(s || "").toLowerCase().replace(/[\s_-]/g, ""); }
 
 /* ------------------------------------------------------------------- model  */
@@ -496,7 +518,15 @@ export function init(mount) {
   var statusEl = mount.querySelector("[data-status]");
   var resultsEl = mount.querySelector("[data-results]");
 
+  // One entry per opened file: { id, file, name, size, state, months, dataset, error }.
+  // state is "reading" | "ready" | "error". Files are parsed as soon as they are opened
+  // rather than at analyze time, so the list can show the months each one covers — and the
+  // parsed rows are kept, so Analyze reuses them instead of reading everything a second
+  // time. Peak memory is unchanged: buildModel already held every dataset at once.
   var files = [];
+  var seq = 0;
+  var queue = [];
+  var draining = false;
   var report = null; // { html, name }
 
   function setStatus(msg, isError) {
@@ -504,14 +534,36 @@ export function init(mount) {
     statusEl.classList.toggle("error", !!isError);
   }
 
+  function readyFiles() {
+    return files.filter(function (f) { return f.state === "ready" && f.dataset; });
+  }
+
+  function monthsText(f) {
+    if (f.state === "reading") return "bezig met lezen…";
+    if (f.state === "error") return f.error;
+    if (!f.months.length) return "geen maand herkend";
+    return monthsSummary(f.months);
+  }
+
+  // A file can parse fine and still have no recognisable date column, which is neither a
+  // success worth highlighting nor a read error — it gets its own muted styling.
+  function monthsState(f) {
+    return f.state === "ready" && !f.months.length ? "unknown" : f.state;
+  }
+
   function refreshList() {
     if (!files.length) { listEl.hidden = true; listEl.innerHTML = ""; analyzeBtn.disabled = true; return; }
     listEl.hidden = false;
-    listEl.innerHTML = files.map(function (f, i) {
-      return "<li><span>" + esc(f.name) + "</span><span class=\"size\">" + fmtBytes(f.size) +
-             " <button type=\"button\" data-remove=\"" + i + "\" aria-label=\"Verwijder\">&times;</button></span></li>";
+    listEl.innerHTML = files.map(function (f) {
+      return "<li><span class=\"fmeta\">" +
+               "<span class=\"fname\">" + esc(f.name) + "</span>" +
+               "<span class=\"fmonths\" data-state=\"" + monthsState(f) + "\">" + esc(monthsText(f)) + "</span>" +
+             "</span>" +
+             "<span class=\"size\">" + fmtBytes(f.size) +
+             " <button type=\"button\" data-remove=\"" + f.id + "\" aria-label=\"Verwijder\">&times;</button></span></li>";
     }).join("");
-    analyzeBtn.disabled = false;
+    // Nothing to analyze until at least one file is parsed, and never mid-read.
+    analyzeBtn.disabled = draining || !readyFiles().length;
   }
 
   function addFiles(fileList) {
@@ -520,11 +572,53 @@ export function init(mount) {
       if (!/\.csv$/i.test(f.name) && f.type !== "text/csv") return;
       // Skip exact duplicates (same name + size).
       if (files.some(function (x) { return x.name === f.name && x.size === f.size; })) return;
-      files.push(f); added++;
+      var entry = { id: ++seq, file: f, name: f.name, size: f.size, state: "reading", months: [], dataset: null, error: "" };
+      files.push(entry);
+      queue.push(entry);
+      added++;
     });
     refreshList();
-    if (added) setStatus(files.length + " bestand(en) klaar om te analyseren.");
-    else setStatus("Kies .csv-bestanden.", true);
+    if (!added) { setStatus("Kies .csv-bestanden.", true); return; }
+    drain();
+  }
+
+  // Parse queued files one at a time — these run up to ~14 MB each, so overlapping them
+  // would spike memory for no gain.
+  async function drain() {
+    if (draining) return;
+    draining = true;
+    refreshList();
+
+    while (queue.length) {
+      var entry = queue.shift();
+      if (files.indexOf(entry) === -1) continue; // removed while queued
+      setStatus("‘" + entry.name + "’ lezen…");
+      try {
+        await nextFrame();
+        var text = await readText(entry.file);
+        var rows = parseCSV(text);
+        text = null; // release the raw string before parsing the next file
+        if (files.indexOf(entry) === -1) continue; // removed while it was being read
+        if (rows.length < 2) {
+          entry.state = "error";
+          entry.error = "geen leesbare rijen";
+        } else {
+          entry.dataset = { cols: detectColumns(rows[0]), rows: rows.slice(1) };
+          entry.months = datasetMonths(entry.dataset);
+          entry.state = "ready";
+        }
+      } catch (err) {
+        entry.state = "error";
+        entry.error = "kon niet gelezen worden";
+        if (window.console) console.error("read failed", entry.name, err);
+      }
+      refreshList();
+    }
+
+    draining = false;
+    refreshList();
+    var ready = readyFiles().length;
+    setStatus(ready ? ready + " bestand(en) klaar om te analyseren." : "Geen bruikbare bestanden.", !ready);
   }
 
   // --- file input / dropzone wiring ---
@@ -547,9 +641,15 @@ export function init(mount) {
   listEl.addEventListener("click", function (e) {
     var btn = e.target.closest("[data-remove]");
     if (!btn) return;
-    files.splice(parseInt(btn.getAttribute("data-remove"), 10), 1);
+    // Match on a stable id, not a list index: entries can be parsed out from under the
+    // rendered order while a read is still in flight.
+    var id = parseInt(btn.getAttribute("data-remove"), 10);
+    for (var i = 0; i < files.length; i++) {
+      if (files[i].id === id) { files.splice(i, 1); break; }
+    }
     refreshList();
-    setStatus(files.length ? files.length + " bestand(en) klaar." : "");
+    var ready = readyFiles().length;
+    setStatus(files.length ? ready + " bestand(en) klaar." : "");
   });
 
   // --- analyze ---
@@ -568,21 +668,15 @@ export function init(mount) {
   function nextFrame() { return new Promise(function (r) { setTimeout(r, 0); }); }
 
   analyzeBtn.addEventListener("click", async function () {
-    if (!files.length) return;
+    var ready = readyFiles();
+    if (!ready.length) return;
     analyzeBtn.disabled = true;
     saveBtn.hidden = true;
     report = null;
 
     try {
-      var datasets = [];
-      for (var i = 0; i < files.length; i++) {
-        setStatus("Bestand " + (i + 1) + " van " + files.length + " lezen…");
-        await nextFrame();
-        var text = await readText(files[i]);
-        var rows = parseCSV(text);
-        text = null; // release the raw string before parsing the next file
-        if (rows.length >= 2) datasets.push({ cols: detectColumns(rows[0]), rows: rows.slice(1) });
-      }
+      // Already parsed when the files were opened — nothing is read twice.
+      var datasets = ready.map(function (f) { return f.dataset; });
 
       if (!datasets.length) { setStatus("Kon geen bruikbare rijen lezen. Is dit een Azure-verbruiks-CSV?", true); analyzeBtn.disabled = false; return; }
       if (!datasets.some(function (d) { return d.cols.cost !== -1; })) {
@@ -597,10 +691,12 @@ export function init(mount) {
 
       renderResults(resultsEl, model);
       var stampName = "azure-waste-scan-rapport-" + new Date().toISOString().slice(0, 10) + ".html";
-      report = { html: buildReportHTML(model, files.map(function (f) { return f.name; })), name: stampName };
+      // `ready`, not `files` — a file that failed to parse must not be named in the report
+      // or counted in the summary line.
+      report = { html: buildReportHTML(model, ready.map(function (f) { return f.name; })), name: stampName };
       saveBtn.hidden = false;
       analyzeBtn.disabled = false;
-      setStatus("Analyse klaar — " + model.rowCount.toLocaleString("nl-NL") + " regels uit " + files.length + " bestand(en) verwerkt.");
+      setStatus("Analyse klaar — " + model.rowCount.toLocaleString("nl-NL") + " regels uit " + ready.length + " bestand(en) verwerkt.");
     } catch (err) {
       if (window.console) console.error(err);
       setStatus("Er ging iets mis bij het lezen van de bestanden.", true);

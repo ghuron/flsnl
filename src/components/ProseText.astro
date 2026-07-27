@@ -1,0 +1,26 @@
+---
+// Renders a content string, turning any known technical term (see src/lib/autolink.ts) into an
+// external link. Opens in a new tab so a reader following the export steps does not lose the
+// page they are working through; rel="noreferrer" also keeps us from leaking a referrer, which
+// is consistent with the no-tracking promise in the footer copy.
+import { autolink } from "../lib/autolink";
+
+interface Props {
+  text: string;
+  /** Localized "opens in a new tab" hint, announced to screen readers (WCAG 3.2.5). */
+  newTabLabel: string;
+}
+
+const { text, newTabLabel } = Astro.props;
+---
+{
+  autolink(text).map((segment) =>
+    segment.href ? (
+      <a href={segment.href} target="_blank" rel="noopener noreferrer"
+        >{segment.text}<span class="sr-only"> ({newTabLabel})</span></a
+      >
+    ) : (
+      segment.text
+    ),
+  )
+}

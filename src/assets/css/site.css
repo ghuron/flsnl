@@ -30,6 +30,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 a { color: var(--blue); }
+/* Available to assistive tech, invisible on screen — used for the "opens in a new tab" hint. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 .wrap { max-width: 1140px; margin: 0 auto; padding: 0 1.75rem; }
 .prose { max-width: 700px; }
 
@@ -79,6 +91,7 @@ header.topbar .bar {
   justify-content: space-between;
   padding: 0.6rem 1.75rem;
 }
+header.topbar .bar-end { display: flex; align-items: center; gap: 1.1rem; }
 header.topbar a.brand { display: inline-flex; }
 header.topbar img.logo { height: 58px; display: block; }
 header.topbar .contact-link {
@@ -96,6 +109,47 @@ header.topbar .contact-link {
   transition: border-color .15s ease, background-color .15s ease;
 }
 header.topbar .contact-link:hover { border-color: #fff; background: rgba(255,255,255,.08); }
+
+/* ---- connectivity indicator (azure page) ----
+   Lives in the topbar's right-hand cluster, on the same baseline as the contact button.
+   Hidden until the script assigns a data-state, so a visitor without JS never sees a status
+   nothing is keeping current.
+
+   Deliberately not a red/green health light. Nothing here is ever broken: the page transmits
+   nothing in either state (connect-src 'none'), so online makes no claim at all and is drawn
+   neutrally, while offline — the state the airplane-mode ritual is steering toward — gets the
+   accent as something the reader achieved. Shape carries the state as well as colour. */
+.connectivity { display: none; }
+.connectivity[data-state] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+.connectivity .ci { display: none; flex: none; }
+.connectivity[data-state="online"] .ci-online,
+.connectivity[data-state="offline"] .ci-offline { display: block; }
+
+.connectivity[data-state="online"] { color: #94a3b8; font-weight: 600; }
+.connectivity[data-state="offline"] { color: #8ab4ff; font-weight: 700; }
+
+/* Narrow screens: the logo and contact button need the room, so keep the dot and drop the
+   word to screen readers only rather than removing it from the accessibility tree. */
+@media (max-width: 600px) {
+  .connectivity[data-state] .connectivity-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
 
 /* ---- hero ---- */
 section.hero {
@@ -372,7 +426,15 @@ section.app .intro { color: var(--ink-dim); font-size: 1.05rem; max-width: 700px
   background: #fff; border: 1px solid var(--line); border-radius: 8px;
   padding: 0.6rem 0.9rem; font-size: 0.92rem;
 }
-.filelist .size { color: var(--ink-dim); font-size: 0.85rem; }
+.filelist .size { color: var(--ink-dim); font-size: 0.85rem; white-space: nowrap; }
+.filelist .fmeta { display: grid; gap: 0.15rem; min-width: 0; }
+.filelist .fname { overflow-wrap: anywhere; }
+/* Which months the opened file actually covers. Colour is a secondary cue only — the text
+   always says which of the three cases it is. */
+.filelist .fmonths { font-size: 0.8rem; color: var(--blue); font-weight: 700; }
+.filelist .fmonths[data-state="reading"] { color: var(--ink-dim); font-weight: 400; font-style: italic; }
+.filelist .fmonths[data-state="error"] { color: #c0392b; font-weight: 400; }
+.filelist .fmonths[data-state="unknown"] { color: var(--ink-dim); font-weight: 400; }
 .filelist button {
   border: none; background: none; color: var(--ink-dim); cursor: pointer;
   font-size: 1.1rem; line-height: 1; padding: 0 0.3rem;

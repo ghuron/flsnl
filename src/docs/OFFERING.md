@@ -1,6 +1,6 @@
 # Azure Waste Scan / FinOps-for-AI — Complete Offering Brief (Claude Code handoff)
 
-Drop this file into the website repo root (e.g. as OFFERING.md, referenced from CLAUDE.md). It is the single source of truth for everything decided about the offering. Build tasks live in section 7; everything else is context that copy, UI text, and behavior must stay consistent with.
+Lives at `src/docs/OFFERING.md` in the website repo (never reached by the build — see ARCHITECTURE.md). It is the single source of truth for everything decided about the offering. Build tasks live in section 7; everything else is context that copy, UI text, and behavior must stay consistent with.
 
 ---
 
