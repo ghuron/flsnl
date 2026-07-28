@@ -20,6 +20,7 @@ Lives at `src/docs/OFFERING.md` in the website repo (never reached by the build 
 - Differentiator stack (all three together): (1) we look inside the workload — code, IaC, data access patterns, prompts; agents make it affordable; (2) outcome pricing with honest effort tiers, backed by a 300-engineer bench; (3) AI spend treated as a first-class cost domain with eval-backed evidence ("FinOps for AI" — nearly empty in NL).
 - No-sysadmin positioning is shown structurally, never preached: the scan hands out a mirror and questions, not manuals. (User decision: the "we don't sell system administration" speech is deleted from copy.)
 - Competitive frame: crowded shallow end (Azure Cost Management, FinOps tools, CSP resellers, free QuickScans). Jujitsu line for sales: "run the free QuickScans first — we start where they stop." Anchors: Xebia day rates €1,500–3,500 (T&M weakness), Freeday normalized pay-per-outcome in NL, Levi9 proves CEE delivery wins Dutch trust.
+- Named landscape (from the competitor-analysis doc, reviewed 2026-07-28): global FinOps SaaS (Flexera, Apptio, Sedai, Archera) — enterprise-grade, requires API integrations/agents/RBAC, rate-and-usage only, no re-engineering; Dutch consultancies/MSPs (InSpark, Valid, Alblas IT) — real engineering depth but friction-heavy: RBAC Reader access, discovery workshops, upfront commitment; licensing specialists (Geltec) — AHB/EA/NCE expertise, no architectural depth; Marketplace "free assessments" (e.g. Saxon Global's 3-day) — still open with meetings and tenant access. The shared weakness is the friction axis: every archetype needs access or workshops before producing a single number, while we need only a file that never leaves the client's browser. State this as independence — "we don't resell Azure; we earn no margin on your consumption" — never as an attack on the incumbent (see §4 politics and §13).
 - Do not lead with certifications/badges/headcount alone. Never promise MACC eligibility or "pay from committed spend" (listing-only; services aren't MACC-eligible).
 
 ## 3. The service ladder (canonical, 8 steps)
@@ -47,6 +48,8 @@ Thread: money and access rise together — file on their laptop → a summary th
 
 **Politics (mid-market):** the sponsor is usually the person whose decisions created the waste — the narrative must make him the hero who found the AI budget. Incumbent MSP/CSP will resist (findings grade their homework, savings cut their margin) — no-sysadmin stance doubles as the peace signal.
 
+**CSP economics behind that resistance (sales background only, never public copy):** the CSP owns the billing relationship and sets retail pricing; margin is a percentage of consumption, plus Partner Earned Credit that requires standing admin-on-behalf-of access; NCE pushes clients into 1/3-year commitments (monthly flexibility carries a ~20% premium). This is why optimization never came from the incumbent — useful to explain in a private conversation when the client asks "why didn't our MSP tell us this." The aggressive "fox in the henhouse" framing (recommended by the competitor-analysis doc) is rejected: it burns the MSP-as-channel play and the Microsoft co-sell motion. Independence framing only.
+
 **Contact ops:** first reply from Andrei personally, no CC. Five elements: mirror their headline number; name their 2–3 signals; the honest line ("commercially tight; what's left is architectural"); one ask; booking link. Engineer is CC'd only after the client's own reply puts findings on the thread. Engineer prep = auto-generated pre-call sheet from the share-version JSON (price band, staffing, homework flags, agenda questions); target ≤10 min prep per call.
 
 ## 5. Free scan — product spec
@@ -55,6 +58,7 @@ Thread: money and access rise together — file on their laptop → a summary th
 - **The mirror:** their spend sorted into piles nobody internally has ever seen — top 10 items, always-on vs sometimes-on, prod-named vs test-named, AI token spend by model. No advice; can't be wrong; can't go stale.
 - **The questions:** per finding — what we saw, yearly € range, one question ("six machines named *test* ran every night for three months, ~€9k/year — does anyone need them at 3 a.m.?"). Name the lever concept ("Azure sells reservations for exactly this pattern"), never the portal buttons; link Microsoft docs and let Microsoft maintain them.
 - **The honest ending:** "patterns, not verdicts — verdicts need production access, longer history, your engineers in the room; that's the study, roughly €X for your size." Clean-bill sentence when true. This paragraph adapts to the routing quadrant (hygiene × engineering surface).
+- **Effort×impact labeling:** every finding carries an effort/impact tag. Low-effort/high-impact (reservations, AHB) and low-effort/low-impact (cleanup) are explicitly do-it-yourself; high-effort/high-impact (architectural) is the study's territory. The matrix makes the division of labor visible instead of argued. Meter/service names are translated to plain language for the non-technical reader; where it lands naturally, express a finding in business equivalents ("this idle pool costs an FTE per quarter").
 
 ### 5.2 Two artifacts + aliasing
 - **Full report:** real names; never leaves the machine; for internal client use.
@@ -84,11 +88,11 @@ Self-contained HTML with human report on top and embedded machine-readable JSON 
 
 ## 6. Detector catalog (deterministic; DuckDB-WASM in browser; seeded by the internal mini-trial SQL)
 
-Ground rules: all numbers from deterministic queries; telemetry-blind findings are labeled signals, never verdicts; conservative math with stated assumptions; reconcile totals before any detector; skip cleanly when meters don't occur ("no GPU or OpenAI meters found").
+Ground rules: all numbers from deterministic queries; telemetry-blind findings are labeled signals, never verdicts; conservative math with stated assumptions; reconcile totals before any detector; skip cleanly when meters don't occur ("no GPU or OpenAI meters found"); state which cost column the math used; segregate ChargeType=Purchase rows (upfront RI/SP buys) from usage before any total — an actual-cost export books the whole reservation on purchase day while an amortized export spreads it over the term, and mixing the two poisons every trend and coverage number.
 
 - D1 Commitment coverage (commercial): OnDemand compute with steady ≥~700 h/month across the window → 30% (1-yr) / 55% (3-yr) assumed discount; list candidates.
 - D2 24/7 non-production (engineering-lite): name/RG/tag regex (dev|tst|test|acc|stag|qa|sbx|sandbox|demo|poc) with full-month hours → ~68% reduction (12x5 schedule assumption).
-- D3 Hybrid Benefit (commercial): Windows/SQL license meters → savings if licenses owned; low confidence until confirmed.
+- D3 Hybrid Benefit (commercial): Windows/SQL license meters → savings if licenses owned; low confidence until confirmed. Detection mechanics: license status lives in AdditionalInfo (legacy) / x_SkuDetails (FOCUS) JSON, or shows as explicit software-surcharge meters; full-retail Windows/SQL compute hours without AHB markers = leakage candidate.
 - D4 Observability (engineering): Log Analytics / App Insights ingestion+retention share of spend; per-GB rate.
 - D5 Storage tiering (engineering): hot-tier GB with near-zero transactions → cool/archive; GRS on non-prod.
 - D6 Orphans (engineering-lite): disks/IPs/LBs in RGs with zero compute all window; snapshots growing monotonically.
@@ -97,7 +101,7 @@ Ground rules: all numbers from deterministic queries; telemetry-blind findings a
 - D9 AI spend (the wedge): model mix, input:output ratio >15:1 flag, batch-meter absence, idle PTU, GPU on-demand 24/7 / no spot.
 - D10 Marketplace zombies (commercial): recurring Marketplace flat fees, aliased list.
 - D11 Drift & anomalies: MoM per service family; resources present in month 3 absent in month 1; refunds/credits.
-- Schema adapters: v1 MCA/pay-as-you-go monthly invoice CSV ("Azure usage and charges"); v2 adds EA and CSP/reseller file; FOCUS variant recognized. Expected columns documented in claude-code-prompt-azure-audit.md.
+- Schema adapters: v1 MCA/pay-as-you-go monthly invoice CSV ("Azure usage and charges"); v2 adds EA and CSP/reseller file; FOCUS variant recognized. Expected columns documented in claude-code-prompt-azure-audit.md. FOCUS↔legacy mapping for the adapter: ChargeCategory↔ChargeType, ServiceName↔MeterCategory, PricingCategory↔PricingModel, EffectiveCost↔CostInBillingCurrency (amortized view), ConsumedQuantity↔Quantity, x_SkuDetails↔AdditionalInfo (AHB status lives here), ResourceId↔ResourceId, Tags↔Tags. Verify the currently exported FOCUS version against Microsoft Learn before building — the competitor-analysis doc's version list (1.0/1.1/1.2-preview/1.4) is unverified.
 - Scoring for routing: hygiene score (1 − commercial findings share of spend) × engineering-surface score (weighted count of section-4 signals) → quadrant drives the report's closing paragraph and, later, lead triage.
 
 ## 7. Build plan (iterative) and MVP definition
@@ -152,6 +156,7 @@ Ground rules: all numbers from deterministic queries; telemetry-blind findings a
 - service-ladder-spec.md — internal spec v0.2 (this file effectively supersedes it as v0.3 content).
 - claude-code-prompt-azure-audit.md — detector spec + schema column expectations; mini-trial produced findings.md, detectors/*.sql, anonymized scorecard, reconciliation (in the mini-trial workspace — reuse as seed + fixtures).
 - azure-export-instructions.md — internal IT export instructions (basis for the public guide's direct/MCA path).
+- "Azure Optimization Competitor Analysis.md" — deep-research competitor scan, reviewed 2026-07-28. Incorporated into §2 (named landscape, friction axis), §4 (CSP economics), §5.1 (effort×impact labeling), §6 (Purchase-row segregation, FOCUS mapping, D3 mechanics). **Rejected on review — do not re-import:** its "upload the CSV" product framing (nothing is uploaded; in-browser analysis is the differentiator it undersells); the "fox in the henhouse" anti-MSP messaging (conflicts with §4/§13 channel stance and the co-sell motion); its market statistics (32% waste, €8.4B market, €2,800/mo average SME spend — SEO-farm sourced and internally inconsistent; the Flexera 29% in §2 remains the citable number); its inflated savings claims (65% for a 1-yr SP is the 3-yr headline rate; conservative D1 assumptions stand); and its no-IT-staff micro-SME persona as the paid-study target (<€10k/mo stays robot-only per §4 — the free scan serves them, the GTM doesn't chase them).
 
 ## 12. Open decisions (placeholders in copy marked [LIKE THIS])
 

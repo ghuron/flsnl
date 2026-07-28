@@ -127,9 +127,13 @@ function pickColumn(header, candidates) {
   return -1;
 }
 
+// Column aliases cover both the legacy Azure usage export and the FOCUS 1.x schema
+// Microsoft now offers alongside it (ChargeCategory/PricingCategory/EffectiveCost/
+// BilledCost etc.) — see src/docs/OFFERING.md §6 for the full mapping. Legacy names are
+// tried first since they're still the more common export today.
 function detectColumns(header) {
   return {
-    cost: pickColumn(header, ["costinbillingcurrency", "costusd", "cost", "pretaxcost", "extendedcost", "billingcost", "paygtotal", "pretaxcostusd", "amount"]),
+    cost: pickColumn(header, ["costinbillingcurrency", "costusd", "cost", "pretaxcost", "extendedcost", "billingcost", "paygtotal", "pretaxcostusd", "amount", "effectivecost", "billedcost"]),
     paygCost: pickColumn(header, ["paygcostinbillingcurrency", "paygcostinusd", "paygprice"]),
     currency: pickColumn(header, ["billingcurrency", "billingcurrencycode", "currency", "currencycode"]),
     category: pickColumn(header, ["metercategory", "consumedservice", "servicename", "servicefamily", "productname", "product", "metersubcategory"]),
@@ -138,7 +142,13 @@ function detectColumns(header) {
     subscription: pickColumn(header, ["subscriptionname", "subscriptionid", "subscriptionguid"]),
     date: pickColumn(header, ["date", "usagedate", "servicedate", "usagedatetime"]),
     period: pickColumn(header, ["billingperiodstartdate", "billingperiod", "billingperiodstart"]),
-    chargeType: pickColumn(header, ["chargetype"]),
+    chargeType: pickColumn(header, ["chargetype", "chargecategory"]),
+    // Not "pricingcategory" (the FOCUS name): FOCUS's PricingCategory enum uses different
+    // values ("Standard"/"Dynamic"/"Committed"/"Other", not "OnDemand"/"Reservation"/"Spot").
+    // The on-demand-coverage math below assumes the legacy vocabulary; matching the FOCUS
+    // column without also remapping its values would silently misclassify on-demand spend
+    // as committed rather than just skipping the signal — verify the values before wiring
+    // this up (see src/docs/OFFERING.md §6 FOCUS mapping note).
     pricingModel: pickColumn(header, ["pricingmodel"]),
     reservation: pickColumn(header, ["reservationname", "benefitname"]),
     tags: pickColumn(header, ["tags", "resourcetags"])
@@ -198,7 +208,7 @@ function norm2(s) { return String(s || "").toLowerCase().replace(/[\s_-]/g, "");
 /* ------------------------------------------------------------------- model  */
 
 function buildModel(datasets) {
-  var total = 0, rowCount = 0, negatives = 0, creditsTotal = 0, unusedCommitment = 0;
+  var total = 0, rowCount = 0, negatives = 0, creditsTotal = 0, unusedCommitment = 0, purchaseCost = 0;
   var onDemandCost = 0, commitmentCost = 0, coverageKnown = 0;
   var paygSum = 0, paygKnown = 0;
   var untaggedCost = 0, taggedKnownCost = 0;
@@ -227,13 +237,24 @@ function buildModel(datasets) {
     for (var r = 0; r < rows.length; r++) {
       var row = rows[r];
       var cost = parseNum(row[cols.cost]);
+      var charge = cols.chargeType !== -1 ? norm2(row[cols.chargeType]) : "";
+
+      // An upfront reservation/savings-plan purchase is a one-time commitment buy, not usage.
+      // Booked into totals it fakes a spend spike in whatever month/category/resource the
+      // purchase happened to land in — poisoning trend, riser and coverage signals alike.
+      // Tracked separately and kept out of every other aggregate instead.
+      if (charge === "purchase") {
+        rowCount++;
+        purchaseCost += cost;
+        continue;
+      }
+
       total += cost;
       rowCount++;
       if (cost < 0) negatives++;
 
       if (cols.currency !== -1 && row[cols.currency]) currencies.add(String(row[cols.currency]).trim().toUpperCase());
 
-      var charge = cols.chargeType !== -1 ? norm2(row[cols.chargeType]) : "";
       var isUnused = charge === "unusedreservation" || charge === "unusedsavingsplan";
       if (charge === "refund" || charge === "credit" || charge === "roundingadjustment") creditsTotal += cost;
       if (isUnused) unusedCommitment += cost;
@@ -339,6 +360,7 @@ function buildModel(datasets) {
     negatives: negatives,
     creditsTotal: creditsTotal,
     unusedCommitment: unusedCommitment,
+    purchaseCost: purchaseCost,
     categories: topN(byCategory, 12),
     categoryCount: byCategory.size,
     categoryMap: byCategory,
@@ -471,6 +493,10 @@ function buildSignals(m, money) {
   if (m.currencies.length > 1) {
     out.push({ severity: "med", title: "Meerdere valuta in één set",
       body: "De bestanden bevatten bedragen in " + m.currencies.join(", ") + ". Het totaal telt de ruwe bedragen op zonder om te rekenen — houd daar rekening mee." });
+  }
+  if (m.purchaseCost > 0) {
+    out.push({ severity: "info", title: "Reserveringsaankopen buiten het totaal gehouden",
+      body: money(m.purchaseCost) + " aan eenmalige aankopen van reserveringen of savings plans (chargeType ‘Purchase’) staat niet in de bedragen hierboven — dat is een eenmalige uitgave, geen verbruik, en zou de trend van één maand onterecht laten pieken." });
   }
 
   if (!out.length) {
