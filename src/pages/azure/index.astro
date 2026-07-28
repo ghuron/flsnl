@@ -48,7 +48,7 @@ const azure = (await getEntry("azure", "nl"))!.data;
       <p class="lede">{azure.hero.lede}</p>
       <div class="hero-ctas">
         <a class="btn btn-primary" href={withBase(azure.hero.ctaPrimary.href)}>{azure.hero.ctaPrimary.label}</a>
-        <a class="btn btn-ghost-dark" href={withBase(azure.hero.ctaGhost.href)}>{azure.hero.ctaGhost.label}</a>
+        <a class="btn btn-ghost-dark" href={withBase("#scan")} data-sample>{azure.app.sampleLabel}</a>
       </div>
     </div>
     <div class="hero-visual" aria-hidden="true">
@@ -122,7 +122,6 @@ const azure = (await getEntry("azure", "nl"))!.data;
     <ul class="filelist" data-filelist hidden></ul>
 
     <div class="app-actions">
-      <button class="btn btn-ghost" type="button" data-sample>{azure.app.sampleLabel}</button>
       <button class="btn btn-primary" type="button" data-analyze disabled>{azure.app.analyzeLabel}</button>
       <button class="btn btn-ghost" type="button" data-save hidden>{azure.app.saveLabel}</button>
       <button class="btn btn-ghost" type="button" data-save-csv hidden>{azure.app.saveCsvLabel}</button>
@@ -155,6 +154,12 @@ const azure = (await getEntry("azure", "nl"))!.data;
     let pending = false;
     let loaded = false;
     let dead = false;
+    let scanApi = null;
+    // Holds the tab window.open() already returned, if the hero sample link is clicked before
+    // scan.js has finished loading — filled in once ready instead of the click just landing as
+    // a dead anchor jump. Cleared once consumed. Not a boolean: the window handle itself has to
+    // survive until scan.js can navigate it to the finished PDF.
+    let pendingSample = null;
 
     const load = () => {
       if (pending || loaded || dead) return;
@@ -168,7 +173,12 @@ const azure = (await getEntry("azure", "nl"))!.data;
         .then((mod) => {
           pending = false;
           loaded = true;
-          mod.init(mount);
+          scanApi = mod.init(mount);
+          if (pendingSample) {
+            const win = pendingSample;
+            pendingSample = null;
+            scanApi.viewSample(win);
+          }
         })
         .catch((err) => {
           // An attempt was made and failed while online. Per the note above, the module map
@@ -199,6 +209,22 @@ const azure = (await getEntry("azure", "nl"))!.data;
 
     // Recover without a reload if the page was opened offline.
     window.addEventListener("online", load);
+
+    // Hero "Bekijk een voorbeeldrapport" link: opens the sample PDF in a new tab rather than
+    // downloading it. The tab has to open synchronously, right here in the click handler,
+    // before any await runs anywhere — a window.open() called later (once scan.js/jsPDF have
+    // loaded and the PDF is built) is no longer inside the original user gesture as far as
+    // popup blockers are concerned, and gets silently blocked. It's a plain #scan anchor too,
+    // so the browser's own scroll still happens on the current tab regardless of load state.
+    const heroSample = document.querySelector(".hero [data-sample]");
+    if (heroSample) {
+      heroSample.addEventListener("click", () => {
+        const win = window.open("", "_blank");
+        if (scanApi) { scanApi.viewSample(win); return; }
+        pendingSample = win;
+        load(); // in case idle time hasn't fired yet — load() itself is idempotent
+      });
+    }
   }
 </script>
 </BaseLayout>

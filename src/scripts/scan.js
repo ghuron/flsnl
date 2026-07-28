@@ -4,6 +4,7 @@
 "use strict";
 
 import { SAMPLE_CSV } from "./sampleData.js";
+import { makeMoney, buildSignals, periodText } from "./report-data.js";
 
 /* ---------------------------------------------------------------- utilities */
 
@@ -392,120 +393,6 @@ function buildModel(datasets) {
   };
 }
 
-/* --------------------------------------------------------------- formatting */
-
-function makeMoney(currency) {
-  var valid = /^[A-Z]{3}$/.test(currency);
-  var nf;
-  try {
-    nf = valid ? new Intl.NumberFormat("nl-NL", { style: "currency", currency: currency, maximumFractionDigits: 0 })
-               : new Intl.NumberFormat("nl-NL", { maximumFractionDigits: 0 });
-  } catch (e) {
-    nf = new Intl.NumberFormat("nl-NL", { maximumFractionDigits: 0 });
-  }
-  return function (n) {
-    var s = nf.format(n || 0);
-    return valid ? s : s + (currency ? " " + currency : "");
-  };
-}
-
-// Honest signals, phrased as questions/observations rather than verdicts. Each
-// is only emitted when the underlying columns are present in the data.
-function buildSignals(m, money) {
-  var out = [];
-
-  // 1. Unused reservations / savings plans — literally paid-for, unconsumed commitment.
-  if (m.unusedCommitment > 0) {
-    out.push({ severity: "high", title: "Ongebruikte reserveringen of savings plans",
-      body: "Er is " + money(m.unusedCommitment) + " aan gereserveerde capaciteit betaald die niet is verbruikt (chargeType ‘Unused…’). " +
-            "Dat is geld dat nu weglekt — controleer of de reservering nog past bij wat je draait." });
-  }
-
-  // 1b. Untagged spend — the number worth forwarding to management as-is.
-  if (m.hasTags && m.untaggedShare >= 0.3) {
-    out.push({ severity: "med", title: "Veel van je rekening heeft geen tags",
-      body: Math.round(m.untaggedShare * 100) + "% van je uitgaven (" + money(m.untaggedCost) + ") staat zonder tags. " +
-            "Zonder tags kun je kosten niet aan een team of project toewijzen — dat is meestal het eerste dat moet veranderen." });
-  }
-
-  // 2. Reservation/savings coverage — steady compute at full on-demand price.
-  if (m.hasCoverage && m.onDemandShare >= 0.85 && m.onDemandCost / (m.total || 1) >= 0.3) {
-    out.push({ severity: "med", title: "Vrijwel alles wordt on-demand betaald",
-      body: Math.round(m.onDemandShare * 100) + "% van je verbruik loopt tegen het on-demand-tarief (" + money(m.onDemandCost) + "). " +
-            "Voor wat maand na maand blijft draaien is een reservering of savings plan doorgaans 20–60% goedkoper — dat is de eerste plek om te kijken." });
-  }
-
-  // 3. Month-over-month trend across multiple periods.
-  if (m.hasMonths && m.months.length >= 2) {
-    var a = m.months[m.months.length - 2], b = m.months[m.months.length - 1];
-    if (a.cost > 0) {
-      var pct = (b.cost - a.cost) / a.cost;
-      if (Math.abs(pct) >= 0.1) {
-        out.push({ severity: pct > 0 ? "med" : "info",
-          title: "Je rekening " + (pct > 0 ? "stijgt" : "daalt") + " (" + (pct > 0 ? "+" : "") + Math.round(pct * 100) + "% laatste maand)",
-          body: b.label + " was " + money(b.cost) + " tegenover " + money(a.cost) + " in " + a.label + ". " +
-                (pct > 0 ? "Kijk welke categorie de stijging veroorzaakt — die staat hieronder." : "Mooi — maar controleer of er niets is uitgezet dat wél nodig was.") });
-      }
-    }
-    var movers = (m._catMovers || []).filter(function (x) { return x.delta > 0 && x.delta / (m.total || 1) >= 0.03; });
-    if (movers.length) {
-      var top = movers[0];
-      out.push({ severity: "info", title: "Grootste stijger: " + top.name,
-        body: top.name + " groeide van " + money(top.prev) + " naar " + money(top.last) + " (+" + money(top.delta) + "). Waarschijnlijk waar de stijging vandaan komt." });
-      var rest = movers.slice(1, 4);
-      if (rest.length) {
-        out.push({ severity: "info", title: "Andere stijgers",
-          body: rest.map(function (x) { return x.name + " (+" + money(x.delta) + ")"; }).join(", ") + "." });
-      }
-    }
-    if (m._newCategories && m._newCategories.length) {
-      var fresh = m._newCategories.slice(0, 3);
-      out.push({ severity: "info", title: "Nieuw deze maand",
-        body: fresh.map(function (x) { return x.name + " (" + money(x.cost) + ")"; }).join(", ") +
-              " stond er de maand ervoor nog niet bij." });
-    }
-  }
-
-  // 4. Concentration — where optimisation pays off most.
-  if (m.hasResources && m.concentrationTop5 >= 0.4 && m.resourceCount > 5) {
-    out.push({ severity: "info", title: "Je uitgaven zijn geconcentreerd",
-      body: "De vijf duurste resources zijn samen " + Math.round(m.concentrationTop5 * 100) +
-            "% van je totale rekening. Dat is waar een optimalisatie het meeste oplevert — begin daar." });
-  }
-
-  // 5. Category watchlist — classic places waste hides.
-  var watch = { "Bandwidth": "uitgaand dataverkeer (egress) is een klassieke plek waar kosten sluipen",
-                "Storage": "oude snapshots en losgekoppelde disks blijven vaak doorlopen",
-                "Load Balancer": "load balancers en ongebruikte publieke IP’s blijven doortikken, ook zonder verkeer",
-                "Virtual Machines": "onbenutte of te ruim bemeten VM’s vallen zelden vanzelf op" };
-  m.categories.forEach(function (c) {
-    if (watch[c.name] && m.total > 0 && c.cost / m.total >= 0.05) {
-      out.push({ severity: "info", title: c.name + " — waard om te bekijken",
-        body: c.name + " is " + money(c.cost) + " (" + Math.round(c.cost / m.total * 100) + "% van je rekening): " + watch[c.name] + "." });
-    }
-  });
-
-  // 6. Data-quality notes.
-  if (m.creditsTotal !== 0) {
-    out.push({ severity: "info", title: "Credits en correcties zijn meegerekend",
-      body: "Het bestand bevat " + money(m.creditsTotal) + " aan afrondingen, kortingen of terugboekingen (chargeType ‘Refund’/‘RoundingAdjustment’). Die zitten in het totaal." });
-  }
-  if (m.currencies.length > 1) {
-    out.push({ severity: "med", title: "Meerdere valuta in één set",
-      body: "De bestanden bevatten bedragen in " + m.currencies.join(", ") + ". Het totaal telt de ruwe bedragen op zonder om te rekenen — houd daar rekening mee." });
-  }
-  if (m.purchaseCost > 0) {
-    out.push({ severity: "info", title: "Reserveringsaankopen buiten het totaal gehouden",
-      body: money(m.purchaseCost) + " aan eenmalige aankopen van reserveringen of savings plans (chargeType ‘Purchase’) staat niet in de bedragen hierboven — dat is een eenmalige uitgave, geen verbruik, en zou de trend van één maand onterecht laten pieken." });
-  }
-
-  if (!out.length) {
-    out.push({ severity: "info", title: "Geen opvallende patronen in dit overzicht",
-      body: "Op factuurniveau springt er niets uit. Een geverifieerd oordeel vraagt meer dan een factuur: productietoegang, historie en je eigen engineers erbij — dat is de aparte, betaalde stap." });
-  }
-  return out;
-}
-
 /* ---------------------------------------------------------------- rendering */
 
 function tableHTML(title, rows, money) {
@@ -520,12 +407,6 @@ function tableHTML(title, rows, money) {
   return "<h3>" + esc(title) + "</h3><div class=\"table-scroll\"><table class=\"result-table\">" +
          "<thead><tr><th>Naam</th><th class=\"num\">Kosten</th><th></th></tr></thead>" +
          "<tbody>" + body + "</tbody></table></div>";
-}
-
-function periodText(m) {
-  if (!m.hasMonths || !m.months.length) return "—";
-  var f = m.months[0].label, l = m.months[m.months.length - 1].label;
-  return f === l ? f : f + " → " + l;
 }
 
 // A compact month-over-month bar table.
@@ -579,63 +460,6 @@ function renderResults(container, m, isSample) {
 
 function kpi(val, lbl) { return "<div class=\"kpi\"><div class=\"val\">" + val + "</div><div class=\"lbl\">" + lbl + "</div></div>"; }
 
-/* ------------------------------------------------------------ saved report  */
-
-function buildReportHTML(m, fileNames, isSample) {
-  var money = makeMoney(m.currency === "MIXED" ? "" : m.currency);
-  var signals = buildSignals(m, money);
-  function t(title, rows) {
-    if (!rows.length) return "";
-    return "<h2>" + esc(title) + "</h2><table><thead><tr><th>Naam</th><th class=num>Kosten</th></tr></thead><tbody>" +
-      rows.map(function (r) { return "<tr><td>" + esc(r.name) + "</td><td class=num>" + esc(money(r.cost)) + "</td></tr>"; }).join("") +
-      "</tbody></table>";
-  }
-  function monthsTable() {
-    if (!m.hasMonths || m.months.length < 2) return "";
-    return "<h2>Verloop per maand</h2><table><thead><tr><th>Maand</th><th class=num>Kosten</th></tr></thead><tbody>" +
-      m.months.map(function (r) { return "<tr><td>" + esc(r.label) + "</td><td class=num>" + esc(money(r.cost)) + "</td></tr>"; }).join("") +
-      "</tbody></table>";
-  }
-  var stamp = m.generatedAt.toLocaleString("nl-NL");
-  var titleSuffix = isSample ? " (voorbeeld)" : "";
-  var sampleBanner = isSample
-    ? "<div class=sample-flag>Dit is een voorbeeldrapport met verzonnen data — geen echte Azure-kosten.</div>"
-    : "";
-  return "<!doctype html><html lang=nl><head><meta charset=utf-8>" +
-    "<meta name=viewport content=\"width=device-width, initial-scale=1\">" +
-    "<title>Azure Waste Scan — rapport" + titleSuffix + "</title><style>" +
-    "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0e0e2a;line-height:1.6;max-width:820px;margin:2rem auto;padding:0 1.25rem}" +
-    "h1{font-size:1.7rem;margin:0 0 .3rem}h2{font-size:1.15rem;margin:2rem 0 .6rem;border-bottom:2px solid #d4d9df;padding-bottom:.3rem}" +
-    ".meta{color:#475569;font-size:.9rem;margin-bottom:1.5rem}" +
-    ".sample-flag{background:#fdf3da;color:#6b4c02;font-weight:700;border-left:3px solid #b7791f;border-radius:0 8px 8px 0;padding:.7rem 1rem;margin:0 0 1.25rem}" +
-    ".kpis{display:flex;flex-wrap:wrap;gap:1rem;margin:1.25rem 0}.k{border:1px solid #d4d9df;border-radius:10px;padding:.9rem 1.1rem;min-width:150px}" +
-    ".k .v{font-size:1.4rem;font-weight:800}.k .l{color:#475569;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}" +
-    "table{border-collapse:collapse;width:100%;font-size:.92rem}th,td{text-align:left;padding:.45rem .5rem;border-bottom:1px solid #d4d9df}td.num,th.num{text-align:right;white-space:nowrap}" +
-    "ul{padding-left:0;list-style:none}li{background:#f5f5f7;border-left:3px solid #6c43ff;border-radius:0 8px 8px 0;padding:.7rem .9rem;margin:.5rem 0}" +
-    "li b{display:block}footer{margin-top:2.5rem;color:#475569;font-size:.85rem;border-top:1px solid #d4d9df;padding-top:1rem}" +
-    "</style></head><body>" +
-    "<h1>Azure Waste Scan — rapport</h1>" +
-    sampleBanner +
-    "<div class=meta>Gegenereerd op " + esc(stamp) + " · Bron: " + esc(fileNames.join(", ")) + " · Periode: " + esc(periodText(m)) + "</div>" +
-    "<div class=kpis>" +
-      "<div class=k><div class=v>" + esc(money(m.total)) + "</div><div class=l>Totale uitgaven</div></div>" +
-      "<div class=k><div class=v>" + esc(String(m.categoryCount)) + "</div><div class=l>Categorieën</div></div>" +
-      (m.hasCoverage ? "<div class=k><div class=v>" + Math.round(m.onDemandShare * 100) + "%</div><div class=l>On-demand</div></div>" : "") +
-      (m.hasTags ? "<div class=k><div class=v>" + Math.round(m.untaggedShare * 100) + "%</div><div class=l>Zonder tags</div></div>" : "") +
-      "<div class=k><div class=v>" + esc(String(m.rowCount)) + "</div><div class=l>Regels</div></div>" +
-    "</div>" +
-    "<h2>Signalen</h2><ul>" +
-      signals.map(function (s) { return "<li><b>" + esc(s.title) + "</b>" + esc(s.body) + "</li>"; }).join("") + "</ul>" +
-    monthsTable() +
-    t("Uitgaven per categorie", m.categories) +
-    (m.hasResources ? t("Duurste resources", m.resources) : "") +
-    (m.hasSubscriptions ? t("Uitgaven per subscription", m.subscriptions) : "") +
-    (m.hasGroups ? t("Uitgaven per resourcegroep", m.groups) : "") +
-    "<footer>Dit rapport is volledig in de browser gegenereerd; er is geen data verzonden. De patronen zijn compleet en van jou. " +
-    "Een geverifieerd oordeel vraagt productietoegang, meer historie dan een factuur laat zien, en je eigen engineers erbij — een aparte, betaalde stap.</footer>" +
-    "</body></html>";
-}
-
 /* ---------------------------------------------------------------- findings CSV */
 
 function csvCell(v) {
@@ -665,13 +489,12 @@ function buildFindingsCSV(m) {
 /* -------------------------------------------------------------------- init  */
 
 export function init(mount) {
-  if (mount.dataset.scanReady) return;
+  if (mount.dataset.scanReady) return mount._api;
   mount.dataset.scanReady = "1";
 
   var dropzone = mount.querySelector("[data-dropzone]");
   var input = mount.querySelector("[data-file-input]");
   var listEl = mount.querySelector("[data-filelist]");
-  var sampleBtn = mount.querySelector("[data-sample]");
   var analyzeBtn = mount.querySelector("[data-analyze]");
   var saveBtn = mount.querySelector("[data-save]");
   var saveCsvBtn = mount.querySelector("[data-save-csv]");
@@ -687,8 +510,27 @@ export function init(mount) {
   var seq = 0;
   var queue = [];
   var draining = false;
-  var report = null; // { html, name }
+  var report = null; // { model, fileNames, isSample, name } — the PDF itself is built on demand
   var findingsCsv = null; // { text, name }
+
+  // The PDF chunk (jspdf + jspdf-autotable, ~124KB gzip — far above what's reasonable to ship
+  // on every page load) is only ever reached via this dynamic import. Mirrors the pending/
+  // loaded/dead state machine index.astro already uses for scan.js's own load, for the same
+  // reason: a failed dynamic import() is cached by the browser as a permanent rejection for
+  // that specifier, so a dead flag stops a doomed retry loop rather than refiring forever.
+  var pdfPending = false, pdfLoaded = false, pdfDead = false, pdfModule = null, pdfLoadPromise = null;
+  function loadPdfModule() {
+    if (pdfLoaded) return Promise.resolve(pdfModule);
+    if (pdfPending) return pdfLoadPromise;
+    if (pdfDead) return Promise.reject(new Error("pdf module dead"));
+    if (!navigator.onLine) return Promise.reject(new Error("offline"));
+    pdfPending = true;
+    pdfLoadPromise = import("./pdf/buildReportPDF.js")
+      .then(function (mod) { pdfPending = false; pdfLoaded = true; pdfModule = mod; return mod; })
+      .catch(function (err) { pdfPending = false; pdfDead = true; throw err; });
+    return pdfLoadPromise;
+  }
+  window.addEventListener("online", function () { loadPdfModule().catch(function () {}); });
 
   function setStatus(msg, isError) {
     statusEl.textContent = msg || "";
@@ -859,10 +701,17 @@ export function init(mount) {
       renderResults(resultsEl, model, isSample);
       var datePart = new Date().toISOString().slice(0, 10);
       var reportName = isSample
-        ? "azure-waste-scan-VOORBEELD-" + datePart + ".html"
-        : "azure-waste-scan-rapport-" + datePart + ".html";
-      report = { html: buildReportHTML(model, fileNames, isSample), name: reportName };
+        ? "azure-waste-scan-VOORBEELD-" + datePart + ".pdf"
+        : "azure-waste-scan-rapport-" + datePart + ".pdf";
+      // The PDF itself is built lazily, on the Save click — this just remembers what it'll
+      // need. Fire a background prefetch of the (large) PDF chunk now, right after a real
+      // result exists to save: the app is built to keep working after the network is cut
+      // (see the connectivity indicator/loader below), so waiting until the click itself to
+      // start this fetch would strand anyone who goes offline between finishing a scan and
+      // clicking Save — a very plausible order given the page invites exactly that.
+      report = { model: model, fileNames: fileNames, isSample: isSample, name: reportName };
       saveBtn.hidden = false;
+      loadPdfModule().catch(function () {}); // failure surfaced later, on click, if it matters
       if (model.hasFindings) {
         findingsCsv = { text: buildFindingsCSV(model), name: "azure-waste-scan-resources-" + datePart + ".csv" };
         saveCsvBtn.hidden = false;
@@ -884,36 +733,75 @@ export function init(mount) {
     runAnalysis(ready.map(function (f) { return f.dataset; }), ready.map(function (f) { return f.name; }), false);
   });
 
-  // --- sample report: zero-effort preview, no file needed ---
-  sampleBtn.addEventListener("click", async function () {
-    sampleBtn.disabled = true;
+  // Zero-effort preview, no file needed. No longer a button inside this mount — called from
+  // the hero's "Bekijk een voorbeeldrapport" link instead (see index.astro), exposed on the
+  // object init() returns so that link works whether scan.js is already loaded or not.
+  //
+  // `win` is a tab already opened by window.open() in the click handler itself, before any
+  // await ran — opening it here instead would get blocked as a popup by most browsers, since
+  // by the time this async function reaches its first await it's no longer considered to be
+  // running synchronously inside the click that triggered it. We just navigate that tab to
+  // the finished PDF once it's ready, rather than downloading it.
+  async function viewSample(win) {
     try {
       var rows = await parseCSV(SAMPLE_CSV, ",");
       var dataset = { cols: detectColumns(rows[0]), rows: rows.slice(1) };
       await runAnalysis([dataset], ["Voorbeelddata (synthetisch)"], true);
-    } finally {
-      sampleBtn.disabled = false;
+      var mod = await loadPdfModule();
+      var blob = await mod.buildReportPDF(report.model, report.fileNames, report.isSample);
+      var url = URL.createObjectURL(blob);
+      if (win && !win.closed) {
+        win.location.href = url;
+      } else {
+        // The pre-opened tab got closed (or never opened — some browsers hand back null even
+        // for a synchronous window.open) — best-effort retry, though this one, not being
+        // synchronous with the original click, may itself get blocked.
+        win = window.open(url, "_blank");
+        if (!win) setStatus("Kon het voorbeeldrapport niet in een nieuw tabblad openen — check of pop-ups geblokkeerd worden.", true);
+      }
+    } catch (err) {
+      if (window.console) console.error(err);
+      if (win && !win.closed) win.close();
+      setStatus("Er ging iets mis bij het maken van het voorbeeldrapport.", true);
     }
-  });
+  }
 
-  // --- save report ---
-  saveBtn.addEventListener("click", function () {
+  // --- save report (PDF, built on demand) ---
+  saveBtn.addEventListener("click", async function () {
     if (!report) return;
-    downloadText(report.html, report.name, "text/html");
+    saveBtn.disabled = true;
+    setStatus("PDF genereren…");
+    try {
+      var mod = await loadPdfModule();
+      var blob = await mod.buildReportPDF(report.model, report.fileNames, report.isSample);
+      downloadBlob(blob, report.name);
+      setStatus("PDF opgeslagen.");
+    } catch (err) {
+      if (window.console) console.error(err);
+      setStatus(pdfDead || !navigator.onLine
+        ? "PDF-module kon niet laden. Controleer je verbinding en probeer opnieuw, of ververs de pagina."
+        : "Er ging iets mis bij het maken van de PDF.", true);
+    } finally {
+      saveBtn.disabled = false;
+    }
   });
 
   // --- save findings CSV ---
   saveCsvBtn.addEventListener("click", function () {
     if (!findingsCsv) return;
-    downloadText(findingsCsv.text, findingsCsv.name, "text/csv");
+    downloadBlob(findingsCsv.text, findingsCsv.name, "text/csv");
   });
 
-  function downloadText(text, name, type) {
-    var blob = new Blob([text], { type: type });
+  function downloadBlob(data, name, type) {
+    var blob = data instanceof Blob ? data : new Blob([data], { type: type });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url; a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
+
+  var api = { viewSample: viewSample };
+  mount._api = api;
+  return api;
 }

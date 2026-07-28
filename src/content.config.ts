@@ -44,7 +44,6 @@ const azure = defineCollection({
       headlinePost: z.string(),
       lede: z.string(),
       ctaPrimary: cta,
-      ctaGhost: cta,
     }),
     expect: z.object({
       heading: z.string(),

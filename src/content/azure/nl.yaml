@@ -10,9 +10,6 @@ hero:
   ctaPrimary:
     label: Start de analyse
     href: "#scan"
-  ctaGhost:
-    label: Zo kom je aan je verbruiksbestanden
-    href: "#export"
 expect:
   heading: Wat je krijgt
   intro: "De scan leest je verbruiksbestanden en wijst uitgavepatronen aan die een nadere blik verdienen. Geen oordeel — een korte lijst aanknopingspunten, elk met een bedrag erbij. Het soort vragen dat op tafel komt:"

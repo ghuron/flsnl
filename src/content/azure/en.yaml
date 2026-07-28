@@ -10,9 +10,6 @@ hero:
   ctaPrimary:
     label: Start the analysis
     href: "#scan"
-  ctaGhost:
-    label: How to get your usage files
-    href: "#export"
 expect:
   heading: What you'll get
   intro: "The scan reads your usage files and points at spending patterns worth a closer look. Not a verdict — a short list of leads, each with a number attached. The kind of questions it puts on the table:"
