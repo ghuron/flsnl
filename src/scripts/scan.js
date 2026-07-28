@@ -182,18 +182,30 @@ function monthLabel(key) {
   var p = key.split("-");
   return p.length === 2 ? MONTH_NL[parseInt(p[1], 10)] + " " + p[0] : key;
 }
-// Which months a single parsed file actually covers, oldest first. The date-column fallback
-// mirrors buildModel exactly, so what the file list promises and what the report totals can
-// never disagree.
+// The single definition of which column carries the usage date. Both the per-file month
+// labels and buildModel's month aggregation go through this, so the file list and the report
+// cannot disagree about the period — an invariant a duplicated expression could not enforce.
+function dateColOf(cols) {
+  return cols.date !== -1 ? cols.date : cols.period;
+}
+
+// Which months a single parsed file actually covers, oldest first.
 function datasetMonths(ds) {
-  var dateCol = ds.cols.date !== -1 ? ds.cols.date : ds.cols.period;
+  var dateCol = dateColOf(ds.cols);
   if (dateCol === -1) return [];
-  var seen = Object.create(null);
+  // Collect distinct raw cells first. An export repeats the same few dozen dates across tens
+  // of thousands of rows, so parsing runs on the distinct values rather than once per row.
+  var rawSeen = Object.create(null);
   for (var r = 0; r < ds.rows.length; r++) {
-    var mk = monthKeyOf(ds.rows[r][dateCol]);
-    if (mk) seen[mk] = true;
+    var raw = ds.rows[r][dateCol];
+    if (raw) rawSeen[raw] = true;
   }
-  return Object.keys(seen).sort();
+  var months = Object.create(null);
+  for (var key in rawSeen) {
+    var mk = monthKeyOf(key);
+    if (mk) months[mk] = true;
+  }
+  return Object.keys(months).sort();
 }
 
 // "mei 2026", "apr 2026 + mei 2026", or a range once it stops being worth spelling out.
@@ -230,10 +242,10 @@ function buildModel(datasets) {
     if (cols.resourceGroup !== -1) anyGroup = true;
     if (cols.resource !== -1) anyResource = true;
     if (cols.subscription !== -1) anySub = true;
-    if (cols.date !== -1 || cols.period !== -1) anyMonth = true;
+    var dateCol = dateColOf(cols);
+    if (dateCol !== -1) anyMonth = true;
     if (cols.pricingModel !== -1) anyCoverage = true;
     if (cols.tags !== -1) anyTags = true;
-    var dateCol = cols.date !== -1 ? cols.date : cols.period;
 
     for (var r = 0; r < rows.length; r++) {
       var row = rows[r];
@@ -501,23 +513,28 @@ export function init(mount) {
   var statusEl = mount.querySelector("[data-status]");
   var resultsEl = mount.querySelector("[data-results]");
 
-  // One entry per opened file: { id, file, name, size, state, months, dataset, error }.
-  // state is "reading" | "ready" | "error". Files are parsed as soon as they are opened
-  // rather than at analyze time, so the list can show the months each one covers — and the
-  // parsed rows are kept, so Analyze reuses them instead of reading everything a second
-  // time. Peak memory is unchanged: buildModel already held every dataset at once.
+  // One entry per opened file: { id, file, name, size, state, months, dataset, error,
+  // singleColumn }. state is "queued" | "reading" | "ready" | "error", and `files` is the only
+  // list — the work queue is just the entries still in a pre-parse state, so removing a file
+  // removes it from the queue by construction.
+  //
+  // Files are parsed as soon as they are opened rather than at analyze time, so the list can
+  // show the months each one covers, and the parsed rows are kept so Analyze reuses them
+  // instead of reading everything a second time. Peak memory is unchanged (buildModel already
+  // held every dataset at once), but they are now held from open until removal rather than
+  // for the duration of one analyze.
   var files = [];
   var seq = 0;
-  var queue = [];
   var draining = false;
   var report = null; // { model, fileNames, isSample, name } — the PDF itself is built on demand
   var findingsCsv = null; // { text, name }
 
   // The PDF chunk (jspdf + jspdf-autotable, ~124KB gzip — far above what's reasonable to ship
-  // on every page load) is only ever reached via this dynamic import. Mirrors the pending/
-  // loaded/dead state machine index.astro already uses for scan.js's own load, for the same
-  // reason: a failed dynamic import() is cached by the browser as a permanent rejection for
-  // that specifier, so a dead flag stops a doomed retry loop rather than refiring forever.
+  // on every page load) is only ever reached via this dynamic import. It carries more state
+  // than index.astro's loader for scan.js because callers need the module back, so the
+  // in-flight promise has to be shareable — but the `dead` flag exists for the same reason:
+  // a failed dynamic import() is cached by the browser as a permanent rejection for that
+  // specifier, so retrying it can never succeed and must not refire forever.
   var pdfPending = false, pdfLoaded = false, pdfDead = false, pdfModule = null, pdfLoadPromise = null;
   function loadPdfModule() {
     if (pdfLoaded) return Promise.resolve(pdfModule);
@@ -538,33 +555,40 @@ export function init(mount) {
   }
 
   function readyFiles() {
-    return files.filter(function (f) { return f.state === "ready" && f.dataset; });
+    return files.filter(function (f) { return f.state === "ready"; });
   }
 
-  function monthsText(f) {
-    if (f.state === "reading") {
-      return f.size >= LARGE_FILE_BYTES
-        ? "bezig met lezen… (groot bestand, kan even duren)"
-        : "bezig met lezen…";
+  // Read errors are stored as codes, not prose, so the entry stays a data structure and the
+  // wording lives here with the rest of the display strings.
+  var READ_ERRORS = {
+    "no-rows": "geen leesbare rijen",
+    unreadable: "kon niet gelezen worden"
+  };
+
+  // The one place the four display cases are defined. "unknown" is a file that parsed fine but
+  // carries no recognisable date column — neither a success worth highlighting nor an error.
+  function monthsCell(f) {
+    if (f.state === "queued" || f.state === "reading") {
+      return {
+        state: "reading",
+        text: f.size >= LARGE_FILE_BYTES
+          ? "bezig met lezen… (groot bestand, kan even duren)"
+          : "bezig met lezen…"
+      };
     }
-    if (f.state === "error") return f.error;
-    if (!f.months.length) return "geen maand herkend";
-    return monthsSummary(f.months);
-  }
-
-  // A file can parse fine and still have no recognisable date column, which is neither a
-  // success worth highlighting nor a read error — it gets its own muted styling.
-  function monthsState(f) {
-    return f.state === "ready" && !f.months.length ? "unknown" : f.state;
+    if (f.state === "error") return { state: "error", text: READ_ERRORS[f.error] || READ_ERRORS.unreadable };
+    if (!f.months.length) return { state: "unknown", text: "geen maand herkend" };
+    return { state: "ready", text: monthsSummary(f.months) };
   }
 
   function refreshList() {
     if (!files.length) { listEl.hidden = true; listEl.innerHTML = ""; analyzeBtn.disabled = true; return; }
     listEl.hidden = false;
     listEl.innerHTML = files.map(function (f) {
+      var cell = monthsCell(f);
       return "<li><span class=\"fmeta\">" +
                "<span class=\"fname\">" + esc(f.name) + "</span>" +
-               "<span class=\"fmonths\" data-state=\"" + monthsState(f) + "\">" + esc(monthsText(f)) + "</span>" +
+               "<span class=\"fmonths\" data-state=\"" + cell.state + "\">" + esc(cell.text) + "</span>" +
              "</span>" +
              "<span class=\"size\">" + fmtBytes(f.size) +
              " <button type=\"button\" data-remove=\"" + f.id + "\" aria-label=\"Verwijder\">&times;</button></span></li>";
@@ -579,9 +603,7 @@ export function init(mount) {
       if (!/\.csv$/i.test(f.name) && f.type !== "text/csv") return;
       // Skip exact duplicates (same name + size).
       if (files.some(function (x) { return x.name === f.name && x.size === f.size; })) return;
-      var entry = { id: ++seq, file: f, name: f.name, size: f.size, state: "reading", months: [], dataset: null, error: "", singleColumn: false };
-      files.push(entry);
-      queue.push(entry);
+      files.push({ id: ++seq, file: f, name: f.name, size: f.size, state: "queued", months: [], dataset: null, error: "", singleColumn: false });
       added++;
     });
     refreshList();
@@ -596,9 +618,11 @@ export function init(mount) {
     draining = true;
     refreshList();
 
-    while (queue.length) {
-      var entry = queue.shift();
-      if (files.indexOf(entry) === -1) continue; // removed while queued
+    // Pulling from `files` each round means a file removed while queued is simply never
+    // picked up; only the mid-read removal below is a real race worth guarding.
+    for (var entry; (entry = files.find(function (f) { return f.state === "queued"; })); ) {
+      entry.state = "reading";
+      refreshList();
       setStatus("‘" + entry.name + "’ lezen…");
       try {
         await nextFrame();
@@ -612,7 +636,7 @@ export function init(mount) {
         entry.singleColumn = rows.length > 0 && rows[0].length <= 1;
         if (rows.length < 2) {
           entry.state = "error";
-          entry.error = "geen leesbare rijen";
+          entry.error = "no-rows";
         } else {
           entry.dataset = { cols: detectColumns(rows[0]), rows: rows.slice(1) };
           entry.months = datasetMonths(entry.dataset);
@@ -620,7 +644,7 @@ export function init(mount) {
         }
       } catch (err) {
         entry.state = "error";
-        entry.error = "kon niet gelezen worden";
+        entry.error = "unreadable";
         if (window.console) console.error("read failed", entry.name, err);
       }
       refreshList();

@@ -35,7 +35,7 @@ const azure = (await getEntry("azure", "nl"))!.data;
       fill="currentColor">
       <path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
     </svg>
-    <span class="connectivity-label" data-connectivity-text></span>
+    <span class="connectivity-label sr-only" data-connectivity-text></span>
   </span>
 </Fragment>
 
@@ -112,7 +112,7 @@ const azure = (await getEntry("azure", "nl"))!.data;
   <h2>{azure.app.heading}</h2>
   <p class="intro">{azure.app.intro}</p>
 
-  <div id="scan-app" data-scan-app>
+  <div id="scan-app" data-scan-app data-load-error={azure.app.loadError}>
     <div class="dropzone" data-dropzone tabindex="0" role="button" aria-label={azure.app.dropzone.ariaLabel}>
       <p><strong>{azure.app.dropzone.title}</strong> {azure.app.dropzone.suffix}</p>
       <p class="hint">{azure.app.dropzone.hint}</p>
@@ -151,9 +151,9 @@ const azure = (await getEntry("azure", "nl"))!.data;
   const mount = document.querySelector("[data-scan-app]");
 
   if (mount) {
-    let pending = false;
-    let loaded = false;
-    let dead = false;
+    // One attempt, ever. A settled import() cannot be retried (see below), so "started" is
+    // the only state the guard needs — success and failure are equally final.
+    let started = false;
     let scanApi = null;
     // Holds the tab window.open() already returned, if the hero sample link is clicked before
     // scan.js has finished loading — filled in once ready instead of the click just landing as
@@ -162,17 +162,15 @@ const azure = (await getEntry("azure", "nl"))!.data;
     let pendingSample = null;
 
     const load = () => {
-      if (pending || loaded || dead) return;
+      if (started) return;
       // Do not attempt a fetch that is guaranteed to fail. The browser caches a failed module
       // load in its module map, so a rejected import() of this specifier stays rejected for
       // the life of the document — one doomed attempt while offline would permanently poison
-      // the retry below. Skipping instead leaves the first real attempt for the `online` event.
+      // the retry below. Skipping leaves the first real attempt for the `online` event.
       if (!navigator.onLine) return;
-      pending = true;
+      started = true;
       import("../../scripts/scan.js")
         .then((mod) => {
-          pending = false;
-          loaded = true;
           scanApi = mod.init(mount);
           if (pendingSample) {
             const win = pendingSample;
@@ -181,14 +179,11 @@ const azure = (await getEntry("azure", "nl"))!.data;
           }
         })
         .catch((err) => {
-          // An attempt was made and failed while online. Per the note above, the module map
-          // has cached that rejection, so retrying this specifier can never succeed — stop
-          // trying and tell the reader to reload.
-          pending = false;
-          dead = true;
+          // Nothing to reset: per the note above, retrying this specifier can never succeed,
+          // so the reader is told to reload instead.
           const status = mount.querySelector("[data-status]");
           if (status) {
-            status.textContent = "De scanner kon niet laden. Ververs de pagina en probeer opnieuw.";
+            status.textContent = mount.dataset.loadError ?? "";
             status.classList.add("error");
           }
           // Surface the real cause in the console for debugging.

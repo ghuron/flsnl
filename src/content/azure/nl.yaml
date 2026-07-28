@@ -55,6 +55,7 @@ app:
   analyzeLabel: Analyseer
   saveLabel: Rapport opslaan
   saveCsvLabel: Exporteer bevindingen (CSV)
+  loadError: De scanner kon niet laden. Ververs de pagina en probeer opnieuw.
   noscript: De scan draait op JavaScript in je eigen browser (er wordt nog steeds niets verzonden). Zet JavaScript aan om je bestand te analyseren.
 footer:
   text: First Line Software — broncode en meer op GitHub.

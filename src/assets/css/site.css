@@ -135,18 +135,17 @@ header.topbar .contact-link:hover { border-color: #fff; background: rgba(255,255
 .connectivity[data-state="online"] { color: #94a3b8; font-weight: 600; }
 .connectivity[data-state="offline"] { color: #8ab4ff; font-weight: 700; }
 
-/* Narrow screens: the logo and contact button need the room, so keep the dot and drop the
-   word to screen readers only rather than removing it from the accessibility tree. */
-@media (max-width: 600px) {
-  .connectivity[data-state] .connectivity-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+/* Narrow screens keep the icon but drop the word, so the logo and contact button get the room.
+   The label carries .sr-only in the markup and is revealed from 601px up, rather than being
+   re-hidden here — that keeps the visually-hidden declarations defined in exactly one place. */
+@media (min-width: 601px) {
+  .connectivity-label {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
     border: 0;
   }
 }
