@@ -46,19 +46,18 @@ const azure = defineCollection({
       ctaPrimary: cta,
       ctaGhost: cta,
     }),
-    steps: z.object({
-      heading: z.string(),
-      items: z.array(z.string()).length(3),
-    }),
-    checks: z.object({
+    expect: z.object({
       heading: z.string(),
       intro: z.string(),
-      items: z.array(z.string()).length(7),
+      items: z.array(z.string()).length(5),
     }),
-    why: z.object({
+    files: z.object({
       heading: z.string(),
-      items: z.array(z.object({ strong: z.string(), text: z.string() })).length(4),
-      trustLine: z.string(),
+      paragraphs: z.array(z.string()).length(3),
+    }),
+    free: z.object({
+      heading: z.string(),
+      paragraphs: z.array(z.string()).length(3),
     }),
     connectivity: z.object({
       online: z.string(),
@@ -67,14 +66,9 @@ const azure = defineCollection({
     export: z.object({
       heading: z.string(),
       intro: z.string(),
-      direct: z.object({
-        heading: z.string(),
-        steps: z.array(z.string()).length(3),
-        noteMonthly: z.string(),
-        multiMonth: z.string(),
-        noteCSP: z.string(),
-        noteRole: z.string(),
-      }),
+      steps: z.array(z.string()).length(3),
+      multiMonth: z.string(),
+      noteRole: z.string(),
     }),
     app: z.object({
       heading: z.string(),

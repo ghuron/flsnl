@@ -228,55 +228,11 @@ section.hero .lede {
   .hero-visual { height: 220px; margin-top: 1rem; }
 }
 
-/* ---- step preview ---- */
-section.steps { padding: 4.5rem 0; }
-section.steps h2 { font-size: 1.7rem; margin: 0 0 2rem; }
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.1rem;
-  padding: 0;
-  margin: 0;
-  counter-reset: step;
-}
-.steps-grid li {
-  position: relative;
-  list-style: none;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 1.6rem 1.5rem 1.6rem 4.4rem;
-  box-shadow: 0 1px 2px rgba(14,14,42,.04);
-  transition: box-shadow .2s ease, transform .2s ease;
-}
-.steps-grid li:hover {
-  box-shadow: 0 10px 24px rgba(14,14,42,.08);
-  transform: translateY(-2px);
-}
-.steps-grid li::before {
-  counter-increment: step;
-  content: counter(step);
-  position: absolute;
-  left: 1.5rem;
-  top: 1.6rem;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: var(--blue);
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.steps-grid p { margin: 0; font-size: 0.94rem; color: var(--ink-dim); }
-
-/* ---- what the scan checks ---- */
-section.checks { background: var(--panel); padding: 4.5rem 0; }
-section.checks h2 { font-size: 1.7rem; margin: 0 0 0.9rem; }
-section.checks .intro { max-width: 680px; color: var(--ink-dim); margin: 0 0 2rem; }
-.checks-list {
+/* ---- what you'll get ---- */
+section.expect { background: var(--panel); padding: 4.5rem 0; }
+section.expect h2 { font-size: 1.7rem; margin: 0 0 0.9rem; }
+section.expect .intro { max-width: 680px; color: var(--ink-dim); margin: 0 0 2rem; }
+.expect-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -285,13 +241,13 @@ section.checks .intro { max-width: 680px; color: var(--ink-dim); margin: 0 0 2re
   gap: 0.9rem 2rem;
   max-width: 900px;
 }
-.checks-list li {
+.expect-list li {
   position: relative;
   padding-left: 1.6rem;
   font-size: 0.98rem;
   line-height: 1.5;
 }
-.checks-list li::before {
+.expect-list li::before {
   content: "";
   position: absolute;
   left: 0;
@@ -302,49 +258,7 @@ section.checks .intro { max-width: 680px; color: var(--ink-dim); margin: 0 0 2re
   background: var(--blue);
 }
 @media (max-width: 720px) {
-  .checks-list { grid-template-columns: 1fr; }
-}
-
-/* ---- dark differentiators band ---- */
-section.why {
-  background:
-    radial-gradient(60% 70% at 15% 0%, rgba(108,67,255,.25) 0%, rgba(108,67,255,0) 60%),
-    var(--navy-deep);
-  color: #fff;
-  padding: 5rem 0;
-}
-section.why h2 { font-size: 1.8rem; margin: 0 0 2.25rem; max-width: 600px; }
-.why-list {
-  list-style: none;
-  margin: 0 0 2.25rem;
-  padding: 0;
-  display: grid;
-  gap: 1.4rem;
-  max-width: 720px;
-}
-.why-list li {
-  display: flex;
-  gap: 0.9rem;
-  font-size: 1.02rem;
-  line-height: 1.55;
-  color: #d4d9df;
-}
-.why-list li::before {
-  content: "";
-  flex: 0 0 auto;
-  width: 8px;
-  height: 8px;
-  margin-top: 0.5em;
-  border-radius: 50%;
-  background: var(--blue);
-}
-.why-list strong { color: #fff; }
-.trust-line {
-  max-width: 640px;
-  font-size: 0.98rem;
-  color: #b9bac1;
-  border-left: 3px solid var(--blue);
-  padding-left: 1rem;
+  .expect-list { grid-template-columns: 1fr; }
 }
 
 /* ---- content sections ---- */

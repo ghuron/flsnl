@@ -1,63 +1,51 @@
 meta:
-  title: Azure Waste Scan — run the scan in your own browser
-  description: Open your Azure usage file, analyze it, and generate a report — entirely in your browser. No account, no upload, no server.
+  title: Azure Waste Scan — First Line Software
+  description: Free analysis of your Azure usage files, entirely in your browser. Find out what you're overpaying for — and what to do about it.
 hero:
-  eyebrow: No account. No upload.
-  headlinePre: "Your Azure bill went up. See in two minutes "
-  headlineEm: why
-  headlinePost: ", without sharing it to find out."
-  lede: One usage file, the scan runs entirely in your own browser. Whatever it finds, you can redirect straight into your AI budget.
+  eyebrow: Free Azure usage analysis
+  headlinePre: "Why is your Azure bill so "
+  headlineEm: big
+  headlinePost: "?"
+  lede: We analyze your Azure usage for free. Download your usage files, open them here, and walk away with leads worth investigating. Your files never leave your browser — we never see them.
   ctaPrimary:
     label: Start the analysis
     href: "#scan"
   ctaGhost:
-    label: How to export your usage
+    label: How to get your usage files
     href: "#export"
-steps:
-  heading: Three steps, two minutes
+expect:
+  heading: What you'll get
+  intro: "The scan reads your usage files and points at spending patterns worth a closer look. Not a verdict — a short list of leads, each with a number attached. The kind of questions it puts on the table:"
   items:
-    - Get your monthly usage file from Microsoft — how, below.
-    - Open it here and click Analyze.
-    - "Read the report: what stands out, and what it costs you to leave it be."
-checks:
-  heading: What the scan actually finds
-  intro: "Not a scan of your resources — only of your bill. That's deliberate: it works cross-subscription, needs no read access to your environment, and looks at behavior over time. Azure Advisor looks at a snapshot; this looks at what you've actually paid for months."
-  items:
-    - Reservations or savings plans you're paying for but not using.
-    - How much of your bill runs at on-demand rates when the pattern justifies a reservation.
-    - Month-over-month spikes in the bill.
-    - Which cost category is rising fastest.
-    - "Concentration: a handful of resources carrying a disproportionate share of the bill."
-    - Data that doesn't add up — credits or mixed currencies skewing your totals.
-    - The share of your bill with no tags — the number worth forwarding to management as-is.
-why:
-  heading: Why this is different
-  items:
-    - strong: Free, and aimed at your AI budget.
-      text: This scans your Azure billing CSV for spend that isn't earning its keep, so you can redirect it — toward AI, or wherever it's actually needed.
-    - strong: Nothing leaves your browser — and you can verify that yourself.
-      text: The page ships a Content-Security-Policy that enforces connect-src 'none' — open devtools, the Network tab, and nothing shows up once the page has loaded. The source is open on GitHub. And because nothing is processed, there's nothing to account for either — no data processing agreement, no DPIA, nothing logged.
-    - strong: Two kinds of waste, and we tell them apart.
-      text: Some of what we find is resources you don't need — a config change, done by your own IT team, no outside help required. Some of it is baked into how the application itself is built, which is a different problem.
-    - strong: The second kind gets a concrete next step, not a sales pitch.
-      text: If the scan turns up enough architectural waste, the report says so with a fixed price attached — roughly €10,000 for one week (top 3 cost drivers) or €15,000–20,000 for two weeks (top 5 to 7). Want to follow up? Email Andrei Zaikin — you'll get a personal reply, nobody cc'd.
-  trustLine: Fix it yourself, email us, or do neither — we won't know which you pick, and it won't change what the report told you.
+    - Why are we paying for everything 24×7 when we only use it 8×5?
+    - Why is nearly all of our steady workload billed at on-demand rates, when reservations run 20–60% cheaper?
+    - What caused last month's jump — and will it repeat?
+    - Five resources carry most of the bill. Is each of them earning its keep?
+    - A chunk of the bill has no tags. Who owns that spend?
+files:
+  heading: What's in an Azure usage file?
+  paragraphs:
+    - "An Azure usage file is the spreadsheet behind your monthly bill: one line per resource per period — its name, resource group, subscription, service type, and what it cost. Microsoft produces it every month whether anyone reads it or not."
+    - "It deserves care: it contains resource and subscription names, cost figures, and tags — which sometimes carry the e-mail addresses of resource owners. It does not contain passwords, source code, or customer data."
+    - Here it stays on your machine. The analysis runs entirely in your browser — and you don't have to take our word for it. Once your files are downloaded, switch your machine to flight mode and run the scan offline. It works exactly the same, because nothing here ever needs a connection.
+free:
+  heading: Why is this free?
+  paragraphs:
+    - "First Line Software is a software engineering company. This scan is how we look for software worth re-engineering: applications that run at full size around the clock, but could scale with demand and cost a fraction of what they do."
+    - Some of what the scan finds is simple — resources to switch off, a configuration to change. Your own team can do that, and the report says so. But when the waste is built into how the application works, that's engineering — our kind of work. If those leads look economically meaningful, come back for a deeper analysis and, if the numbers hold, the re-engineering itself. Email Andrei Zaikin — you'll get a personal reply.
+    - And since nothing you open here ever reaches us, we don't even know you ran the scan. There's no follow-up unless you start it.
+export:
+  heading: How to get your usage files
+  intro: A few minutes in the Azure portal. You don't need access to production — just to the billing side.
+  steps:
+    - Log in at portal.azure.com and open Cost Management + Billing.
+    - Open Cost analysis and set the scope to the subscription you want to look at.
+    - Download as CSV.
+  multiMonth: Multiple months? Download them all — you can open several files at once and they'll be analyzed together.
+  noteRole: No access? Ask whoever manages your Azure for the Cost Management Reader role. It's read-only, and it's all you need.
 connectivity:
   online: Online
   offline: Airplane mode
-export:
-  heading: How to export your usage
-  intro: "This takes about two minutes. You don't need access to production environments, and you're not sharing anything Microsoft doesn't already send you every month: your billing usage overview."
-  direct:
-    heading: From the Azure portal — any contract type
-    steps:
-      - Log in at portal.azure.com and open Cost Management + Billing.
-      - "Pick Cost analysis, set the scope to the subscription you want scanned, and click Download/Export."
-      - Export as CSV, with monthly granularity.
-    noteMonthly: Choose monthly granularity, not daily. Daily is bigger, more detailed than needed, and adds nothing the analysis can use.
-    multiMonth: Multiple months? Download them all — you'll be able to open several CSV files at once and have them analyzed together.
-    noteCSP: "Does this also work through a reseller (CSP) or an Enterprise Agreement? Yes — same steps, same place in the portal. No access to the actual invoice needed, only to Cost analysis at subscription scope."
-    noteRole: "No access? Cost analysis only needs the Cost Management Reader role on the subscription — you can often grant that to yourself, no finance involved. Portal set to English? Same fields, different language."
 app:
   heading: The scan
   intro: Open your usage file(s) and hit analyze. Everything happens here, on your screen — nothing is sent anywhere.

@@ -1,63 +1,51 @@
 meta:
-  title: Azure Waste Scan — draai de scan in je eigen browser
-  description: Open je Azure-verbruiksbestand, analyseer het en genereer een rapport — volledig in je browser. Geen account, geen upload, geen server.
+  title: Azure Waste Scan — First Line Software
+  description: Gratis analyse van je Azure-verbruiksbestanden, volledig in je browser. Ontdek waar je te veel voor betaalt — en wat je eraan kunt doen.
 hero:
-  eyebrow: Geen account. Geen upload.
-  headlinePre: "Je Azure-rekening steeg. Zie in twee minuten "
-  headlineEm: waarom
-  headlinePost: ", zonder er iets voor te delen."
-  lede: Eén verbruiksbestand, de scan draait volledig in je browser. Wat je terugvindt, kun je meteen omleiden naar je AI-budget.
+  eyebrow: Gratis Azure-verbruiksanalyse
+  headlinePre: "Waarom is je Azure-rekening zo "
+  headlineEm: hoog
+  headlinePost: "?"
+  lede: We analyseren je Azure-verbruik gratis. Download je verbruiksbestanden, open ze hier, en je loopt weg met aanknopingspunten die het onderzoeken waard zijn. Je bestanden verlaten nooit je browser — wij zien ze nooit.
   ctaPrimary:
     label: Start de analyse
     href: "#scan"
   ctaGhost:
-    label: Zo exporteer je je verbruik
+    label: Zo kom je aan je verbruiksbestanden
     href: "#export"
-steps:
-  heading: Drie stappen, twee minuten
+expect:
+  heading: Wat je krijgt
+  intro: "De scan leest je verbruiksbestanden en wijst uitgavepatronen aan die een nadere blik verdienen. Geen oordeel — een korte lijst aanknopingspunten, elk met een bedrag erbij. Het soort vragen dat op tafel komt:"
   items:
-    - Haal je maandelijkse verbruiksbestand op bij Microsoft — hoe dat werkt lees je hieronder.
-    - Open het hier en klik op Analyseren.
-    - "Lees het rapport: wat opvalt, en wat het je kost om het te laten liggen."
-checks:
-  heading: Wat de scan vindt
-  intro: "Geen scan van je resources — alleen van je rekening. Dat is expres: het werkt cross-subscription, heeft geen toegang tot je omgeving nodig, en ziet gedrag over tijd. Azure Advisor kijkt naar een momentopname; dit kijkt naar wat je maandenlang hebt betaald."
-  items:
-    - Reserveringen of savings plans die je betaalt maar niet gebruikt.
-    - Hoeveel van je rekening op on-demand tarief draait, terwijl het patroon een reservering rechtvaardigt.
-    - Maand-op-maand pieken in de rekening.
-    - Welke kostencategorie het hardst stijgt.
-    - "Concentratie: een handvol resources dat een onevenredig deel van de rekening draagt."
-    - Data die niet klopt — creditnota's of meerdere valuta's die je totalen vertekenen.
-    - Het aandeel van je rekening zonder tags — het cijfer dat je management wil zien.
-why:
-  heading: Waarom dit anders is
-  items:
-    - strong: Gratis, en gericht op je AI-budget.
-      text: Dit doorzoekt je Azure-factuur-CSV op uitgaven die hun geld niet waard zijn, zodat je ze kunt omleiden — naar AI, of waar het écht nodig is.
-    - strong: Niets verlaat je browser — en dat kun je zelf verifiëren.
-      text: "De pagina stuurt een Content-Security-Policy mee die connect-src 'none' afdwingt — open de devtools, tab Network, en er verschijnt niets zodra de pagina geladen is. De broncode staat open op GitHub. En omdat er niets verwerkt wordt, is er ook niets: geen verwerkersovereenkomst, geen DPIA, niets te loggen."
-    - strong: Twee soorten verspilling, en we maken onderscheid.
-      text: Een deel van wat we vinden zijn resources die je niet nodig hebt — een configuratiewijziging, uit te voeren door je eigen IT-team, zonder hulp van buitenaf. Een ander deel zit ingebakken in hoe de applicatie zelf gebouwd is, en dat is een ander soort probleem.
-    - strong: Het tweede soort krijgt een concreet vervolg, geen verkooppraatje.
-      text: Als de scan genoeg architecturale verspilling vindt, zegt het rapport dat met een vaste prijs erbij — ongeveer €10.000 voor een week (top 3 kostenposten) of €15.000–20.000 voor twee weken (top 5 tot 7). Wil je dat opvolgen, dan mail je Andrei Zaikin — je krijgt persoonlijk antwoord, niemand in cc.
-  trustLine: Fix het zelf, mail ons, of doe geen van beide — wij weten niet wat je kiest, en het verandert niets aan wat het rapport je vertelde.
+    - Waarom betalen we voor alles 24×7, terwijl we het maar 8×5 gebruiken?
+    - Waarom draait bijna al onze stabiele workload op on-demand tarief, terwijl reserveringen 20–60% goedkoper zijn?
+    - Wat veroorzaakte de piek van vorige maand — en komt die terug?
+    - Vijf resources dragen het grootste deel van de rekening. Verdient elk daarvan nog zijn plek?
+    - Een deel van de rekening heeft geen tags. Van wie is die uitgave?
+files:
+  heading: Wat zit er in een Azure-verbruiksbestand?
+  paragraphs:
+    - "Een Azure-verbruiksbestand is het rekenblad achter je maandelijkse rekening: één regel per resource per periode — naam, resourcegroep, subscription, type dienst, en wat het kostte. Microsoft maakt het elke maand, of iemand het nu leest of niet."
+    - "Het verdient zorgvuldigheid: het bevat namen van resources en subscriptions, kostenbedragen, en tags — die soms het e-mailadres van de resource-eigenaar bevatten. Het bevat geen wachtwoorden, broncode, of klantdata."
+    - "Hier blijft het op je eigen machine. De analyse draait volledig in je browser — en dat hoef je niet op ons woord te geloven. Zodra je bestanden gedownload zijn, zet je je machine gerust in vliegtuigmodus en draai je de scan offline — die werkt precies hetzelfde, want er is nooit een verbinding nodig."
+free:
+  heading: Waarom is dit gratis?
+  paragraphs:
+    - "First Line Software is een softwarebedrijf. Deze scan is hoe we op zoek gaan naar software die het waard is om opnieuw te bouwen: applicaties die dag en nacht op volle grootte draaien, terwijl ze met de vraag mee zouden kunnen schalen — voor een fractie van de huidige kosten."
+    - "Een deel van wat de scan vindt is eenvoudig — resources uitzetten, een configuratie aanpassen. Dat kan je eigen team, en het rapport zegt dat er ook bij. Maar als de verspilling ingebakken zit in hoe de applicatie werkt, is dat engineering — ons soort werk. Zien die aanknopingspunten er economisch de moeite waard uit, kom dan terug voor een diepere analyse en, als de cijfers standhouden, de herbouw zelf. Mail Andrei Zaikin — je krijgt persoonlijk antwoord."
+    - "En omdat niets wat je hier opent ons ooit bereikt, weten we niet eens dat je de scan hebt gedraaid. Geen opvolging, tenzij jij die zelf start."
 connectivity:
   online: Online
   offline: Vliegtuigmodus
 export:
-  heading: Zo exporteer je je verbruik
-  intro: "Dit duurt ongeveer twee minuten. Je hebt geen toegang tot productieomgevingen nodig en je deelt niets dat Microsoft je niet toch al elke maand stuurt: het verbruiksoverzicht van je facturatie."
-  direct:
-    heading: Vanuit de Azure-portal — voor elk type contract
-    steps:
-      - Log in op portal.azure.com en open Cost Management + Billing.
-      - "Kies Cost analysis, zet het bereik op de subscription die je wilt scannen, en klik Download/Export."
-      - Exporteer als CSV, met maandelijkse granulariteit.
-    noteMonthly: Kies maandelijkse granulariteit, niet dagelijks. Dat laatste is groter, gedetailleerder dan nodig, en bevat niets dat de analyse beter maakt.
-    multiMonth: Meerdere maanden? Download ze allemaal — je kunt straks meerdere CSV-bestanden tegelijk openen en samen laten analyseren.
-    noteCSP: "Werkt dit ook via een reseller (CSP) of Enterprise Agreement? Ja — dezelfde stappen, dezelfde plek in de portal. Geen toegang tot de eigenlijke factuur nodig, alleen tot Cost analysis op subscription-niveau."
-    noteRole: "Geen toegang? Cost analysis vereist alleen de rol Cost Management Reader op de subscription — die kun je vaak zelf toekennen, zonder tussenkomst van finance. Portal in het Engels? Dezelfde velden, andere taal."
+  heading: Zo kom je aan je verbruiksbestanden
+  intro: Een paar minuten in de Azure-portal. Je hebt geen toegang tot productie nodig — alleen tot de facturatiekant.
+  steps:
+    - Log in op portal.azure.com en open Cost Management + Billing.
+    - Open Cost analysis en zet het bereik op de subscription die je wilt bekijken.
+    - Exporteer als CSV.
+  multiMonth: Meerdere maanden? Download ze allemaal — je kunt straks meerdere bestanden tegelijk openen en samen laten analyseren.
+  noteRole: Geen toegang? Vraag wie jullie Azure beheert om de rol Cost Management Reader. Die is alleen-lezen, en meer heb je niet nodig.
 app:
   heading: De scan
   intro: Open je verbruiksbestand(en) en druk op analyseren. Alles gebeurt hier, op je scherm — er wordt niets verzonden.

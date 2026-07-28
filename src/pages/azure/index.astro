@@ -59,63 +59,54 @@ const azure = (await getEntry("azure", "nl"))!.data;
   </div>
 </section>
 
-<!-- 2. Longer convincing text — how it works -->
-<section class="steps" id="hoe-het-werkt">
+<!-- 2. What you'll get — leads worth investigating -->
+<section class="expect">
   <div class="wrap">
-    <h2>{azure.steps.heading}</h2>
-    <ul class="steps-grid">
-      {azure.steps.items.map((item) => <li><p>{item}</p></li>)}
+    <h2>{azure.expect.heading}</h2>
+    <p class="intro">{azure.expect.intro}</p>
+    <ul class="expect-list">
+      {azure.expect.items.map((item) => <li>{item}</li>)}
     </ul>
-  </div>
-</section>
-
-<section class="checks">
-  <div class="wrap">
-    <h2>{azure.checks.heading}</h2>
-    <p class="intro">{azure.checks.intro}</p>
-    <ul class="checks-list">
-      {azure.checks.items.map((item) => <li>{item}</li>)}
-    </ul>
-  </div>
-</section>
-
-<section class="why">
-  <div class="wrap">
-    <h2>{azure.why.heading}</h2>
-    <ul class="why-list">
-      {azure.why.items.map((item) => (
-        <li><span><strong>{item.strong}</strong> <ProseText text={item.text} newTabLabel={common.a11y.newTab} /></span></li>
-      ))}
-    </ul>
-    <p class="trust-line">{azure.why.trustLine}</p>
   </div>
 </section>
 
 <div class="wrap">
 <main class="prose">
 
-  <!-- 3. Export explanation — Direct vanuit Microsoft -->
+  <!-- 3. What's in the file, why it's safe, why it's free -->
+  <section class="content" id="wat-zit-erin">
+    <h2>{azure.files.heading}</h2>
+    {azure.files.paragraphs.map((p) => (
+      <p><ProseText text={p} newTabLabel={common.a11y.newTab} /></p>
+    ))}
+  </section>
+
+  <section class="content">
+    <h2>{azure.free.heading}</h2>
+    {azure.free.paragraphs.map((p) => (
+      <p><ProseText text={p} newTabLabel={common.a11y.newTab} /></p>
+    ))}
+  </section>
+
+  <!-- 4. Export explanation -->
   <section class="content" id="export">
     <h2>{azure.export.heading}</h2>
     <p class="intro">{azure.export.intro}</p>
 
-    <h3>{azure.export.direct.heading}</h3>
     <ol>
-      {azure.export.direct.steps.map((step) => (
+      {azure.export.steps.map((step) => (
         <li><ProseText text={step} newTabLabel={common.a11y.newTab} /></li>
       ))}
     </ol>
-    <div class="note">{azure.export.direct.noteMonthly}</div>
-    <p>{azure.export.direct.multiMonth}</p>
+    <p>{azure.export.multiMonth}</p>
 
-    <div class="note">{azure.export.direct.noteCSP}</div>
-    <div class="note">{azure.export.direct.noteRole}</div>
+    <div class="note">{azure.export.noteRole}</div>
   </section>
 
 </main>
 </div>
 
-<!-- 4. The app -->
+<!-- 5. The app -->
 <div class="wrap">
 <section class="app" id="scan">
   <h2>{azure.app.heading}</h2>
