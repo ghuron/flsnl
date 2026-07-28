@@ -19,7 +19,17 @@
   --paper: #ffffff;
   --panel: #f5f5f7;
   --line: #d4d9df;
+  /* Kept as variables so the sticky bar's height and the anchor offset below cannot drift
+     apart: bar = logo + 0.6rem padding top and bottom + its 1px bottom border. */
+  --logo-h: 58px;
+  --topbar-h: calc(var(--logo-h) + 1.2rem + 1px);
 }
+
+/* header.topbar is sticky, so a bare anchor jump aligns the target with the viewport top and
+   the bar then sits on top of its first line. Every in-page target reserves the bar's height
+   plus breathing room. Applied to [id] rather than a list of sections so a future anchor
+   cannot be added without it. Inert on elements that are never scrolled to. */
+[id] { scroll-margin-top: calc(var(--topbar-h) + 1.25rem); }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
@@ -73,6 +83,9 @@ p { margin: 0 0 1.1rem; }
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
+  /* <button> does not inherit the page font, so without this a .btn button renders in the UA
+     default while a .btn anchor renders in Manrope. Both forms are used side by side. */
+  font-family: inherit;
   font-weight: 700;
   font-size: 1rem;
   padding: 0.9rem 1.6rem;
@@ -108,7 +121,7 @@ header.topbar .bar {
 }
 header.topbar .bar-end { display: flex; align-items: center; gap: 1.1rem; }
 header.topbar a.brand { display: inline-flex; }
-header.topbar img.logo { height: 58px; display: block; }
+header.topbar img.logo { height: var(--logo-h); display: block; }
 header.topbar .contact-link {
   display: inline-flex;
   align-items: center;

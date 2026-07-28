@@ -48,7 +48,8 @@ const azure = (await getEntry("azure", "nl"))!.data;
       <p class="lede">{azure.hero.lede}</p>
       <div class="hero-ctas">
         <a class="btn btn-primary" href={withBase(azure.hero.ctaPrimary.href)}>{azure.hero.ctaPrimary.label}</a>
-        <a class="btn btn-ghost-dark" href={withBase("#scan")} data-sample>{azure.app.sampleLabel}</a>
+        <!-- A button, not a link: it navigates nothing on this page, it produces a report. -->
+        <button class="btn btn-ghost-dark" type="button" data-sample>{azure.app.sampleLabel}</button>
       </div>
     </div>
     <div class="hero-visual" aria-hidden="true">
@@ -206,12 +207,12 @@ const azure = (await getEntry("azure", "nl"))!.data;
     // Recover without a reload if the page was opened offline.
     window.addEventListener("online", load);
 
-    // Hero "Bekijk een voorbeeldrapport" link: opens the sample PDF in a new tab rather than
-    // downloading it. The tab has to open synchronously, right here in the click handler,
-    // before any await runs anywhere — a window.open() called later (once scan.js/jsPDF have
-    // loaded and the PDF is built) is no longer inside the original user gesture as far as
-    // popup blockers are concerned, and gets silently blocked. It's a plain #scan anchor too,
-    // so the browser's own scroll still happens on the current tab regardless of load state.
+    // Hero "Bekijk een voorbeeldrapport" button: opens the sample PDF in a new tab rather than
+    // downloading it, and does nothing else — it is not a link and moves the current page
+    // nowhere. The tab has to open synchronously, right here in the click handler, before any
+    // await runs anywhere — a window.open() called later (once scan.js/jsPDF have loaded and
+    // the PDF is built) is no longer inside the original user gesture as far as popup blockers
+    // are concerned, and gets silently blocked.
     const heroSample = document.querySelector(".hero [data-sample]");
     if (heroSample) {
       heroSample.addEventListener("click", () => {
