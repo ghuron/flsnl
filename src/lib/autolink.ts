@@ -3,6 +3,8 @@
 // linkifies the term across all locales — no href duplicated into each content YAML.
 export const AUTOLINK_TERMS: Record<string, string> = {
   "portal.azure.com": "https://portal.azure.com/",
+  GitHub: "https://github.com/ghuron/flsnl",
+  "Andrei Zaikin": "https://www.linkedin.com/in/zaikin/",
 };
 
 export type TextSegment = { text: string; href?: string };

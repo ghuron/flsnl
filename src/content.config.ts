@@ -50,6 +50,11 @@ const azure = defineCollection({
       heading: z.string(),
       items: z.array(z.string()).length(3),
     }),
+    checks: z.object({
+      heading: z.string(),
+      intro: z.string(),
+      items: z.array(z.string()).length(7),
+    }),
     why: z.object({
       heading: z.string(),
       items: z.array(z.object({ strong: z.string(), text: z.string() })).length(4),
@@ -68,6 +73,7 @@ const azure = defineCollection({
         noteMonthly: z.string(),
         multiMonth: z.string(),
         noteCSP: z.string(),
+        noteRole: z.string(),
       }),
     }),
     app: z.object({
@@ -79,8 +85,10 @@ const azure = defineCollection({
         hint: z.string(),
         ariaLabel: z.string(),
       }),
+      sampleLabel: z.string(),
       analyzeLabel: z.string(),
       saveLabel: z.string(),
+      saveCsvLabel: z.string(),
       noscript: z.string(),
     }),
     footer: z.object({

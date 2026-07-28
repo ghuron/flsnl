@@ -272,6 +272,39 @@ section.steps h2 { font-size: 1.7rem; margin: 0 0 2rem; }
 }
 .steps-grid p { margin: 0; font-size: 0.94rem; color: var(--ink-dim); }
 
+/* ---- what the scan checks ---- */
+section.checks { background: var(--panel); padding: 4.5rem 0; }
+section.checks h2 { font-size: 1.7rem; margin: 0 0 0.9rem; }
+section.checks .intro { max-width: 680px; color: var(--ink-dim); margin: 0 0 2rem; }
+.checks-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.9rem 2rem;
+  max-width: 900px;
+}
+.checks-list li {
+  position: relative;
+  padding-left: 1.6rem;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+.checks-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+@media (max-width: 720px) {
+  .checks-list { grid-template-columns: 1fr; }
+}
+
 /* ---- dark differentiators band ---- */
 section.why {
   background:
@@ -329,6 +362,12 @@ section.content .intro { color: var(--ink-dim); font-size: 1.05rem; }
   padding: 0.8rem 1.1rem;
   border-radius: 0 8px 8px 0;
   margin: 1rem 0 1.6rem;
+}
+.note.sample-banner {
+  border-left-color: #b7791f;
+  background: #fdf3da;
+  color: #6b4c02;
+  font-weight: 700;
 }
 
 details {
@@ -445,7 +484,7 @@ section.app .intro { color: var(--ink-dim); font-size: 1.05rem; max-width: 700px
 .app-status.error { color: #c0392b; }
 
 .results { margin-top: 2.5rem; }
-.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
 .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 1.2rem; }
 .kpi .val { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
 .kpi .lbl { color: var(--ink-dim); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.3rem; }

@@ -69,12 +69,22 @@ const azure = (await getEntry("azure", "nl"))!.data;
   </div>
 </section>
 
+<section class="checks">
+  <div class="wrap">
+    <h2>{azure.checks.heading}</h2>
+    <p class="intro">{azure.checks.intro}</p>
+    <ul class="checks-list">
+      {azure.checks.items.map((item) => <li>{item}</li>)}
+    </ul>
+  </div>
+</section>
+
 <section class="why">
   <div class="wrap">
     <h2>{azure.why.heading}</h2>
     <ul class="why-list">
       {azure.why.items.map((item) => (
-        <li><span><strong>{item.strong}</strong> {item.text}</span></li>
+        <li><span><strong>{item.strong}</strong> <ProseText text={item.text} newTabLabel={common.a11y.newTab} /></span></li>
       ))}
     </ul>
     <p class="trust-line">{azure.why.trustLine}</p>
@@ -99,6 +109,7 @@ const azure = (await getEntry("azure", "nl"))!.data;
     <p>{azure.export.direct.multiMonth}</p>
 
     <div class="note">{azure.export.direct.noteCSP}</div>
+    <div class="note">{azure.export.direct.noteRole}</div>
   </section>
 
 </main>
@@ -120,8 +131,10 @@ const azure = (await getEntry("azure", "nl"))!.data;
     <ul class="filelist" data-filelist hidden></ul>
 
     <div class="app-actions">
+      <button class="btn btn-ghost" type="button" data-sample>{azure.app.sampleLabel}</button>
       <button class="btn btn-primary" type="button" data-analyze disabled>{azure.app.analyzeLabel}</button>
       <button class="btn btn-ghost" type="button" data-save hidden>{azure.app.saveLabel}</button>
+      <button class="btn btn-ghost" type="button" data-save-csv hidden>{azure.app.saveCsvLabel}</button>
       <span class="app-status" data-status role="status" aria-live="polite"></span>
     </div>
 
@@ -135,7 +148,7 @@ const azure = (await getEntry("azure", "nl"))!.data;
 </div>
 
 <Fragment slot="footer">
-  {azure.footer.text} <a href={withBase(azure.footer.backLink.href)}>{azure.footer.backLink.label}</a>
+  <ProseText text={azure.footer.text} newTabLabel={common.a11y.newTab} /> <a href={withBase(azure.footer.backLink.href)}>{azure.footer.backLink.label}</a>
 </Fragment>
 <script>
   // Vite code-splits the dynamic import below into its own hashed chunk and resolves the URL

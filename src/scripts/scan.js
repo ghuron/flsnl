@@ -1,7 +1,9 @@
 // scan.js — the Azure Waste Scan analyzer. Runs entirely in the browser.
-// Loaded on demand by boot.js. Nothing here makes a network request; files are
-// read locally via the File API and the report is saved as a local download.
+// Loaded on demand. Nothing here makes a network request; files are read
+// locally via the File API and the report is saved as a local download.
 "use strict";
+
+import { SAMPLE_CSV } from "./sampleData.js";
 
 /* ---------------------------------------------------------------- utilities */
 
@@ -16,6 +18,14 @@ function fmtBytes(n) {
   if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
   return (n / (1024 * 1024)).toFixed(1) + " MB";
 }
+
+// Yield to the event loop. Used both between queued files and, inside parseCSV, every
+// few thousand rows of a single large file — the freeze on a multi-hundred-MB export
+// comes from the synchronous parse loop, not from reading the file itself.
+function nextFrame() { return new Promise(function (r) { setTimeout(r, 0); }); }
+
+var LARGE_FILE_BYTES = 100 * 1024 * 1024;
+var PARSE_YIELD_ROWS = 20000;
 
 // Parse an Azure billing amount written in invariant culture, tolerant of the
 // odd thousands separator. Returns 0 for blanks/unparseable cells.
@@ -36,16 +46,42 @@ function parseNum(raw) {
   return isFinite(n) ? n : 0;
 }
 
-// RFC-4180-ish CSV parser tuned for large files (14 MB MCA exports): unquoted
+// Detect the field delimiter from a bounded prefix of the file. Azure exports are
+// comma-delimited, but a CSV re-saved by a Dutch-locale Excel switches to semicolons
+// (with a comma decimal separator inside numeric cells — parseNum already tolerates
+// that once the cell is correctly isolated by the right delimiter). Counts outside
+// quoted spans; a tie keeps the comma default so normal files are unaffected.
+function sniffDelimiter(text) {
+  var sample = text.slice(0, 4096);
+  var inQuotes = false, commas = 0, semicolons = 0;
+  for (var i = 0; i < sample.length; i++) {
+    var c = sample[i];
+    if (c === '"') inQuotes = !inQuotes;
+    else if (!inQuotes) {
+      if (c === ",") commas++;
+      else if (c === ";") semicolons++;
+    }
+  }
+  return semicolons > commas ? ";" : ",";
+}
+
+// RFC-4180-ish CSV parser tuned for large files (14 MB+ MCA exports): unquoted
 // fields are sliced with indexOf instead of char-by-char concatenation, and
 // only quoted fields fall into the slow path. Handles escaped quotes and CRLF.
-function parseCSV(text) {
+// Async and yields every PARSE_YIELD_ROWS rows so the tab stays responsive on a
+// large single file — onProgress (optional) gets the running row count.
+async function parseCSV(text, delim, onProgress) {
+  delim = delim || ",";
+  var delimCode = delim.charCodeAt(0);
   if (text.charCodeAt(0) === 0xfeff) text = text.slice(1); // strip BOM
   var rows = [], row = [], i = 0, n = text.length;
+  var nextYield = PARSE_YIELD_ROWS; // a plateau, not a per-field trigger: rows.length only
+  // advances at row boundaries, so this must fire once per threshold crossing, not once
+  // per field of every row sitting on top of an already-crossed multiple.
   // Consume the delimiter after a field; returns new index. Ends the row on EOL.
   function afterField(idx) {
     var c = text[idx];
-    if (c === ",") return idx + 1;
+    if (c === delim) return idx + 1;
     if (c === "\r") { rows.push(row); row = []; return text[idx + 1] === "\n" ? idx + 2 : idx + 1; }
     if (c === "\n") { rows.push(row); row = []; return idx + 1; }
     return idx; // EOF
@@ -64,9 +100,14 @@ function parseCSV(text) {
       i = afterField(j);
     } else {
       var next = i;
-      while (next < n) { var cc = text.charCodeAt(next); if (cc === 44 || cc === 10 || cc === 13) break; next++; }
+      while (next < n) { var cc = text.charCodeAt(next); if (cc === delimCode || cc === 10 || cc === 13) break; next++; }
       row.push(text.slice(i, next));
       i = afterField(next);
+    }
+    if (rows.length >= nextYield) {
+      nextYield += PARSE_YIELD_ROWS;
+      if (onProgress) onProgress(rows.length);
+      await nextFrame();
     }
   }
   if (row.length) rows.push(row);
@@ -99,7 +140,8 @@ function detectColumns(header) {
     period: pickColumn(header, ["billingperiodstartdate", "billingperiod", "billingperiodstart"]),
     chargeType: pickColumn(header, ["chargetype"]),
     pricingModel: pickColumn(header, ["pricingmodel"]),
-    reservation: pickColumn(header, ["reservationname", "benefitname"])
+    reservation: pickColumn(header, ["reservationname", "benefitname"]),
+    tags: pickColumn(header, ["tags", "resourcetags"])
   };
 }
 
@@ -159,14 +201,16 @@ function buildModel(datasets) {
   var total = 0, rowCount = 0, negatives = 0, creditsTotal = 0, unusedCommitment = 0;
   var onDemandCost = 0, commitmentCost = 0, coverageKnown = 0;
   var paygSum = 0, paygKnown = 0;
+  var untaggedCost = 0, taggedKnownCost = 0;
   var byCategory = new Map();
   var byGroup = new Map();
   var byResource = new Map();
   var bySubscription = new Map();
   var byMonth = new Map();
   var byMonthCat = new Map(); // monthKey -> Map(category -> cost)
+  var byFinding = new Map(); // "subscription|resourceId" -> finding row, for the CSV export
   var currencies = new Set();
-  var anyCost = false, anyGroup = false, anyResource = false, anySub = false, anyMonth = false, anyCoverage = false;
+  var anyCost = false, anyGroup = false, anyResource = false, anySub = false, anyMonth = false, anyCoverage = false, anyTags = false;
 
   datasets.forEach(function (ds) {
     var cols = ds.cols, rows = ds.rows;
@@ -177,6 +221,7 @@ function buildModel(datasets) {
     if (cols.subscription !== -1) anySub = true;
     if (cols.date !== -1 || cols.period !== -1) anyMonth = true;
     if (cols.pricingModel !== -1) anyCoverage = true;
+    if (cols.tags !== -1) anyTags = true;
     var dateCol = cols.date !== -1 ? cols.date : cols.period;
 
     for (var r = 0; r < rows.length; r++) {
@@ -189,8 +234,9 @@ function buildModel(datasets) {
       if (cols.currency !== -1 && row[cols.currency]) currencies.add(String(row[cols.currency]).trim().toUpperCase());
 
       var charge = cols.chargeType !== -1 ? norm2(row[cols.chargeType]) : "";
+      var isUnused = charge === "unusedreservation" || charge === "unusedsavingsplan";
       if (charge === "refund" || charge === "credit" || charge === "roundingadjustment") creditsTotal += cost;
-      if (charge === "unusedreservation" || charge === "unusedsavingsplan") unusedCommitment += cost;
+      if (isUnused) unusedCommitment += cost;
 
       if (cols.pricingModel !== -1) {
         var pm = norm2(row[cols.pricingModel]);
@@ -202,6 +248,12 @@ function buildModel(datasets) {
       }
       if (cols.paygCost !== -1) { paygSum += parseNum(row[cols.paygCost]); paygKnown += cost; }
 
+      if (cols.tags !== -1) {
+        var tagVal = String(row[cols.tags] || "").trim().toLowerCase();
+        taggedKnownCost += cost;
+        if (!tagVal || tagVal === "{}" || tagVal === "[]" || tagVal === "null") untaggedCost += cost;
+      }
+
       var cat = cols.category !== -1 ? (String(row[cols.category] || "").trim() || "(onbekend)") : "(alle)";
       byCategory.set(cat, (byCategory.get(cat) || 0) + cost);
 
@@ -209,13 +261,31 @@ function buildModel(datasets) {
         var g = String(row[cols.resourceGroup] || "").trim() || "(geen)";
         byGroup.set(g, (byGroup.get(g) || 0) + cost);
       }
-      if (cols.resource !== -1) {
-        var res = lastSegment(String(row[cols.resource] || "").trim()) || "(geen)";
-        byResource.set(res, (byResource.get(res) || 0) + cost);
-      }
+      var sub = "(geen)";
       if (cols.subscription !== -1) {
-        var sub = String(row[cols.subscription] || "").trim() || "(geen)";
+        sub = String(row[cols.subscription] || "").trim() || "(geen)";
         bySubscription.set(sub, (bySubscription.get(sub) || 0) + cost);
+      }
+      if (cols.resource !== -1) {
+        var resourceRaw = String(row[cols.resource] || "").trim();
+        var res = lastSegment(resourceRaw) || "(geen)";
+        byResource.set(res, (byResource.get(res) || 0) + cost);
+
+        var fkey = sub + "|" + (resourceRaw || res);
+        var finding = byFinding.get(fkey);
+        if (!finding) {
+          finding = {
+            resourceId: resourceRaw || res,
+            subscription: sub,
+            resourceGroup: cols.resourceGroup !== -1 ? (String(row[cols.resourceGroup] || "").trim() || "(geen)") : "",
+            category: cat,
+            cost: 0,
+            unusedReservationCost: 0
+          };
+          byFinding.set(fkey, finding);
+        }
+        finding.cost += cost;
+        if (isUnused) finding.unusedReservationCost += cost;
       }
       if (dateCol !== -1) {
         var mk = monthKeyOf(row[dateCol]);
@@ -242,17 +312,23 @@ function buildModel(datasets) {
   var monthKeys = Array.from(byMonth.keys()).sort();
   var months = monthKeys.map(function (k) { return { key: k, label: monthLabel(k), cost: byMonth.get(k) }; });
 
-  // Category that grew most between the last two months.
-  var catRiser = null;
+  // Categories ranked by how much they grew between the last two months, plus any
+  // category that has spend this month but had none in the previous one.
+  var catMovers = [], newCategories = [];
   if (monthKeys.length >= 2) {
     var prevK = monthKeys[monthKeys.length - 2], lastK = monthKeys[monthKeys.length - 1];
     var prevMap = byMonthCat.get(prevK) || new Map(), lastMap = byMonthCat.get(lastK) || new Map();
     var names = new Set([].concat(Array.from(prevMap.keys()), Array.from(lastMap.keys())));
     names.forEach(function (name) {
       var pv = prevMap.get(name) || 0, lv = lastMap.get(name) || 0, delta = lv - pv;
-      if (!catRiser || delta > catRiser.delta) catRiser = { name: name, prev: pv, last: lv, delta: delta };
+      catMovers.push({ name: name, prev: pv, last: lv, delta: delta });
+      if (pv <= 0 && lv > 0) newCategories.push({ name: name, cost: lv });
     });
+    catMovers.sort(function (a, b) { return b.delta - a.delta; });
+    newCategories.sort(function (a, b) { return b.cost - a.cost; });
   }
+
+  var findings = Array.from(byFinding.values()).sort(function (a, b) { return b.cost - a.cost; });
 
   return {
     ok: anyCost && rowCount > 0,
@@ -273,7 +349,8 @@ function buildModel(datasets) {
     subscriptions: anySub ? topN(bySubscription, 10) : [],
     subscriptionCount: bySubscription.size,
     months: months,
-    _catRiser: catRiser,
+    _catMovers: catMovers.slice(0, 5),
+    _newCategories: newCategories,
     hasResources: anyResource,
     hasGroups: anyGroup,
     hasSubscriptions: anySub && bySubscription.size > 1,
@@ -284,6 +361,11 @@ function buildModel(datasets) {
     commitmentCost: commitmentCost,
     paygDelta: paygKnown > 0 ? paygSum - paygKnown : 0,
     concentrationTop5: total > 0 ? top5 / total : 0,
+    hasTags: anyTags,
+    untaggedCost: untaggedCost,
+    untaggedShare: taggedKnownCost > 0 ? untaggedCost / taggedKnownCost : 0,
+    resourceFindings: findings,
+    hasFindings: findings.length > 0,
     generatedAt: new Date()
   };
 }
@@ -317,6 +399,13 @@ function buildSignals(m, money) {
             "Dat is geld dat nu weglekt — controleer of de reservering nog past bij wat je draait." });
   }
 
+  // 1b. Untagged spend — the number worth forwarding to management as-is.
+  if (m.hasTags && m.untaggedShare >= 0.3) {
+    out.push({ severity: "med", title: "Veel van je rekening heeft geen tags",
+      body: Math.round(m.untaggedShare * 100) + "% van je uitgaven (" + money(m.untaggedCost) + ") staat zonder tags. " +
+            "Zonder tags kun je kosten niet aan een team of project toewijzen — dat is meestal het eerste dat moet veranderen." });
+  }
+
   // 2. Reservation/savings coverage — steady compute at full on-demand price.
   if (m.hasCoverage && m.onDemandShare >= 0.85 && m.onDemandCost / (m.total || 1) >= 0.3) {
     out.push({ severity: "med", title: "Vrijwel alles wordt on-demand betaald",
@@ -336,10 +425,22 @@ function buildSignals(m, money) {
                 (pct > 0 ? "Kijk welke categorie de stijging veroorzaakt — die staat hieronder." : "Mooi — maar controleer of er niets is uitgezet dat wél nodig was.") });
       }
     }
-    var riser = biggestCategoryRiser(m);
-    if (riser && riser.delta > 0 && riser.delta / (m.total || 1) >= 0.03) {
-      out.push({ severity: "info", title: "Grootste stijger: " + riser.name,
-        body: riser.name + " groeide van " + money(riser.prev) + " naar " + money(riser.last) + " (+" + money(riser.delta) + "). Waarschijnlijk waar de stijging vandaan komt." });
+    var movers = (m._catMovers || []).filter(function (x) { return x.delta > 0 && x.delta / (m.total || 1) >= 0.03; });
+    if (movers.length) {
+      var top = movers[0];
+      out.push({ severity: "info", title: "Grootste stijger: " + top.name,
+        body: top.name + " groeide van " + money(top.prev) + " naar " + money(top.last) + " (+" + money(top.delta) + "). Waarschijnlijk waar de stijging vandaan komt." });
+      var rest = movers.slice(1, 4);
+      if (rest.length) {
+        out.push({ severity: "info", title: "Andere stijgers",
+          body: rest.map(function (x) { return x.name + " (+" + money(x.delta) + ")"; }).join(", ") + "." });
+      }
+    }
+    if (m._newCategories && m._newCategories.length) {
+      var fresh = m._newCategories.slice(0, 3);
+      out.push({ severity: "info", title: "Nieuw deze maand",
+        body: fresh.map(function (x) { return x.name + " (" + money(x.cost) + ")"; }).join(", ") +
+              " stond er de maand ervoor nog niet bij." });
     }
   }
 
@@ -379,14 +480,6 @@ function buildSignals(m, money) {
   return out;
 }
 
-// Which category grew the most between the last two months.
-function biggestCategoryRiser(m) {
-  if (!m.hasMonths || m.months.length < 2) return null;
-  // Rebuilt from per-row data would be ideal; approximate from category totals
-  // is not possible without per-month category breakdown, so use it only when present.
-  return m._catRiser || null;
-}
-
 /* ---------------------------------------------------------------- rendering */
 
 function tableHTML(title, rows, money) {
@@ -422,7 +515,7 @@ function monthsTableHTML(m, money) {
          "<thead><tr><th>Maand</th><th class=\"num\">Kosten</th><th></th></tr></thead><tbody>" + body + "</tbody></table></div>";
 }
 
-function renderResults(container, m) {
+function renderResults(container, m, isSample) {
   var money = makeMoney(m.currency === "MIXED" ? "" : m.currency);
   var fourth = m.hasCoverage
     ? kpi(Math.round(m.onDemandShare * 100) + "%", "On-demand")
@@ -431,7 +524,8 @@ function renderResults(container, m) {
     kpi(money(m.total), "Totale uitgaven") +
     kpi(esc(periodText(m)), "Periode") +
     kpi(String(m.categoryCount), "Categorieën") +
-    fourth;
+    fourth +
+    (m.hasTags ? kpi(Math.round(m.untaggedShare * 100) + "%", "Zonder tags") : "");
 
   var signals = buildSignals(m, money);
   var sevLabel = { high: "Actie", med: "Let op", info: "Ter info" };
@@ -441,7 +535,12 @@ function renderResults(container, m) {
       return "<li class=\"sig-" + (s.severity || "info") + "\"><strong>" + tag + esc(s.title) + "</strong>" + esc(s.body) + "</li>";
     }).join("") + "</ul>";
 
+  var sampleBanner = isSample
+    ? "<div class=\"note sample-banner\">Dit is een voorbeeldrapport met verzonnen data — geen echte Azure-kosten.</div>"
+    : "";
+
   container.innerHTML =
+    sampleBanner +
     "<div class=\"kpis\">" + kpis + "</div>" +
     signalsHTML +
     monthsTableHTML(m, money) +
@@ -456,7 +555,7 @@ function kpi(val, lbl) { return "<div class=\"kpi\"><div class=\"val\">" + val +
 
 /* ------------------------------------------------------------ saved report  */
 
-function buildReportHTML(m, fileNames) {
+function buildReportHTML(m, fileNames, isSample) {
   var money = makeMoney(m.currency === "MIXED" ? "" : m.currency);
   var signals = buildSignals(m, money);
   function t(title, rows) {
@@ -472,12 +571,17 @@ function buildReportHTML(m, fileNames) {
       "</tbody></table>";
   }
   var stamp = m.generatedAt.toLocaleString("nl-NL");
+  var titleSuffix = isSample ? " (voorbeeld)" : "";
+  var sampleBanner = isSample
+    ? "<div class=sample-flag>Dit is een voorbeeldrapport met verzonnen data — geen echte Azure-kosten.</div>"
+    : "";
   return "<!doctype html><html lang=nl><head><meta charset=utf-8>" +
     "<meta name=viewport content=\"width=device-width, initial-scale=1\">" +
-    "<title>Azure Waste Scan — rapport</title><style>" +
+    "<title>Azure Waste Scan — rapport" + titleSuffix + "</title><style>" +
     "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0e0e2a;line-height:1.6;max-width:820px;margin:2rem auto;padding:0 1.25rem}" +
     "h1{font-size:1.7rem;margin:0 0 .3rem}h2{font-size:1.15rem;margin:2rem 0 .6rem;border-bottom:2px solid #d4d9df;padding-bottom:.3rem}" +
     ".meta{color:#475569;font-size:.9rem;margin-bottom:1.5rem}" +
+    ".sample-flag{background:#fdf3da;color:#6b4c02;font-weight:700;border-left:3px solid #b7791f;border-radius:0 8px 8px 0;padding:.7rem 1rem;margin:0 0 1.25rem}" +
     ".kpis{display:flex;flex-wrap:wrap;gap:1rem;margin:1.25rem 0}.k{border:1px solid #d4d9df;border-radius:10px;padding:.9rem 1.1rem;min-width:150px}" +
     ".k .v{font-size:1.4rem;font-weight:800}.k .l{color:#475569;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}" +
     "table{border-collapse:collapse;width:100%;font-size:.92rem}th,td{text-align:left;padding:.45rem .5rem;border-bottom:1px solid #d4d9df}td.num,th.num{text-align:right;white-space:nowrap}" +
@@ -485,11 +589,13 @@ function buildReportHTML(m, fileNames) {
     "li b{display:block}footer{margin-top:2.5rem;color:#475569;font-size:.85rem;border-top:1px solid #d4d9df;padding-top:1rem}" +
     "</style></head><body>" +
     "<h1>Azure Waste Scan — rapport</h1>" +
+    sampleBanner +
     "<div class=meta>Gegenereerd op " + esc(stamp) + " · Bron: " + esc(fileNames.join(", ")) + " · Periode: " + esc(periodText(m)) + "</div>" +
     "<div class=kpis>" +
       "<div class=k><div class=v>" + esc(money(m.total)) + "</div><div class=l>Totale uitgaven</div></div>" +
       "<div class=k><div class=v>" + esc(String(m.categoryCount)) + "</div><div class=l>Categorieën</div></div>" +
       (m.hasCoverage ? "<div class=k><div class=v>" + Math.round(m.onDemandShare * 100) + "%</div><div class=l>On-demand</div></div>" : "") +
+      (m.hasTags ? "<div class=k><div class=v>" + Math.round(m.untaggedShare * 100) + "%</div><div class=l>Zonder tags</div></div>" : "") +
       "<div class=k><div class=v>" + esc(String(m.rowCount)) + "</div><div class=l>Regels</div></div>" +
     "</div>" +
     "<h2>Signalen</h2><ul>" +
@@ -504,6 +610,32 @@ function buildReportHTML(m, fileNames) {
     "</body></html>";
 }
 
+/* ---------------------------------------------------------------- findings CSV */
+
+function csvCell(v) {
+  var s = v == null ? "" : String(v);
+  return /[",\n]/.test(s) ? "\"" + s.replace(/"/g, "\"\"") + "\"" : s;
+}
+
+function buildFindingsCSV(m) {
+  var header = ["resourceId", "subscription", "resourceGroup", "category", "cost", "unusedReservationCost", "top5Concentrated", "note"];
+  var top5Names = {};
+  (m.resources || []).slice(0, 5).forEach(function (r) { top5Names[r.name] = true; });
+  var watch = { "Bandwidth": "uitgaand dataverkeer (egress) is een klassieke plek waar kosten sluipen",
+                "Storage": "oude snapshots en losgekoppelde disks blijven vaak doorlopen",
+                "Load Balancer": "load balancers en ongebruikte publieke IP’s blijven doortikken, ook zonder verkeer",
+                "Virtual Machines": "onbenutte of te ruim bemeten VM’s vallen zelden vanzelf op" };
+  var lines = [header.join(",")];
+  (m.resourceFindings || []).forEach(function (f) {
+    var isTop5 = top5Names[lastSegment(f.resourceId)] ? "ja" : "nee";
+    lines.push([
+      csvCell(f.resourceId), csvCell(f.subscription), csvCell(f.resourceGroup), csvCell(f.category),
+      f.cost.toFixed(2), f.unusedReservationCost.toFixed(2), isTop5, csvCell(watch[f.category] || "")
+    ].join(","));
+  });
+  return lines.join("\r\n");
+}
+
 /* -------------------------------------------------------------------- init  */
 
 export function init(mount) {
@@ -513,8 +645,10 @@ export function init(mount) {
   var dropzone = mount.querySelector("[data-dropzone]");
   var input = mount.querySelector("[data-file-input]");
   var listEl = mount.querySelector("[data-filelist]");
+  var sampleBtn = mount.querySelector("[data-sample]");
   var analyzeBtn = mount.querySelector("[data-analyze]");
   var saveBtn = mount.querySelector("[data-save]");
+  var saveCsvBtn = mount.querySelector("[data-save-csv]");
   var statusEl = mount.querySelector("[data-status]");
   var resultsEl = mount.querySelector("[data-results]");
 
@@ -528,6 +662,7 @@ export function init(mount) {
   var queue = [];
   var draining = false;
   var report = null; // { html, name }
+  var findingsCsv = null; // { text, name }
 
   function setStatus(msg, isError) {
     statusEl.textContent = msg || "";
@@ -539,7 +674,11 @@ export function init(mount) {
   }
 
   function monthsText(f) {
-    if (f.state === "reading") return "bezig met lezen…";
+    if (f.state === "reading") {
+      return f.size >= LARGE_FILE_BYTES
+        ? "bezig met lezen… (groot bestand, kan even duren)"
+        : "bezig met lezen…";
+    }
     if (f.state === "error") return f.error;
     if (!f.months.length) return "geen maand herkend";
     return monthsSummary(f.months);
@@ -572,7 +711,7 @@ export function init(mount) {
       if (!/\.csv$/i.test(f.name) && f.type !== "text/csv") return;
       // Skip exact duplicates (same name + size).
       if (files.some(function (x) { return x.name === f.name && x.size === f.size; })) return;
-      var entry = { id: ++seq, file: f, name: f.name, size: f.size, state: "reading", months: [], dataset: null, error: "" };
+      var entry = { id: ++seq, file: f, name: f.name, size: f.size, state: "reading", months: [], dataset: null, error: "", singleColumn: false };
       files.push(entry);
       queue.push(entry);
       added++;
@@ -596,9 +735,13 @@ export function init(mount) {
       try {
         await nextFrame();
         var text = await readText(entry.file);
-        var rows = parseCSV(text);
+        var delim = sniffDelimiter(text);
+        var rows = await parseCSV(text, delim, function (n) {
+          setStatus("‘" + entry.name + "’ lezen… (" + n.toLocaleString("nl-NL") + " regels)");
+        });
         text = null; // release the raw string before parsing the next file
         if (files.indexOf(entry) === -1) continue; // removed while it was being read
+        entry.singleColumn = rows.length > 0 && rows[0].length <= 1;
         if (rows.length < 2) {
           entry.state = "error";
           entry.error = "geen leesbare rijen";
@@ -663,55 +806,88 @@ export function init(mount) {
     });
   }
 
-  // Yield to the event loop so the status text actually repaints between the
-  // heavy synchronous parse of each (up to ~14 MB) file.
-  function nextFrame() { return new Promise(function (r) { setTimeout(r, 0); }); }
-
-  analyzeBtn.addEventListener("click", async function () {
-    var ready = readyFiles();
-    if (!ready.length) return;
+  // Shared by the real Analyze click and the sample-report click below, so render/save/status
+  // logic exists exactly once. datasets/fileNames come pre-parsed in both cases.
+  async function runAnalysis(datasets, fileNames, isSample) {
     analyzeBtn.disabled = true;
     saveBtn.hidden = true;
+    saveCsvBtn.hidden = true;
     report = null;
+    findingsCsv = null;
 
     try {
-      // Already parsed when the files were opened — nothing is read twice.
-      var datasets = ready.map(function (f) { return f.dataset; });
-
-      if (!datasets.length) { setStatus("Kon geen bruikbare rijen lezen. Is dit een Azure-verbruiks-CSV?", true); analyzeBtn.disabled = false; return; }
+      if (!datasets.length) { setStatus("Kon geen bruikbare rijen lezen. Is dit een Azure-verbruiks-CSV?", true); return; }
       if (!datasets.some(function (d) { return d.cols.cost !== -1; })) {
-        setStatus("Geen kostenkolom gevonden. Verwacht een kolom zoals ‘CostInBillingCurrency’ of ‘Cost’.", true);
-        analyzeBtn.disabled = false; return;
+        var delimIssue = !isSample && readyFiles().some(function (f) { return f.singleColumn; });
+        setStatus(delimIssue
+          ? "Geen kostenkolom gevonden — het bestand lijkt niet op komma's of puntkomma's gesplitst te zijn. Is dit een onbewerkte Azure-export?"
+          : "Geen kostenkolom gevonden. Verwacht een kolom zoals ‘CostInBillingCurrency’ of ‘Cost’.", true);
+        return;
       }
 
-      setStatus("Analyseren…");
+      setStatus(isSample ? "Voorbeeld analyseren…" : "Analyseren…");
       await nextFrame();
       var model = buildModel(datasets);
-      if (!model.ok) { setStatus("Geen kostenregels gevonden in het bestand.", true); analyzeBtn.disabled = false; return; }
+      if (!model.ok) { setStatus("Geen kostenregels gevonden in het bestand.", true); return; }
 
-      renderResults(resultsEl, model);
-      var stampName = "azure-waste-scan-rapport-" + new Date().toISOString().slice(0, 10) + ".html";
-      // `ready`, not `files` — a file that failed to parse must not be named in the report
-      // or counted in the summary line.
-      report = { html: buildReportHTML(model, ready.map(function (f) { return f.name; })), name: stampName };
+      renderResults(resultsEl, model, isSample);
+      var datePart = new Date().toISOString().slice(0, 10);
+      var reportName = isSample
+        ? "azure-waste-scan-VOORBEELD-" + datePart + ".html"
+        : "azure-waste-scan-rapport-" + datePart + ".html";
+      report = { html: buildReportHTML(model, fileNames, isSample), name: reportName };
       saveBtn.hidden = false;
-      analyzeBtn.disabled = false;
-      setStatus("Analyse klaar — " + model.rowCount.toLocaleString("nl-NL") + " regels uit " + ready.length + " bestand(en) verwerkt.");
+      if (model.hasFindings) {
+        findingsCsv = { text: buildFindingsCSV(model), name: "azure-waste-scan-resources-" + datePart + ".csv" };
+        saveCsvBtn.hidden = false;
+      }
+      setStatus((isSample ? "Voorbeeld klaar — " : "Analyse klaar — ") +
+        model.rowCount.toLocaleString("nl-NL") + " regels uit " + fileNames.length + " bestand(en) verwerkt.");
     } catch (err) {
       if (window.console) console.error(err);
       setStatus("Er ging iets mis bij het lezen van de bestanden.", true);
+    } finally {
       analyzeBtn.disabled = false;
+    }
+  }
+
+  analyzeBtn.addEventListener("click", function () {
+    var ready = readyFiles();
+    if (!ready.length) return;
+    // Already parsed when the files were opened — nothing is read twice.
+    runAnalysis(ready.map(function (f) { return f.dataset; }), ready.map(function (f) { return f.name; }), false);
+  });
+
+  // --- sample report: zero-effort preview, no file needed ---
+  sampleBtn.addEventListener("click", async function () {
+    sampleBtn.disabled = true;
+    try {
+      var rows = await parseCSV(SAMPLE_CSV, ",");
+      var dataset = { cols: detectColumns(rows[0]), rows: rows.slice(1) };
+      await runAnalysis([dataset], ["Voorbeelddata (synthetisch)"], true);
+    } finally {
+      sampleBtn.disabled = false;
     }
   });
 
   // --- save report ---
   saveBtn.addEventListener("click", function () {
     if (!report) return;
-    var blob = new Blob([report.html], { type: "text/html" });
+    downloadText(report.html, report.name, "text/html");
+  });
+
+  // --- save findings CSV ---
+  saveCsvBtn.addEventListener("click", function () {
+    if (!findingsCsv) return;
+    downloadText(findingsCsv.text, findingsCsv.name, "text/csv");
+  });
+
+  function downloadText(text, name, type) {
+    var blob = new Blob([text], { type: type });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
-    a.href = url; a.download = report.name;
+    a.href = url; a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-  });
+  }
 }
