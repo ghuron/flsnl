@@ -35,7 +35,7 @@ const azure = (await getEntry("azure", "nl"))!.data;
       fill="currentColor">
       <path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
     </svg>
-    <span class="connectivity-label sr-only" data-connectivity-text></span>
+    <span class="connectivity-label sr-only reveal-from-sm" data-connectivity-text></span>
   </span>
 </Fragment>
 
@@ -182,8 +182,9 @@ const azure = (await getEntry("azure", "nl"))!.data;
           // Nothing to reset: per the note above, retrying this specifier can never succeed,
           // so the reader is told to reload instead.
           const status = mount.querySelector("[data-status]");
-          if (status) {
-            status.textContent = mount.dataset.loadError ?? "";
+          const message = mount.dataset.loadError;
+          if (status && message) {
+            status.textContent = message;
             status.classList.add("error");
           }
           // Surface the real cause in the console for debugging.

@@ -193,19 +193,21 @@ function dateColOf(cols) {
 function datasetMonths(ds) {
   var dateCol = dateColOf(ds.cols);
   if (dateCol === -1) return [];
-  // Collect distinct raw cells first. An export repeats the same few dozen dates across tens
-  // of thousands of rows, so parsing runs on the distinct values rather than once per row.
-  var rawSeen = Object.create(null);
+  // Skip repeats of the previous cell rather than hashing every distinct value: exports are
+  // date-ordered, so this collapses the tens of thousands of rows sharing a date down to one
+  // monthKeyOf call each, and costs one string compare when they don't. A hash of distinct
+  // raw cells would be faster on unsorted input, but `date` may be a full timestamp
+  // (usagedatetime is an accepted column), and an hourly export would then build a
+  // row-sized dictionary — the exact case where the tab can least afford it.
+  var seen = Object.create(null), last = null;
   for (var r = 0; r < ds.rows.length; r++) {
     var raw = ds.rows[r][dateCol];
-    if (raw) rawSeen[raw] = true;
+    if (!raw || raw === last) continue;
+    last = raw;
+    var mk = monthKeyOf(raw);
+    if (mk) seen[mk] = true;
   }
-  var months = Object.create(null);
-  for (var key in rawSeen) {
-    var mk = monthKeyOf(key);
-    if (mk) months[mk] = true;
-  }
-  return Object.keys(months).sort();
+  return Object.keys(seen).sort();
 }
 
 // "mei 2026", "apr 2026 + mei 2026", or a range once it stops being worth spelling out.
@@ -554,6 +556,7 @@ export function init(mount) {
     statusEl.classList.toggle("error", !!isError);
   }
 
+  // "ready" is only ever set alongside entry.dataset, so callers can rely on it being there.
   function readyFiles() {
     return files.filter(function (f) { return f.state === "ready"; });
   }
@@ -588,7 +591,7 @@ export function init(mount) {
       var cell = monthsCell(f);
       return "<li><span class=\"fmeta\">" +
                "<span class=\"fname\">" + esc(f.name) + "</span>" +
-               "<span class=\"fmonths\" data-state=\"" + cell.state + "\">" + esc(cell.text) + "</span>" +
+               "<span class=\"fmonths\" data-state=\"" + esc(cell.state) + "\">" + esc(cell.text) + "</span>" +
              "</span>" +
              "<span class=\"size\">" + fmtBytes(f.size) +
              " <button type=\"button\" data-remove=\"" + f.id + "\" aria-label=\"Verwijder\">&times;</button></span></li>";
@@ -619,10 +622,11 @@ export function init(mount) {
     refreshList();
 
     // Pulling from `files` each round means a file removed while queued is simply never
-    // picked up; only the mid-read removal below is a real race worth guarding.
-    for (var entry; (entry = files.find(function (f) { return f.state === "queued"; })); ) {
+    // picked up; only the mid-read removal below is a real race worth guarding. The state has
+    // to leave "queued" before the await, or find() would keep re-picking the in-flight entry.
+    var entry;
+    while ((entry = files.find(function (f) { return f.state === "queued"; }))) {
       entry.state = "reading";
-      refreshList();
       setStatus("‘" + entry.name + "’ lezen…");
       try {
         await nextFrame();

@@ -11,7 +11,8 @@ type TextSegment = { text: string; href?: string };
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-// Longest-first, so an entry can never be swallowed by a shorter one that is its prefix.
+// Longest-first, so a future entry can never be swallowed by a shorter one that is its prefix.
+// No current term is a prefix of another; this is insurance for the next one.
 const terms = Object.keys(AUTOLINK_TERMS).sort((a, b) => b.length - a.length);
 const pattern = new RegExp(`(${terms.map(escapeRe).join("|")})`, "g");
 
