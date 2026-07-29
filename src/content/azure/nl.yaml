@@ -52,9 +52,7 @@ app:
     hint: Eén of meerdere Azure-verbruiksbestanden — .csv
     ariaLabel: Kies of sleep je CSV-bestanden
   sampleLabel: Bekijk een voorbeeldrapport
-  analyzeLabel: Analyseer
-  saveLabel: Rapport opslaan
-  saveCsvLabel: Exporteer bevindingen (CSV)
+  analyzeLabel: Genereer rapport
   loadError: De scanner kon niet laden. Ververs de pagina en probeer opnieuw.
   noscript: De scan draait op JavaScript in je eigen browser (er wordt nog steeds niets verzonden). Zet JavaScript aan om je bestand te analyseren.
 footer:

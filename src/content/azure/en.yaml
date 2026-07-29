@@ -52,13 +52,11 @@ app:
     hint: One or more Azure usage files — .csv
     ariaLabel: Choose or drag your CSV files
   sampleLabel: View a sample report
-  analyzeLabel: Analyze
-  saveLabel: Save report
-  saveCsvLabel: Export findings (CSV)
+  analyzeLabel: Produce report
   loadError: The scanner couldn't load. Reload the page and try again.
   noscript: The scan runs on JavaScript in your own browser (still nothing is sent anywhere). Turn on JavaScript to analyze your file.
 footer:
   text: First Line Software — source code and more on GitHub.
   backLink:
     label: Back to home
-    href: "/"
+    href: "/en/"

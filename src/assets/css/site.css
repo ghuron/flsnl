@@ -293,13 +293,6 @@ section.content .intro { color: var(--ink-dim); font-size: 1.05rem; }
   border-radius: 0 8px 8px 0;
   margin: 1rem 0 1.6rem;
 }
-.note.sample-banner {
-  border-left-color: #b7791f;
-  background: #fdf3da;
-  color: #6b4c02;
-  font-weight: 700;
-}
-
 details {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -412,30 +405,3 @@ section.app .intro { color: var(--ink-dim); font-size: 1.05rem; max-width: 700px
 .app-actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.5rem; align-items: center; }
 .app-status { color: var(--ink-dim); font-size: 0.9rem; }
 .app-status.error { color: #c0392b; }
-
-.results { margin-top: 2.5rem; }
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 1.2rem; }
-.kpi .val { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
-.kpi .lbl { color: var(--ink-dim); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.3rem; }
-@media (max-width: 720px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
-
-.result-table { width: 100%; border-collapse: collapse; margin: 0.5rem 0 2rem; font-size: 0.92rem; }
-.result-table th { text-align: left; color: var(--ink-dim); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.5rem 0.6rem; border-bottom: 2px solid var(--line); }
-.result-table td { padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--line); }
-.result-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.result-table .bar { position: relative; }
-.result-table .bar span { display: block; height: 6px; border-radius: 3px; background: var(--blue); margin-top: 0.35rem; }
-/* Sits between a signal section's heading and its list, so the heading keeps its own
-   margin-bottom collapsed against this rather than against the first card. */
-.sig-intro { color: var(--ink-dim); font-size: 0.92rem; max-width: 640px; margin: 0.3rem 0 0; }
-.signals { list-style: none; padding: 0; margin: 0.5rem 0 2rem; display: grid; gap: 0.8rem; }
-.signals li { background: var(--panel); border-left: 3px solid var(--purple); border-radius: 0 8px 8px 0; padding: 0.9rem 1.1rem; font-size: 0.95rem; }
-.signals li strong { display: block; margin-bottom: 0.2rem; }
-.signals li.sig-high { border-left-color: #c0392b; }
-.signals li.sig-med { border-left-color: #d98a00; }
-.signals .sev { display: inline-block; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.1rem 0.45rem; border-radius: 4px; vertical-align: middle; margin-right: 0.15rem; }
-.signals .sev-high { background: #fbe3e0; color: #c0392b; }
-.signals .sev-med { background: #fdefd4; color: #a66a00; }
-.signals .sev-info { background: #e6ecff; color: var(--blue-dark); }
-.table-scroll { overflow-x: auto; }

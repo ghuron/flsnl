@@ -11,9 +11,11 @@ interface Props {
   description: string;
   scriptSrc: "'none'" | "'self'";
   nav: { contactLabel: string; contactHref: string };
+  /** Where the header logo links to — the homepage of the current locale, not always "/". */
+  homeHref: string;
 }
 
-const { lang, title, description, scriptSrc, nav } = Astro.props;
+const { lang, title, description, scriptSrc, nav, homeHref } = Astro.props;
 const csp = `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'none'; img-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'none'`;
 ---
 <!doctype html>
@@ -36,7 +38,7 @@ const csp = `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsa
 
 <header class="topbar">
   <div class="bar">
-    <a class="brand" href={withBase("/")}><img class="logo" src={withBase("/assets/img/logo-fls-white.png")} alt="First Line Software"></a>
+    <a class="brand" href={withBase(homeHref)}><img class="logo" src={withBase("/assets/img/logo-fls-white.png")} alt="First Line Software"></a>
     <!-- Right-hand cluster: page-supplied status/actions sit on the same baseline as the
          contact button, and a future nav menu drops into the same row. -->
     <div class="bar-end">

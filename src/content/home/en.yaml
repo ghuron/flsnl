@@ -9,13 +9,13 @@ hero:
   lede: We build small, honest tools you can use right away — no account, no handing over your data. The first one is ready below.
   ctaPrimary:
     label: Go to the Azure Waste Scan
-    href: /azure/
+    href: /en/azure/
 promo:
   tag: Available now
   heading: Azure Waste Scan
   body: Open your monthly Azure usage file and see within two minutes where money is leaking. The analysis runs entirely in your own browser — no account, no upload, no server. This page simply cannot see your bill.
   cta:
     label: Start the scan
-    href: /azure/
+    href: /en/azure/
 footer:
   text: First Line Software — no tracking, no cookies, no external requests.

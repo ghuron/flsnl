@@ -1,10 +1,11 @@
 // scan.js — the Azure Waste Scan analyzer. Runs entirely in the browser.
 // Loaded on demand. Nothing here makes a network request; files are read
-// locally via the File API and the report is saved as a local download.
+// locally via the File API and the report opens as a PDF in a new tab.
 "use strict";
 
 import { buildSampleCSV } from "./sampleData.js";
-import { makeMoney, buildSignals, periodText } from "./report-data.js";
+import { monthLabel } from "./report-data.js";
+import { textFor } from "./strings.js";
 
 /* ---------------------------------------------------------------- utilities */
 
@@ -155,9 +156,7 @@ function detectColumns(header) {
     tags: pickColumn(header, ["tags", "resourcetags"]),
     meterName: pickColumn(header, ["metername", "xskumetername"]),
     meterSubCategory: pickColumn(header, ["metersubcategory"]),
-    publisherType: pickColumn(header, ["publishertype"]),
-    quantity: pickColumn(header, ["quantity", "consumedquantity"]),
-    unitOfMeasure: pickColumn(header, ["unitofmeasure", "pricingunit"])
+    publisherType: pickColumn(header, ["publishertype"])
   };
 }
 
@@ -182,11 +181,6 @@ function monthKeyOf(raw) {
   return "";
 }
 
-var MONTH_NL = ["", "jan", "feb", "mrt", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec"];
-function monthLabel(key) {
-  var p = key.split("-");
-  return p.length === 2 ? MONTH_NL[parseInt(p[1], 10)] + " " + p[0] : key;
-}
 // The single definition of which column carries the usage date. Both the per-file month
 // labels and buildModel's month aggregation go through this, so the file list and the report
 // cannot disagree about the period — an invariant a duplicated expression could not enforce.
@@ -216,11 +210,14 @@ function datasetMonths(ds) {
 }
 
 // "mei 2026", "apr 2026 + mei 2026", or a range once it stops being worth spelling out.
-function monthsSummary(keys) {
+// Only used for the per-file "months covered" text in the file list — the report's own
+// month labels/ranges go through report-data.js's periodText instead.
+function monthsSummary(keys, lang) {
+  var S = textFor(lang);
   if (!keys.length) return "";
-  if (keys.length === 1) return monthLabel(keys[0]);
-  if (keys.length === 2) return monthLabel(keys[0]) + " + " + monthLabel(keys[1]);
-  return monthLabel(keys[0]) + " – " + monthLabel(keys[keys.length - 1]) + " · " + keys.length + " maanden";
+  if (keys.length === 1) return monthLabel(keys[0], lang);
+  if (keys.length === 2) return S.monthsJoinTwo(monthLabel(keys[0], lang), monthLabel(keys[1], lang));
+  return S.monthsRange(monthLabel(keys[0], lang), monthLabel(keys[keys.length - 1], lang), keys.length);
 }
 
 function norm2(s) { return String(s || "").toLowerCase().replace(/[\s_-]/g, ""); }
@@ -253,18 +250,17 @@ var IAAS_CATEGORIES = {
 // bare "cognitive" would report AI spend that isn't there. "Foundry Models" is where Azure
 // bills GPT tokens today, so leaving it out misses the whole category.
 var AI_CATEGORY_RE = /openai|foundry|cognitive services|machine learning|azure ai(?! search)|document intelligence|form recognizer/i;
-// Token meters split into prompt, cached prompt and completion ("… Inpt Glbl 1M Tokens",
-// "5.2 codex cd inp Gl 1M Tokens", "… outpt Glbl 1M Tokens"). Cached is tested first: it is
-// also an input meter, and counting it twice would flatter the cache share.
-var AI_CACHED_RE = /cach|cd inp/i;
-var AI_INPUT_RE = /\binput\b|\binp\b|inpt/i;
-var AI_OUTPUT_RE = /\boutput\b|\bopt\b|outpt/i;
-// Only these units are token counts; the same AI service also bills hours (speech) and 1K
-// units, which must not be summed into a token ratio.
-var TOKEN_UNITS = { "1m": 1e6, "1k": 1e3 };
 var EGRESS_METER_RE = /data transfer out|egress/i;
-var GPU_RE = /\bN[CDV]\d/i;
 var LICENSE_RE = /windows|sql server (licen|edition)/i;
+// Load Balancer meters split into the flat "included rules" base fee and actual data-processed
+// volume — the base fee bills the same whether the LB carries any traffic or not, so a set of
+// LBs whose cost is almost entirely base fee is the signal that they're each running well under
+// capacity and worth consolidating (see the lbConsolidation signal in report-data.js).
+var LB_DATA_PROCESSED_RE = /data processed/i;
+// Azure prefixes the resource group it auto-creates for a Container Apps managed environment
+// with "ME_" — one Standard Load Balancer comes bundled per environment, so a set of LBs living
+// in these groups are platform-provisioned, not something a customer wired up by hand.
+var MANAGED_ENV_RG_RE = /^me_/i;
 
 // Name fragments that mark an environment as non-production. Matched per token against the
 // resource name and its resource group, with trailing digits stripped, so "…-stage2" and
@@ -295,7 +291,7 @@ function dateOf(raw) {
 
 /* ------------------------------------------------------------------- model  */
 
-function buildModel(datasets) {
+function buildModel(datasets, lang) {
   var total = 0, rowCount = 0, negatives = 0, creditsTotal = 0, unusedCommitment = 0, purchaseCost = 0;
   var onDemandCost = 0, commitmentCost = 0, coverageKnown = 0;
   var paygSum = 0, paygKnown = 0;
@@ -305,18 +301,15 @@ function buildModel(datasets) {
   var bySubscription = new Map();
   var byMonth = new Map();
   var byMonthCat = new Map(); // monthKey -> Map(category -> cost)
-  var byFinding = new Map(); // "subscription|resourceId" -> finding row, for the CSV export
+  var byFinding = new Map(); // "subscription|resourceId" -> finding row, for resource ranking
   var byMeter = new Map();   // meterName -> cost. Bounded by distinct meters (hundreds), so the
   var bySubCat = new Map();  // meterSubCategory -> cost. classification regexes below run over
                              // these once at the end instead of once per row.
+  var byLB = new Map();      // resourceId -> { resourceGroup, cost, dataProcessedCost }, Load
+                             // Balancer resources only, for the consolidation signal.
   var computeByDay = new Map(); // raw date cell -> compute-only cost, for the weekend comparison
   var daysSeen = new Set();     // distinct raw date cells, to tell daily data from monthly
   var marketplaceCost = 0;
-  var aiTokens = { input: 0, cached: 0, output: 0 };
-  // The classification regexes are keyed by the string they were run against, so each
-  // distinct category/meter/unit costs one regex and every later row costs a hash lookup.
-  // Category and meter names number in the hundreds even in a million-row export.
-  var catIsAi = Object.create(null), meterRole = Object.create(null), unitScale = Object.create(null);
   var currencies = new Set();
   var anyCost = false, anyGroup = false, anyResource = false, anySub = false, anyMonth = false, anyCoverage = false, anyTags = false;
 
@@ -376,31 +369,14 @@ function buildModel(datasets) {
       var cat = cols.category !== -1 ? (String(row[cols.category] || "").trim() || "(onbekend)") : "(alle)";
       byCategory.set(cat, (byCategory.get(cat) || 0) + cost);
       var isCompute = COMPUTE_CATEGORIES[cat.toLowerCase()] === 1;
+      var isLB = cat.toLowerCase() === "load balancer";
+      var lbDataProcessed = false;
 
       if (cols.meterName !== -1) {
         var mn = String(row[cols.meterName] || "").trim();
         if (mn) {
+          if (isLB) lbDataProcessed = LB_DATA_PROCESSED_RE.test(mn);
           byMeter.set(mn, (byMeter.get(mn) || 0) + cost);
-          // Prompt/completion volumes, for the input:output ratio. Only inside AI categories,
-          // so an unrelated meter that happens to contain "inp" cannot land here.
-          if (cols.quantity !== -1 && cols.unitOfMeasure !== -1) {
-            var ai = catIsAi[cat];
-            if (ai === undefined) ai = catIsAi[cat] = AI_CATEGORY_RE.test(cat);
-            if (ai) {
-              var role = meterRole[mn];
-              if (role === undefined) {
-                role = meterRole[mn] = AI_CACHED_RE.test(mn) ? "cached"
-                  : AI_INPUT_RE.test(mn) ? "input"
-                  : AI_OUTPUT_RE.test(mn) ? "output" : "";
-              }
-              if (role) {
-                var uRaw = String(row[cols.unitOfMeasure] || "").trim();
-                var scale = unitScale[uRaw];
-                if (scale === undefined) scale = unitScale[uRaw] = TOKEN_UNITS[uRaw.toLowerCase().replace(/[\s]/g, "")] || 0;
-                if (scale) aiTokens[role] += parseNum(row[cols.quantity]) * scale;
-              }
-            }
-          }
         }
       }
       if (cols.meterSubCategory !== -1) {
@@ -443,6 +419,13 @@ function buildModel(datasets) {
         // if any of them is compute.
         if (isCompute) finding.compute = true;
         if (isUnused) finding.unusedReservationCost += cost;
+        if (isLB) {
+          var lbKey = resourceRaw || res;
+          var lb = byLB.get(lbKey);
+          if (!lb) { lb = { resourceGroup: finding.resourceGroup, cost: 0, dataProcessedCost: 0 }; byLB.set(lbKey, lb); }
+          lb.cost += cost;
+          if (lbDataProcessed) lb.dataProcessedCost += cost;
+        }
         if (dateCol !== -1) {
           var dRaw = row[dateCol];
           if (dRaw) {
@@ -477,7 +460,10 @@ function buildModel(datasets) {
 
   var currency = currencies.size === 1 ? Array.from(currencies)[0] : (currencies.size === 0 ? "" : "MIXED");
   var monthKeys = Array.from(byMonth.keys()).sort();
-  var months = monthKeys.map(function (k) { return { key: k, label: monthLabel(k), cost: byMonth.get(k) }; });
+  // Labels are baked in here, in the page's own language: a single scan is only ever
+  // rendered (on-screen and in its PDF) in the language it was run in, so there is no reason
+  // to defer this to render time and every consumer below can just read .label.
+  var months = monthKeys.map(function (k) { return { key: k, label: monthLabel(k, lang), cost: byMonth.get(k) }; });
 
   // Categories ranked by how much they grew between the last two months, plus any
   // category that has spend this month but had none in the previous one.
@@ -509,8 +495,6 @@ function buildModel(datasets) {
     return { name: nameCounts[f.name] > 1 && f.resourceGroup ? f.name + " · " + f.resourceGroup : f.name, cost: f.cost };
   });
   var top5 = findings.slice(0, 5).reduce(function (a, x) { return a + x.cost; }, 0);
-  var top5Ids = Object.create(null);
-  findings.slice(0, 5).forEach(function (f) { top5Ids[f.resourceId] = 1; });
 
   // --- derived workload metrics. All classification runs over the small per-name maps
   // collected above, never per row, so none of this scales with file size.
@@ -520,20 +504,27 @@ function buildModel(datasets) {
     return s;
   }
   var computeCost = 0, iaasCost = 0, aiCost = 0;
-  var aiCategories = [];
   byCategory.forEach(function (c, name) {
     var k = name.toLowerCase();
     if (COMPUTE_CATEGORIES[k] === 1) computeCost += c;
     if (IAAS_CATEGORIES[k] === 1) iaasCost += c;
-    if (AI_CATEGORY_RE.test(name)) { aiCost += c; aiCategories.push({ name: name, cost: c }); }
+    if (AI_CATEGORY_RE.test(name)) aiCost += c;
   });
-  aiCategories.sort(function (a, b) { return b.cost - a.cost; });
 
   // Egress reads meter names when the export has them (the category is usually the service,
   // not the transfer); a file without a meter column falls back to the Bandwidth category.
   var egressCost = byMeter.size ? sumMatching(byMeter, EGRESS_METER_RE) : (byCategory.get("Bandwidth") || 0);
-  var gpuCost = byMeter.size ? sumMatching(byMeter, GPU_RE) : 0;
   var licenseCost = bySubCat.size ? sumMatching(bySubCat, LICENSE_RE) : 0;
+
+  // Load Balancer consolidation candidates: how many distinct LBs, how much of their combined
+  // cost is real data-processing volume vs flat base fee, and how many sit in an auto-created
+  // Container Apps managed-environment resource group (platform-provisioned, not hand-wired).
+  var lbCount = byLB.size, lbCost = 0, lbDataProcessedCost = 0, lbManagedEnvCount = 0;
+  byLB.forEach(function (lb) {
+    lbCost += lb.cost;
+    lbDataProcessedCost += lb.dataProcessedCost;
+    if (MANAGED_ENV_RG_RE.test(lb.resourceGroup || "")) lbManagedEnvCount++;
+  });
 
   // Weekend vs weekday, compute only. Needs real daily rows on both sides of the week to mean
   // anything — a monthly summary, or a date column that resolves to the billing period, gives
@@ -583,11 +574,13 @@ function buildModel(datasets) {
     categoryMap: byCategory,
     groups: anyGroup ? topN(byGroup, 10) : [],
     groupCount: byGroup.size,
+    groupMap: byGroup,
     resources: anyResource ? resourcesRanked.slice(0, 10) : [],
+    resourcesRankedAll: anyResource ? resourcesRanked : [],
     resourceCount: findings.length,
-    _top5Ids: top5Ids,
     subscriptions: anySub ? topN(bySubscription, 10) : [],
     subscriptionCount: bySubscription.size,
+    subscriptionMap: bySubscription,
     months: months,
     _catMovers: catMovers.slice(0, 5),
     _newCategories: newCategories,
@@ -604,21 +597,18 @@ function buildModel(datasets) {
     hasTags: anyTags,
     untaggedCost: untaggedCost,
     untaggedShare: taggedKnownCost > 0 ? untaggedCost / taggedKnownCost : 0,
-    resourceFindings: findings,
-    hasFindings: findings.length > 0,
     // --- workload shape, for the engineering signals
     computeCost: computeCost,
     computeShare: total > 0 ? computeCost / total : 0,
     iaasShare: total > 0 ? iaasCost / total : 0,
     egressCost: egressCost,
     aiCost: aiCost,
-    aiCategories: aiCategories,
-    aiTokens: aiTokens,
-    aiInputRatio: aiTokens.output > 0 ? (aiTokens.input + aiTokens.cached) / aiTokens.output : null,
-    aiCachedShare: (aiTokens.input + aiTokens.cached) > 0 ? aiTokens.cached / (aiTokens.input + aiTokens.cached) : null,
-    gpuCost: gpuCost,
     licenseCost: licenseCost,
     marketplaceCost: marketplaceCost,
+    lbCount: lbCount,
+    lbCost: lbCost,
+    lbDataProcessedCost: lbDataProcessedCost,
+    lbManagedEnvCount: lbManagedEnvCount,
     dayCount: daysSeen.size,
     hasDaily: hasDaily,
     weekendRatio: weekendRatio,
@@ -633,117 +623,19 @@ function buildModel(datasets) {
   };
 }
 
-/* ---------------------------------------------------------------- rendering */
-
-function tableHTML(title, rows, money) {
-  if (!rows.length) return "";
-  var max = rows[0].cost || 1;
-  var body = rows.map(function (r) {
-    var pct = Math.max(0, Math.min(100, (r.cost / max) * 100));
-    return "<tr><td>" + esc(r.name) + "</td>" +
-           "<td class=\"num\">" + esc(money(r.cost)) + "</td>" +
-           "<td class=\"bar\"><span style=\"width:" + pct.toFixed(1) + "%\"></span></td></tr>";
-  }).join("");
-  return "<h3>" + esc(title) + "</h3><div class=\"table-scroll\"><table class=\"result-table\">" +
-         "<thead><tr><th>Naam</th><th class=\"num\">Kosten</th><th></th></tr></thead>" +
-         "<tbody>" + body + "</tbody></table></div>";
-}
-
-// A compact month-over-month bar table.
-function monthsTableHTML(m, money) {
-  if (!m.hasMonths || m.months.length < 2) return "";
-  var max = m.months.reduce(function (a, x) { return Math.max(a, x.cost); }, 1);
-  var body = m.months.map(function (r) {
-    var pct = Math.max(0, Math.min(100, (r.cost / max) * 100));
-    return "<tr><td>" + esc(r.label) + "</td><td class=\"num\">" + esc(money(r.cost)) +
-           "</td><td class=\"bar\"><span style=\"width:" + pct.toFixed(1) + "%\"></span></td></tr>";
-  }).join("");
-  return "<h3>Verloop per maand</h3><div class=\"table-scroll\"><table class=\"result-table\">" +
-         "<thead><tr><th>Maand</th><th class=\"num\">Kosten</th><th></th></tr></thead><tbody>" + body + "</tbody></table></div>";
-}
-
-function renderResults(container, m, isSample) {
-  var money = makeMoney(m.currency === "MIXED" ? "" : m.currency);
-  var fourth = m.hasCoverage
-    ? kpi(Math.round(m.onDemandShare * 100) + "%", "On-demand")
-    : kpi(String(m.hasGroups ? m.groupCount : m.rowCount), m.hasGroups ? "Resourcegroepen" : "Regels");
-  var kpis =
-    kpi(money(m.total), "Totale uitgaven") +
-    kpi(esc(periodText(m)), "Periode") +
-    kpi(String(m.categoryCount), "Categorieën") +
-    fourth +
-    (m.hasTags ? kpi(Math.round(m.untaggedShare * 100) + "%", "Zonder tags") : "");
-
-  var sevLabel = { high: "Actie", med: "Let op", info: "Ter info" };
-  var signalsHTML = buildSignals(m, money).map(function (sec) {
-    return "<h3>" + esc(sec.heading) + "</h3>" +
-      (sec.intro ? "<p class=\"sig-intro\">" + esc(sec.intro) + "</p>" : "") +
-      "<ul class=\"signals\">" +
-      sec.items.map(function (s) {
-        var tag = s.severity && sevLabel[s.severity] ? "<span class=\"sev sev-" + s.severity + "\">" + sevLabel[s.severity] + "</span> " : "";
-        return "<li class=\"sig-" + (s.severity || "info") + "\"><strong>" + tag + esc(s.title) + "</strong>" + esc(s.body) + "</li>";
-      }).join("") + "</ul>";
-  }).join("");
-
-  var sampleBanner = isSample
-    ? "<div class=\"note sample-banner\">Dit is een voorbeeldrapport met verzonnen data — geen echte Azure-kosten.</div>"
-    : "";
-
-  container.innerHTML =
-    sampleBanner +
-    "<div class=\"kpis\">" + kpis + "</div>" +
-    signalsHTML +
-    monthsTableHTML(m, money) +
-    tableHTML("Uitgaven per categorie", m.categories, money) +
-    (m.hasResources ? tableHTML("Duurste resources", m.resources, money) : "") +
-    (m.hasSubscriptions ? tableHTML("Uitgaven per subscription", m.subscriptions, money) : "") +
-    (m.hasGroups ? tableHTML("Uitgaven per resourcegroep", m.groups, money) : "");
-  container.hidden = false;
-}
-
-function kpi(val, lbl) { return "<div class=\"kpi\"><div class=\"val\">" + val + "</div><div class=\"lbl\">" + lbl + "</div></div>"; }
-
-/* ---------------------------------------------------------------- findings CSV */
-
-function csvCell(v) {
-  var s = v == null ? "" : String(v);
-  return /[",\n]/.test(s) ? "\"" + s.replace(/"/g, "\"\"") + "\"" : s;
-}
-
-function buildFindingsCSV(m) {
-  var header = ["resourceId", "subscription", "resourceGroup", "category", "cost", "unusedReservationCost", "top5Concentrated", "note"];
-  // Matched on the resource ID, not the display name: display names may carry a resource-group
-  // suffix to disambiguate repeats, and would never compare equal here.
-  var top5Ids = m._top5Ids || {};
-  var watch = { "Bandwidth": "uitgaand dataverkeer (egress) is een klassieke plek waar kosten sluipen",
-                "Storage": "oude snapshots en losgekoppelde disks blijven vaak doorlopen",
-                "Load Balancer": "load balancers en ongebruikte publieke IP’s blijven doortikken, ook zonder verkeer",
-                "Virtual Machines": "onbenutte of te ruim bemeten VM’s vallen zelden vanzelf op" };
-  var lines = [header.join(",")];
-  (m.resourceFindings || []).forEach(function (f) {
-    var isTop5 = top5Ids[f.resourceId] ? "ja" : "nee";
-    lines.push([
-      csvCell(f.resourceId), csvCell(f.subscription), csvCell(f.resourceGroup), csvCell(f.category),
-      f.cost.toFixed(2), f.unusedReservationCost.toFixed(2), isTop5, csvCell(watch[f.category] || "")
-    ].join(","));
-  });
-  return lines.join("\r\n");
-}
-
 /* -------------------------------------------------------------------- init  */
 
-export function init(mount) {
+export function init(mount, lang) {
   if (mount.dataset.scanReady) return mount._api;
   mount.dataset.scanReady = "1";
+  lang = lang || "nl";
+  var S = textFor(lang);
 
   var dropzone = mount.querySelector("[data-dropzone]");
   var input = mount.querySelector("[data-file-input]");
   var listEl = mount.querySelector("[data-filelist]");
   var analyzeBtn = mount.querySelector("[data-analyze]");
-  var saveBtn = mount.querySelector("[data-save]");
-  var saveCsvBtn = mount.querySelector("[data-save-csv]");
   var statusEl = mount.querySelector("[data-status]");
-  var resultsEl = mount.querySelector("[data-results]");
 
   // One entry per opened file: { id, file, name, size, state, months, dataset, error,
   // singleColumn }. state is "queued" | "reading" | "ready" | "error", and `files` is the only
@@ -758,8 +650,6 @@ export function init(mount) {
   var files = [];
   var seq = 0;
   var draining = false;
-  var report = null; // { model, fileNames, isSample, name } — the PDF itself is built on demand
-  var findingsCsv = null; // { text, name }
 
   // The PDF chunk (jspdf + jspdf-autotable, ~124KB gzip — far above what's reasonable to ship
   // on every page load) is only ever reached via this dynamic import. It carries more state
@@ -793,25 +683,17 @@ export function init(mount) {
 
   // Read errors are stored as codes, not prose, so the entry stays a data structure and the
   // wording lives here with the rest of the display strings.
-  var READ_ERRORS = {
-    "no-rows": "geen leesbare rijen",
-    unreadable: "kon niet gelezen worden"
-  };
+  var READ_ERRORS = { "no-rows": S.status.noRows, unreadable: S.status.unreadable };
 
   // The one place the four display cases are defined. "unknown" is a file that parsed fine but
   // carries no recognisable date column — neither a success worth highlighting nor an error.
   function monthsCell(f) {
     if (f.state === "queued" || f.state === "reading") {
-      return {
-        state: "reading",
-        text: f.size >= LARGE_FILE_BYTES
-          ? "bezig met lezen… (groot bestand, kan even duren)"
-          : "bezig met lezen…"
-      };
+      return { state: "reading", text: f.size >= LARGE_FILE_BYTES ? S.status.readingLarge : S.status.readingPlain };
     }
     if (f.state === "error") return { state: "error", text: READ_ERRORS[f.error] || READ_ERRORS.unreadable };
-    if (!f.months.length) return { state: "unknown", text: "geen maand herkend" };
-    return { state: "ready", text: monthsSummary(f.months) };
+    if (!f.months.length) return { state: "unknown", text: S.status.noMonthRecognised };
+    return { state: "ready", text: monthsSummary(f.months, lang) };
   }
 
   function refreshList() {
@@ -824,7 +706,7 @@ export function init(mount) {
                "<span class=\"fmonths\" data-state=\"" + esc(cell.state) + "\">" + esc(cell.text) + "</span>" +
              "</span>" +
              "<span class=\"size\">" + fmtBytes(f.size) +
-             " <button type=\"button\" data-remove=\"" + f.id + "\" aria-label=\"Verwijder\">&times;</button></span></li>";
+             " <button type=\"button\" data-remove=\"" + f.id + "\" aria-label=\"" + esc(S.status.removeFile) + "\">&times;</button></span></li>";
     }).join("");
     // Nothing to analyze until at least one file is parsed, and never mid-read.
     analyzeBtn.disabled = draining || !readyFiles().length;
@@ -840,7 +722,7 @@ export function init(mount) {
       added++;
     });
     refreshList();
-    if (!added) { setStatus("Kies .csv-bestanden.", true); return; }
+    if (!added) { setStatus(S.status.chooseFiles, true); return; }
     drain();
   }
 
@@ -857,13 +739,13 @@ export function init(mount) {
     var entry;
     while ((entry = files.find(function (f) { return f.state === "queued"; }))) {
       entry.state = "reading";
-      setStatus("‘" + entry.name + "’ lezen…");
+      setStatus(S.status.reading(entry.name));
       try {
         await nextFrame();
         var text = await readText(entry.file);
         var delim = sniffDelimiter(text);
         var rows = await parseCSV(text, delim, function (n) {
-          setStatus("‘" + entry.name + "’ lezen… (" + n.toLocaleString("nl-NL") + " regels)");
+          setStatus(S.status.readingProgress(entry.name, n));
         });
         text = null; // release the raw string before parsing the next file
         if (files.indexOf(entry) === -1) continue; // removed while it was being read
@@ -887,7 +769,7 @@ export function init(mount) {
     draining = false;
     refreshList();
     var ready = readyFiles().length;
-    setStatus(ready ? ready + " bestand(en) klaar om te analyseren." : "Geen bruikbare bestanden.", !ready);
+    setStatus(ready ? S.status.filesReadyToAnalyze(ready) : S.status.noUsableFiles, !ready);
   }
 
   // --- file input / dropzone wiring ---
@@ -918,7 +800,7 @@ export function init(mount) {
     }
     refreshList();
     var ready = readyFiles().length;
-    setStatus(files.length ? ready + " bestand(en) klaar." : "");
+    setStatus(files.length ? S.status.filesReady(ready) : "");
   });
 
   // --- analyze ---
@@ -932,81 +814,34 @@ export function init(mount) {
     });
   }
 
-  // Shared by the real Analyze click and the sample-report click below, so render/save/status
-  // logic exists exactly once. datasets/fileNames come pre-parsed in both cases.
-  async function runAnalysis(datasets, fileNames, isSample) {
+  // Shared by the real Produce-report click and the sample-report click below, so the
+  // analyze -> build PDF -> open tab logic exists exactly once. `win` is a tab already opened
+  // by window.open() in the click handler itself, before any await ran — opening it here
+  // instead would get blocked as a popup by most browsers, since by the time this async
+  // function reaches its first await it's no longer considered to be running synchronously
+  // inside the click that triggered it. This just navigates that tab to the finished PDF once
+  // it's ready — there is no on-screen report and nothing is downloaded, only opened.
+  async function produceReport(datasets, fileNames, isSample, win) {
     analyzeBtn.disabled = true;
-    saveBtn.hidden = true;
-    saveCsvBtn.hidden = true;
-    report = null;
-    findingsCsv = null;
+    function closeWin() { if (win && !win.closed) win.close(); }
 
     try {
-      if (!datasets.length) { setStatus("Kon geen bruikbare rijen lezen. Is dit een Azure-verbruiks-CSV?", true); return; }
+      if (!datasets.length) { setStatus(S.status.noUsableRows, true); closeWin(); return; }
       if (!datasets.some(function (d) { return d.cols.cost !== -1; })) {
         var delimIssue = !isSample && readyFiles().some(function (f) { return f.singleColumn; });
-        setStatus(delimIssue
-          ? "Geen kostenkolom gevonden — het bestand lijkt niet op komma's of puntkomma's gesplitst te zijn. Is dit een onbewerkte Azure-export?"
-          : "Geen kostenkolom gevonden. Verwacht een kolom zoals ‘CostInBillingCurrency’ of ‘Cost’.", true);
+        setStatus(delimIssue ? S.status.noCostColumnDelim : S.status.noCostColumn, true);
+        closeWin();
         return;
       }
 
-      setStatus(isSample ? "Voorbeeld analyseren…" : "Analyseren…");
+      setStatus(isSample ? S.status.analyzingSample : S.status.analyzing);
       await nextFrame();
-      var model = buildModel(datasets);
-      if (!model.ok) { setStatus("Geen kostenregels gevonden in het bestand.", true); return; }
+      var model = buildModel(datasets, lang);
+      if (!model.ok) { setStatus(S.status.noCostRows, true); closeWin(); return; }
 
-      renderResults(resultsEl, model, isSample);
-      var datePart = new Date().toISOString().slice(0, 10);
-      var reportName = isSample
-        ? "azure-waste-scan-VOORBEELD-" + datePart + ".pdf"
-        : "azure-waste-scan-rapport-" + datePart + ".pdf";
-      // The PDF itself is built lazily, on the Save click — this just remembers what it'll
-      // need. Fire a background prefetch of the (large) PDF chunk now, right after a real
-      // result exists to save: the app is built to keep working after the network is cut
-      // (see the connectivity indicator/loader below), so waiting until the click itself to
-      // start this fetch would strand anyone who goes offline between finishing a scan and
-      // clicking Save — a very plausible order given the page invites exactly that.
-      report = { model: model, fileNames: fileNames, isSample: isSample, name: reportName };
-      saveBtn.hidden = false;
-      loadPdfModule().catch(function () {}); // failure surfaced later, on click, if it matters
-      if (model.hasFindings) {
-        findingsCsv = { text: buildFindingsCSV(model), name: "azure-waste-scan-resources-" + datePart + ".csv" };
-        saveCsvBtn.hidden = false;
-      }
-      setStatus((isSample ? "Voorbeeld klaar — " : "Analyse klaar — ") +
-        model.rowCount.toLocaleString("nl-NL") + " regels uit " + fileNames.length + " bestand(en) verwerkt.");
-    } catch (err) {
-      if (window.console) console.error(err);
-      setStatus("Er ging iets mis bij het lezen van de bestanden.", true);
-    } finally {
-      analyzeBtn.disabled = false;
-    }
-  }
-
-  analyzeBtn.addEventListener("click", function () {
-    var ready = readyFiles();
-    if (!ready.length) return;
-    // Already parsed when the files were opened — nothing is read twice.
-    runAnalysis(ready.map(function (f) { return f.dataset; }), ready.map(function (f) { return f.name; }), false);
-  });
-
-  // Zero-effort preview, no file needed. No longer a button inside this mount — called from
-  // the hero's "Bekijk een voorbeeldrapport" link instead (see index.astro), exposed on the
-  // object init() returns so that link works whether scan.js is already loaded or not.
-  //
-  // `win` is a tab already opened by window.open() in the click handler itself, before any
-  // await ran — opening it here instead would get blocked as a popup by most browsers, since
-  // by the time this async function reaches its first await it's no longer considered to be
-  // running synchronously inside the click that triggered it. We just navigate that tab to
-  // the finished PDF once it's ready, rather than downloading it.
-  async function viewSample(win) {
-    try {
-      var rows = await parseCSV(buildSampleCSV(), ",");
-      var dataset = { cols: detectColumns(rows[0]), rows: rows.slice(1) };
-      await runAnalysis([dataset], ["Voorbeelddata (synthetisch)"], true);
+      setStatus(S.status.generatingPdf);
       var mod = await loadPdfModule();
-      var blob = await mod.buildReportPDF(report.model, report.fileNames, report.isSample);
+      var blob = await mod.buildReportPDF(model, fileNames, isSample, lang);
       var url = URL.createObjectURL(blob);
       if (win && !win.closed) {
         win.location.href = url;
@@ -1015,48 +850,40 @@ export function init(mount) {
         // for a synchronous window.open) — best-effort retry, though this one, not being
         // synchronous with the original click, may itself get blocked.
         win = window.open(url, "_blank");
-        if (!win) setStatus("Kon het voorbeeldrapport niet in een nieuw tabblad openen — check of pop-ups geblokkeerd worden.", true);
+        if (!win) { setStatus(S.status.popupBlocked, true); return; }
       }
+      setStatus(isSample ? S.status.sampleDone(model.rowCount, fileNames.length) : S.status.analysisDone(model.rowCount, fileNames.length));
     } catch (err) {
       if (window.console) console.error(err);
-      if (win && !win.closed) win.close();
-      setStatus("Er ging iets mis bij het maken van het voorbeeldrapport.", true);
+      closeWin();
+      setStatus(pdfDead || !navigator.onLine ? S.status.pdfModuleFailed : (isSample ? S.status.sampleReportError : S.status.pdfError), true);
+    } finally {
+      analyzeBtn.disabled = false;
     }
   }
 
-  // --- save report (PDF, built on demand) ---
-  saveBtn.addEventListener("click", async function () {
-    if (!report) return;
-    saveBtn.disabled = true;
-    setStatus("PDF genereren…");
+  analyzeBtn.addEventListener("click", function () {
+    var ready = readyFiles();
+    if (!ready.length) return;
+    // Must open synchronously, right here in the click handler — see produceReport's comment.
+    var win = window.open("", "_blank");
+    // Already parsed when the files were opened — nothing is read twice.
+    produceReport(ready.map(function (f) { return f.dataset; }), ready.map(function (f) { return f.name; }), false, win);
+  });
+
+  // Zero-effort preview, no file needed. No longer a button inside this mount — called from
+  // the hero's sample-report link instead (see AzurePage.astro), exposed on the object init()
+  // returns so that link works whether scan.js is already loaded or not.
+  async function viewSample(win) {
     try {
-      var mod = await loadPdfModule();
-      var blob = await mod.buildReportPDF(report.model, report.fileNames, report.isSample);
-      downloadBlob(blob, report.name);
-      setStatus("PDF opgeslagen.");
+      var rows = await parseCSV(buildSampleCSV(), ",");
+      var dataset = { cols: detectColumns(rows[0]), rows: rows.slice(1) };
+      await produceReport([dataset], [S.sample.sourceLabel], true, win);
     } catch (err) {
       if (window.console) console.error(err);
-      setStatus(pdfDead || !navigator.onLine
-        ? "PDF-module kon niet laden. Controleer je verbinding en probeer opnieuw, of ververs de pagina."
-        : "Er ging iets mis bij het maken van de PDF.", true);
-    } finally {
-      saveBtn.disabled = false;
+      if (win && !win.closed) win.close();
+      setStatus(S.status.sampleReportError, true);
     }
-  });
-
-  // --- save findings CSV ---
-  saveCsvBtn.addEventListener("click", function () {
-    if (!findingsCsv) return;
-    downloadBlob(findingsCsv.text, findingsCsv.name, "text/csv");
-  });
-
-  function downloadBlob(data, name, type) {
-    var blob = data instanceof Blob ? data : new Blob([data], { type: type });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url; a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
 
   var api = { viewSample: viewSample };

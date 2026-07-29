@@ -80,8 +80,6 @@ const azure = defineCollection({
       }),
       sampleLabel: z.string(),
       analyzeLabel: z.string(),
-      saveLabel: z.string(),
-      saveCsvLabel: z.string(),
       loadError: z.string(),
       noscript: z.string(),
     }),
