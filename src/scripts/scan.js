@@ -689,6 +689,22 @@ export function init(mount, lang) {
   }
   window.addEventListener("online", function () { loadPdfModule().catch(function () {}); });
 
+  // Fetch the PDF builder eagerly, off the critical path, for the same reason scan.js itself is
+  // fetched on idle rather than on demand: the page tells the reader to download their files,
+  // switch to airplane mode, and *then* run the scan. Waiting for the Analyseer click means the
+  // import happens after the network is already gone, and the report cannot be produced — which
+  // is what the copy in `files.paragraphs` promises will work.
+  //
+  // It is the expensive one (~143 kB gzip against scan.js's 16 kB), so it stays behind idle time
+  // and never blocks first paint. Failures are swallowed: loadPdfModule refuses to try while
+  // offline, and the `online` listener above retries, so a visitor who arrives offline still
+  // gets the module the moment a connection appears.
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(function () { loadPdfModule().catch(function () {}); }, { timeout: 3000 });
+  } else {
+    setTimeout(function () { loadPdfModule().catch(function () {}); }, 500);
+  }
+
   function setStatus(msg, isError) {
     statusEl.textContent = msg || "";
     statusEl.classList.toggle("error", !!isError);
