@@ -23,7 +23,7 @@ files:
   heading: Wat zit er in een Azure-verbruiksbestand?
   paragraphs:
     - "Een Azure-verbruiksbestand is het rekenblad achter je maandelijkse rekening: één regel per resource per periode — naam, resourcegroep, subscription, type dienst, en wat het kostte. Microsoft maakt het elke maand, of iemand het nu leest of niet."
-    - "Het verdient zorgvuldigheid: het bevat namen van resources en subscriptions, kostenbedragen, en tags — die soms het e-mailadres van de resource-eigenaar bevatten. Het bevat geen wachtwoorden, broncode, of klantdata."
+    - "Het verdient zorgvuldigheid: het bevat namen van resources en subscriptions, kostenbedragen, en tags — die soms de naam van de resource-eigenaar bevatten. Het bevat geen wachtwoorden, broncode, of klantdata."
     - "Hier blijft het op je eigen machine. De analyse draait volledig in je browser — en dat hoef je niet op ons woord te geloven. Zodra je bestanden gedownload zijn, zet je je machine gerust in vliegtuigmodus en draai je de scan offline — die werkt precies hetzelfde, want er is nooit een verbinding nodig."
 free:
   heading: Waarom is dit gratis?

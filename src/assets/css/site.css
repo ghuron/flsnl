@@ -426,6 +426,9 @@ section.app .intro { color: var(--ink-dim); font-size: 1.05rem; max-width: 700px
 .result-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .result-table .bar { position: relative; }
 .result-table .bar span { display: block; height: 6px; border-radius: 3px; background: var(--blue); margin-top: 0.35rem; }
+/* Sits between a signal section's heading and its list, so the heading keeps its own
+   margin-bottom collapsed against this rather than against the first card. */
+.sig-intro { color: var(--ink-dim); font-size: 0.92rem; max-width: 640px; margin: 0.3rem 0 0; }
 .signals { list-style: none; padding: 0; margin: 0.5rem 0 2rem; display: grid; gap: 0.8rem; }
 .signals li { background: var(--panel); border-left: 3px solid var(--purple); border-radius: 0 8px 8px 0; padding: 0.9rem 1.1rem; font-size: 0.95rem; }
 .signals li strong { display: block; margin-bottom: 0.2rem; }

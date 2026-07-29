@@ -145,64 +145,83 @@ function drawKpiStrip(doc, tiles, x, y, width) {
 // regular body, which doesn't fit autotable's one-fontStyle-per-cell model cleanly. Runs its
 // own page-break check (ensureChrome/addPage), since this is the one section not driven by
 // autotable's automatic pagination.
-function drawSignals(doc, signals, x, yStart, width, addPageFn) {
+function drawSignals(doc, sections, x, yStart, width, addPageFn) {
   var y = yStart;
-  setTextRGB(doc, INK);
-  doc.setFont(undefined, "bold");
-  doc.setFontSize(13);
-  doc.text("Signalen", x, y);
-  y += 18;
-
   var barW = 3, padX = 10, padY = 8, gap = 8, lineH = 11.5, footerReserve = 60;
   var innerW = width - barW - padX * 2;
 
-  signals.forEach(function (s) {
-    var sev = SEV[s.severity] || SEV.info;
+  sections.forEach(function (sec, secIndex) {
+    if (secIndex > 0) y += 10;
 
-    doc.setFont(undefined, "bold");
-    doc.setFontSize(10);
-    var titleLines = doc.splitTextToSize(s.title, innerW);
+    // Measure the heading (plus its intro) and keep them with the first item: a section
+    // title stranded alone at the foot of a page reads as a bug.
     doc.setFont(undefined, "normal");
     doc.setFontSize(9);
-    var bodyLines = doc.splitTextToSize(s.body, innerW);
-
-    var pillH = sev.label ? 16 : 0;
-    var blockH = padY * 2 + pillH + titleLines.length * lineH + bodyLines.length * lineH;
-
-    if (y + blockH > PAGE_H - footerReserve) {
-      y = addPageFn();
-    }
-
-    setFillRGB(doc, PANEL);
-    doc.roundedRect(x, y, width, blockH, 3, 3, "F");
-    setFillRGB(doc, sev.border);
-    doc.rect(x, y, barW, blockH, "F");
-
-    var tx = x + barW + padX;
-    var cy = y + padY;
-
-    if (sev.label) {
-      doc.setFont(undefined, "bold");
-      doc.setFontSize(7);
-      var pillW = doc.getTextWidth(sev.label) + 12;
-      setFillRGB(doc, sev.pillBg);
-      doc.roundedRect(tx, cy, pillW, 12, 2, 2, "F");
-      setTextRGB(doc, sev.pillText);
-      doc.text(sev.label, tx + pillW / 2, cy + 8.5, { align: "center" });
-      cy += pillH;
-    }
+    var introLines = sec.intro ? doc.splitTextToSize(sec.intro, width) : [];
+    var headH = 18 + (introLines.length ? introLines.length * lineH + 6 : 0);
+    if (y + headH + 40 > PAGE_H - footerReserve) y = addPageFn();
 
     setTextRGB(doc, INK);
     doc.setFont(undefined, "bold");
-    doc.setFontSize(10);
-    doc.text(titleLines, tx, cy + 8);
-    cy += titleLines.length * lineH;
+    doc.setFontSize(13);
+    doc.text(sec.heading, x, y);
+    y += 18;
+    if (introLines.length) {
+      setTextRGB(doc, INK_DIM);
+      doc.setFont(undefined, "normal");
+      doc.setFontSize(9);
+      doc.text(introLines, x, y);
+      y += introLines.length * lineH + 6;
+    }
 
-    doc.setFont(undefined, "normal");
-    doc.setFontSize(9);
-    doc.text(bodyLines, tx, cy + 7);
+    sec.items.forEach(function (s) {
+      var sev = SEV[s.severity] || SEV.info;
 
-    y += blockH + gap;
+      doc.setFont(undefined, "bold");
+      doc.setFontSize(10);
+      var titleLines = doc.splitTextToSize(s.title, innerW);
+      doc.setFont(undefined, "normal");
+      doc.setFontSize(9);
+      var bodyLines = doc.splitTextToSize(s.body, innerW);
+
+      var pillH = sev.label ? 16 : 0;
+      var blockH = padY * 2 + pillH + titleLines.length * lineH + bodyLines.length * lineH;
+
+      if (y + blockH > PAGE_H - footerReserve) {
+        y = addPageFn();
+      }
+
+      setFillRGB(doc, PANEL);
+      doc.roundedRect(x, y, width, blockH, 3, 3, "F");
+      setFillRGB(doc, sev.border);
+      doc.rect(x, y, barW, blockH, "F");
+
+      var tx = x + barW + padX;
+      var cy = y + padY;
+
+      if (sev.label) {
+        doc.setFont(undefined, "bold");
+        doc.setFontSize(7);
+        var pillW = doc.getTextWidth(sev.label) + 12;
+        setFillRGB(doc, sev.pillBg);
+        doc.roundedRect(tx, cy, pillW, 12, 2, 2, "F");
+        setTextRGB(doc, sev.pillText);
+        doc.text(sev.label, tx + pillW / 2, cy + 8.5, { align: "center" });
+        cy += pillH;
+      }
+
+      setTextRGB(doc, INK);
+      doc.setFont(undefined, "bold");
+      doc.setFontSize(10);
+      doc.text(titleLines, tx, cy + 8);
+      cy += titleLines.length * lineH;
+
+      doc.setFont(undefined, "normal");
+      doc.setFontSize(9);
+      doc.text(bodyLines, tx, cy + 7);
+
+      y += blockH + gap;
+    });
   });
 
   return y;
@@ -276,7 +295,7 @@ function drawRankedTable(doc, title, rows, money, startY, ensureChromeForPage) {
  */
 export async function buildReportPDF(m, fileNames, isSample) {
   var money = makeMoney(m.currency === "MIXED" ? "" : m.currency);
-  var signals = buildSignals(m, money);
+  var sections = buildSignals(m, money);
   var doc = new jsPDF({ unit: "pt", format: "a4" });
 
   var meta = {
@@ -313,7 +332,7 @@ export async function buildReportPDF(m, fileNames, isSample) {
 
   y = drawKpiStrip(doc, kpiTiles, MARGIN, y, CONTENT_W) + 24;
 
-  y = drawSignals(doc, signals, MARGIN, y, CONTENT_W, function () {
+  y = drawSignals(doc, sections, MARGIN, y, CONTENT_W, function () {
     doc.addPage();
     var pn = doc.getCurrentPageInfo().pageNumber;
     ensureChromeForPage(pn);

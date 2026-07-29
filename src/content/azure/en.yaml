@@ -23,7 +23,7 @@ files:
   heading: What's in an Azure usage file?
   paragraphs:
     - "An Azure usage file is the spreadsheet behind your monthly bill: one line per resource per period — its name, resource group, subscription, service type, and what it cost. Microsoft produces it every month whether anyone reads it or not."
-    - "It deserves care: it contains resource and subscription names, cost figures, and tags — which sometimes carry the e-mail addresses of resource owners. It does not contain passwords, source code, or customer data."
+    - "It deserves care: it contains resource and subscription names, cost figures, and tags — which sometimes carry the names of resource owners. It does not contain passwords, source code, or customer data."
     - Here it stays on your machine. The analysis runs entirely in your browser — and you don't have to take our word for it. Once your files are downloaded, switch your machine to flight mode and run the scan offline. It works exactly the same, because nothing here ever needs a connection.
 free:
   heading: Why is this free?

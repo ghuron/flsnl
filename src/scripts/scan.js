@@ -3,7 +3,7 @@
 // locally via the File API and the report is saved as a local download.
 "use strict";
 
-import { SAMPLE_CSV } from "./sampleData.js";
+import { buildSampleCSV } from "./sampleData.js";
 import { makeMoney, buildSignals, periodText } from "./report-data.js";
 
 /* ---------------------------------------------------------------- utilities */
@@ -152,7 +152,12 @@ function detectColumns(header) {
     // this up (see src/docs/OFFERING.md §6 FOCUS mapping note).
     pricingModel: pickColumn(header, ["pricingmodel"]),
     reservation: pickColumn(header, ["reservationname", "benefitname"]),
-    tags: pickColumn(header, ["tags", "resourcetags"])
+    tags: pickColumn(header, ["tags", "resourcetags"]),
+    meterName: pickColumn(header, ["metername", "xskumetername"]),
+    meterSubCategory: pickColumn(header, ["metersubcategory"]),
+    publisherType: pickColumn(header, ["publishertype"]),
+    quantity: pickColumn(header, ["quantity", "consumedquantity"]),
+    unitOfMeasure: pickColumn(header, ["unitofmeasure", "pricingunit"])
   };
 }
 
@@ -220,6 +225,74 @@ function monthsSummary(keys) {
 
 function norm2(s) { return String(s || "").toLowerCase().replace(/[\s_-]/g, ""); }
 
+/* -------------------------------------------------- workload classification */
+
+// Meter categories whose cost tracks something that is actually running, so it can in
+// principle be switched off or scaled down. Weekend-vs-weekday and the schedulable share of
+// non-production spend are both measured against this set — storage and networking keep
+// costing the same whether anyone is using them, so counting them would flatten the very
+// pattern we are looking for. Lowercased; covers both meterCategory names and the coarser
+// serviceFamily value ("Compute") for exports whose category column resolves to that.
+var COMPUTE_CATEGORIES = {
+  "compute": 1, "virtual machines": 1, "virtual machines licenses": 1, "azure container apps": 1,
+  "container apps": 1, "azure app service": 1, "app service": 1, "azure kubernetes service": 1,
+  "container instances": 1, "functions": 1, "azure functions": 1, "cloud services": 1, "batch": 1
+};
+
+// Infrastructure you run yourself, as opposed to a managed service. A high share is the
+// classic lift-and-shift fingerprint: paying for machines and plumbing rather than for
+// something that scales itself.
+var IAAS_CATEGORIES = {
+  "virtual machines": 1, "virtual machines licenses": 1, "storage": 1, "virtual network": 1,
+  "load balancer": 1, "bandwidth": 1, "ip addresses": 1, "application gateway": 1,
+  "vpn gateway": 1, "azure firewall": 1
+};
+
+// Model/inference spend specifically — not "anything with a clever name". Azure Cognitive
+// Search is a search index and shows up in estates with no AI workload at all, so matching a
+// bare "cognitive" would report AI spend that isn't there. "Foundry Models" is where Azure
+// bills GPT tokens today, so leaving it out misses the whole category.
+var AI_CATEGORY_RE = /openai|foundry|cognitive services|machine learning|azure ai(?! search)|document intelligence|form recognizer/i;
+// Token meters split into prompt, cached prompt and completion ("… Inpt Glbl 1M Tokens",
+// "5.2 codex cd inp Gl 1M Tokens", "… outpt Glbl 1M Tokens"). Cached is tested first: it is
+// also an input meter, and counting it twice would flatter the cache share.
+var AI_CACHED_RE = /cach|cd inp/i;
+var AI_INPUT_RE = /\binput\b|\binp\b|inpt/i;
+var AI_OUTPUT_RE = /\boutput\b|\bopt\b|outpt/i;
+// Only these units are token counts; the same AI service also bills hours (speech) and 1K
+// units, which must not be summed into a token ratio.
+var TOKEN_UNITS = { "1m": 1e6, "1k": 1e3 };
+var EGRESS_METER_RE = /data transfer out|egress/i;
+var GPU_RE = /\bN[CDV]\d/i;
+var LICENSE_RE = /windows|sql server (licen|edition)/i;
+
+// Name fragments that mark an environment as non-production. Matched per token against the
+// resource name and its resource group, with trailing digits stripped, so "…-stage2" and
+// "rg-dev-01" hit while "accounting" or "devices" (whole tokens, not prefixes) do not.
+var NONPROD_TOKENS = {
+  dev: 1, development: 1, tst: 1, test: 1, testing: 1, acc: 1, acceptance: 1, stag: 1, stage: 1,
+  staging: 1, qa: 1, sbx: 1, sandbox: 1, demo: 1, poc: 1, uat: 1, preprod: 1, nonprod: 1
+};
+function isNonProdName(name, group) {
+  var parts = String(name || "").concat("-", String(group || "")).toLowerCase().split(/[-_/.]+/);
+  for (var i = 0; i < parts.length; i++) {
+    if (NONPROD_TOKENS[parts[i].replace(/\d+$/, "")]) return true;
+  }
+  return false;
+}
+
+// A real Date for the weekday check, in the same formats monthKeyOf accepts.
+function dateOf(raw) {
+  var s = String(raw || "").trim();
+  if (!s) return null;
+  var m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);      // MM/DD/YYYY
+  if (m) return new Date(+m[3], +m[1] - 1, +m[2]);
+  m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);                 // YYYY-MM-DD / ISO
+  if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+  var d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
 /* ------------------------------------------------------------------- model  */
 
 function buildModel(datasets) {
@@ -229,11 +302,21 @@ function buildModel(datasets) {
   var untaggedCost = 0, taggedKnownCost = 0;
   var byCategory = new Map();
   var byGroup = new Map();
-  var byResource = new Map();
   var bySubscription = new Map();
   var byMonth = new Map();
   var byMonthCat = new Map(); // monthKey -> Map(category -> cost)
   var byFinding = new Map(); // "subscription|resourceId" -> finding row, for the CSV export
+  var byMeter = new Map();   // meterName -> cost. Bounded by distinct meters (hundreds), so the
+  var bySubCat = new Map();  // meterSubCategory -> cost. classification regexes below run over
+                             // these once at the end instead of once per row.
+  var computeByDay = new Map(); // raw date cell -> compute-only cost, for the weekend comparison
+  var daysSeen = new Set();     // distinct raw date cells, to tell daily data from monthly
+  var marketplaceCost = 0;
+  var aiTokens = { input: 0, cached: 0, output: 0 };
+  // The classification regexes are keyed by the string they were run against, so each
+  // distinct category/meter/unit costs one regex and every later row costs a hash lookup.
+  // Category and meter names number in the hundreds even in a million-row export.
+  var catIsAi = Object.create(null), meterRole = Object.create(null), unitScale = Object.create(null);
   var currencies = new Set();
   var anyCost = false, anyGroup = false, anyResource = false, anySub = false, anyMonth = false, anyCoverage = false, anyTags = false;
 
@@ -292,6 +375,39 @@ function buildModel(datasets) {
 
       var cat = cols.category !== -1 ? (String(row[cols.category] || "").trim() || "(onbekend)") : "(alle)";
       byCategory.set(cat, (byCategory.get(cat) || 0) + cost);
+      var isCompute = COMPUTE_CATEGORIES[cat.toLowerCase()] === 1;
+
+      if (cols.meterName !== -1) {
+        var mn = String(row[cols.meterName] || "").trim();
+        if (mn) {
+          byMeter.set(mn, (byMeter.get(mn) || 0) + cost);
+          // Prompt/completion volumes, for the input:output ratio. Only inside AI categories,
+          // so an unrelated meter that happens to contain "inp" cannot land here.
+          if (cols.quantity !== -1 && cols.unitOfMeasure !== -1) {
+            var ai = catIsAi[cat];
+            if (ai === undefined) ai = catIsAi[cat] = AI_CATEGORY_RE.test(cat);
+            if (ai) {
+              var role = meterRole[mn];
+              if (role === undefined) {
+                role = meterRole[mn] = AI_CACHED_RE.test(mn) ? "cached"
+                  : AI_INPUT_RE.test(mn) ? "input"
+                  : AI_OUTPUT_RE.test(mn) ? "output" : "";
+              }
+              if (role) {
+                var uRaw = String(row[cols.unitOfMeasure] || "").trim();
+                var scale = unitScale[uRaw];
+                if (scale === undefined) scale = unitScale[uRaw] = TOKEN_UNITS[uRaw.toLowerCase().replace(/[\s]/g, "")] || 0;
+                if (scale) aiTokens[role] += parseNum(row[cols.quantity]) * scale;
+              }
+            }
+          }
+        }
+      }
+      if (cols.meterSubCategory !== -1) {
+        var msc = String(row[cols.meterSubCategory] || "").trim();
+        if (msc) bySubCat.set(msc, (bySubCat.get(msc) || 0) + cost);
+      }
+      if (cols.publisherType !== -1 && norm2(row[cols.publisherType]) === "marketplace") marketplaceCost += cost;
 
       if (cols.resourceGroup !== -1) {
         var g = String(row[cols.resourceGroup] || "").trim() || "(geen)";
@@ -305,26 +421,43 @@ function buildModel(datasets) {
       if (cols.resource !== -1) {
         var resourceRaw = String(row[cols.resource] || "").trim();
         var res = lastSegment(resourceRaw) || "(geen)";
-        byResource.set(res, (byResource.get(res) || 0) + cost);
 
         var fkey = sub + "|" + (resourceRaw || res);
         var finding = byFinding.get(fkey);
         if (!finding) {
           finding = {
             resourceId: resourceRaw || res,
+            name: res,
             subscription: sub,
             resourceGroup: cols.resourceGroup !== -1 ? (String(row[cols.resourceGroup] || "").trim() || "(geen)") : "",
             category: cat,
+            compute: isCompute,
             cost: 0,
-            unusedReservationCost: 0
+            unusedReservationCost: 0,
+            days: null // filled below only when the export carries dates
           };
           byFinding.set(fkey, finding);
         }
         finding.cost += cost;
+        // A resource billed under several meters can span categories; "does it run" is true
+        // if any of them is compute.
+        if (isCompute) finding.compute = true;
         if (isUnused) finding.unusedReservationCost += cost;
+        if (dateCol !== -1) {
+          var dRaw = row[dateCol];
+          if (dRaw) {
+            if (!finding.days) finding.days = new Set();
+            finding.days.add(dRaw);
+          }
+        }
       }
       if (dateCol !== -1) {
-        var mk = monthKeyOf(row[dateCol]);
+        var rawDate = row[dateCol];
+        if (rawDate) {
+          daysSeen.add(rawDate);
+          if (isCompute) computeByDay.set(rawDate, (computeByDay.get(rawDate) || 0) + cost);
+        }
+        var mk = monthKeyOf(rawDate);
         if (mk) {
           byMonth.set(mk, (byMonth.get(mk) || 0) + cost);
           var mc = byMonthCat.get(mk);
@@ -343,8 +476,6 @@ function buildModel(datasets) {
   }
 
   var currency = currencies.size === 1 ? Array.from(currencies)[0] : (currencies.size === 0 ? "" : "MIXED");
-  var resourcesSorted = topN(byResource, 1e9);
-  var top5 = resourcesSorted.slice(0, 5).reduce(function (a, x) { return a + x.cost; }, 0);
   var monthKeys = Array.from(byMonth.keys()).sort();
   var months = monthKeys.map(function (k) { return { key: k, label: monthLabel(k), cost: byMonth.get(k) }; });
 
@@ -366,6 +497,77 @@ function buildModel(datasets) {
 
   var findings = Array.from(byFinding.values()).sort(function (a, b) { return b.cost - a.cost; });
 
+  // Resource rankings come from these findings, keyed on the full resource ID — not from a map
+  // keyed on the trailing name segment. Azure gives per-environment infrastructure the same
+  // name in every environment (nine load balancers all called `capp-svc-lb` in the reference
+  // export), so collapsing on the segment invented one top-spending resource that does not
+  // exist and overstated concentration by nine points. The resource group only joins the
+  // label where a name genuinely repeats, so the common case stays readable.
+  var nameCounts = Object.create(null);
+  findings.forEach(function (f) { nameCounts[f.name] = (nameCounts[f.name] || 0) + 1; });
+  var resourcesRanked = findings.map(function (f) {
+    return { name: nameCounts[f.name] > 1 && f.resourceGroup ? f.name + " · " + f.resourceGroup : f.name, cost: f.cost };
+  });
+  var top5 = findings.slice(0, 5).reduce(function (a, x) { return a + x.cost; }, 0);
+  var top5Ids = Object.create(null);
+  findings.slice(0, 5).forEach(function (f) { top5Ids[f.resourceId] = 1; });
+
+  // --- derived workload metrics. All classification runs over the small per-name maps
+  // collected above, never per row, so none of this scales with file size.
+  function sumMatching(map, re) {
+    var s = 0;
+    map.forEach(function (c, name) { if (re.test(name)) s += c; });
+    return s;
+  }
+  var computeCost = 0, iaasCost = 0, aiCost = 0;
+  var aiCategories = [];
+  byCategory.forEach(function (c, name) {
+    var k = name.toLowerCase();
+    if (COMPUTE_CATEGORIES[k] === 1) computeCost += c;
+    if (IAAS_CATEGORIES[k] === 1) iaasCost += c;
+    if (AI_CATEGORY_RE.test(name)) { aiCost += c; aiCategories.push({ name: name, cost: c }); }
+  });
+  aiCategories.sort(function (a, b) { return b.cost - a.cost; });
+
+  // Egress reads meter names when the export has them (the category is usually the service,
+  // not the transfer); a file without a meter column falls back to the Bandwidth category.
+  var egressCost = byMeter.size ? sumMatching(byMeter, EGRESS_METER_RE) : (byCategory.get("Bandwidth") || 0);
+  var gpuCost = byMeter.size ? sumMatching(byMeter, GPU_RE) : 0;
+  var licenseCost = bySubCat.size ? sumMatching(bySubCat, LICENSE_RE) : 0;
+
+  // Weekend vs weekday, compute only. Needs real daily rows on both sides of the week to mean
+  // anything — a monthly summary, or a date column that resolves to the billing period, gives
+  // a handful of identical dates and is skipped rather than guessed at.
+  var weekdayTotal = 0, weekdayDays = 0, weekendTotal = 0, weekendDays = 0;
+  computeByDay.forEach(function (c, raw) {
+    var d = dateOf(raw);
+    if (!d) return;
+    var wd = d.getDay();
+    if (wd === 0 || wd === 6) { weekendTotal += c; weekendDays++; } else { weekdayTotal += c; weekdayDays++; }
+  });
+  var hasDaily = daysSeen.size >= 14 && weekdayDays >= 8 && weekendDays >= 4;
+  var weekdayAvg = weekdayDays ? weekdayTotal / weekdayDays : 0;
+  var weekendAvg = weekendDays ? weekendTotal / weekendDays : 0;
+  var weekendRatio = hasDaily && weekdayAvg > 0 ? weekendAvg / weekdayAvg : null;
+
+  // Non-production names that bill on (nearly) every day in the period. The schedulable
+  // subset is the compute part: storage and load balancers attached to a stopped environment
+  // keep costing the same, so folding them into an office-hours estimate would overstate it.
+  var nonProdCost = 0, nonProdSchedulable = 0, nonProdCount = 0, nonProdExamples = [];
+  var alwaysOnFloor = daysSeen.size ? daysSeen.size * 0.9 : 0;
+  if (daysSeen.size) {
+    findings.forEach(function (f) {
+      if (!f.days || f.days.size < alwaysOnFloor) return;
+      if (!isNonProdName(f.name, f.resourceGroup)) return;
+      nonProdCost += f.cost;
+      nonProdCount++;
+      if (f.compute) nonProdSchedulable += f.cost;
+      if (nonProdExamples.length < 3 && !nonProdExamples.some(function (e) { return e.name === f.name; })) {
+        nonProdExamples.push({ name: f.name, cost: f.cost, days: f.days.size });
+      }
+    });
+  }
+
   return {
     ok: anyCost && rowCount > 0,
     total: total,
@@ -381,8 +583,9 @@ function buildModel(datasets) {
     categoryMap: byCategory,
     groups: anyGroup ? topN(byGroup, 10) : [],
     groupCount: byGroup.size,
-    resources: anyResource ? resourcesSorted.slice(0, 10) : [],
-    resourceCount: byResource.size,
+    resources: anyResource ? resourcesRanked.slice(0, 10) : [],
+    resourceCount: findings.length,
+    _top5Ids: top5Ids,
     subscriptions: anySub ? topN(bySubscription, 10) : [],
     subscriptionCount: bySubscription.size,
     months: months,
@@ -403,6 +606,29 @@ function buildModel(datasets) {
     untaggedShare: taggedKnownCost > 0 ? untaggedCost / taggedKnownCost : 0,
     resourceFindings: findings,
     hasFindings: findings.length > 0,
+    // --- workload shape, for the engineering signals
+    computeCost: computeCost,
+    computeShare: total > 0 ? computeCost / total : 0,
+    iaasShare: total > 0 ? iaasCost / total : 0,
+    egressCost: egressCost,
+    aiCost: aiCost,
+    aiCategories: aiCategories,
+    aiTokens: aiTokens,
+    aiInputRatio: aiTokens.output > 0 ? (aiTokens.input + aiTokens.cached) / aiTokens.output : null,
+    aiCachedShare: (aiTokens.input + aiTokens.cached) > 0 ? aiTokens.cached / (aiTokens.input + aiTokens.cached) : null,
+    gpuCost: gpuCost,
+    licenseCost: licenseCost,
+    marketplaceCost: marketplaceCost,
+    dayCount: daysSeen.size,
+    hasDaily: hasDaily,
+    weekendRatio: weekendRatio,
+    weekdayAvg: weekdayAvg,
+    weekendAvg: weekendAvg,
+    nonProdCost: nonProdCost,
+    nonProdSchedulable: nonProdSchedulable,
+    nonProdCount: nonProdCount,
+    nonProdExamples: nonProdExamples,
+    monthsCovered: months.length,
     generatedAt: new Date()
   };
 }
@@ -448,13 +674,16 @@ function renderResults(container, m, isSample) {
     fourth +
     (m.hasTags ? kpi(Math.round(m.untaggedShare * 100) + "%", "Zonder tags") : "");
 
-  var signals = buildSignals(m, money);
   var sevLabel = { high: "Actie", med: "Let op", info: "Ter info" };
-  var signalsHTML = "<h3>Signalen</h3><ul class=\"signals\">" +
-    signals.map(function (s) {
-      var tag = s.severity && sevLabel[s.severity] ? "<span class=\"sev sev-" + s.severity + "\">" + sevLabel[s.severity] + "</span> " : "";
-      return "<li class=\"sig-" + (s.severity || "info") + "\"><strong>" + tag + esc(s.title) + "</strong>" + esc(s.body) + "</li>";
-    }).join("") + "</ul>";
+  var signalsHTML = buildSignals(m, money).map(function (sec) {
+    return "<h3>" + esc(sec.heading) + "</h3>" +
+      (sec.intro ? "<p class=\"sig-intro\">" + esc(sec.intro) + "</p>" : "") +
+      "<ul class=\"signals\">" +
+      sec.items.map(function (s) {
+        var tag = s.severity && sevLabel[s.severity] ? "<span class=\"sev sev-" + s.severity + "\">" + sevLabel[s.severity] + "</span> " : "";
+        return "<li class=\"sig-" + (s.severity || "info") + "\"><strong>" + tag + esc(s.title) + "</strong>" + esc(s.body) + "</li>";
+      }).join("") + "</ul>";
+  }).join("");
 
   var sampleBanner = isSample
     ? "<div class=\"note sample-banner\">Dit is een voorbeeldrapport met verzonnen data — geen echte Azure-kosten.</div>"
@@ -483,15 +712,16 @@ function csvCell(v) {
 
 function buildFindingsCSV(m) {
   var header = ["resourceId", "subscription", "resourceGroup", "category", "cost", "unusedReservationCost", "top5Concentrated", "note"];
-  var top5Names = {};
-  (m.resources || []).slice(0, 5).forEach(function (r) { top5Names[r.name] = true; });
+  // Matched on the resource ID, not the display name: display names may carry a resource-group
+  // suffix to disambiguate repeats, and would never compare equal here.
+  var top5Ids = m._top5Ids || {};
   var watch = { "Bandwidth": "uitgaand dataverkeer (egress) is een klassieke plek waar kosten sluipen",
                 "Storage": "oude snapshots en losgekoppelde disks blijven vaak doorlopen",
                 "Load Balancer": "load balancers en ongebruikte publieke IP’s blijven doortikken, ook zonder verkeer",
                 "Virtual Machines": "onbenutte of te ruim bemeten VM’s vallen zelden vanzelf op" };
   var lines = [header.join(",")];
   (m.resourceFindings || []).forEach(function (f) {
-    var isTop5 = top5Names[lastSegment(f.resourceId)] ? "ja" : "nee";
+    var isTop5 = top5Ids[f.resourceId] ? "ja" : "nee";
     lines.push([
       csvCell(f.resourceId), csvCell(f.subscription), csvCell(f.resourceGroup), csvCell(f.category),
       f.cost.toFixed(2), f.unusedReservationCost.toFixed(2), isTop5, csvCell(watch[f.category] || "")
@@ -772,7 +1002,7 @@ export function init(mount) {
   // the finished PDF once it's ready, rather than downloading it.
   async function viewSample(win) {
     try {
-      var rows = await parseCSV(SAMPLE_CSV, ",");
+      var rows = await parseCSV(buildSampleCSV(), ",");
       var dataset = { cols: detectColumns(rows[0]), rows: rows.slice(1) };
       await runAnalysis([dataset], ["Voorbeelddata (synthetisch)"], true);
       var mod = await loadPdfModule();
