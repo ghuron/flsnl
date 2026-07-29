@@ -292,6 +292,9 @@ function dateOf(raw) {
 /* ------------------------------------------------------------------- model  */
 
 function buildModel(datasets, lang) {
+  // Row labels for blank cells / absent columns. They become table row names in the PDF, so
+  // they follow the report's locale rather than sitting in the code as Dutch literals.
+  var PH = textFor(lang).placeholders;
   var total = 0, rowCount = 0, negatives = 0, creditsTotal = 0, unusedCommitment = 0, purchaseCost = 0;
   var onDemandCost = 0, commitmentCost = 0, coverageKnown = 0;
   var paygSum = 0, paygKnown = 0;
@@ -307,6 +310,11 @@ function buildModel(datasets, lang) {
                              // these once at the end instead of once per row.
   var byLB = new Map();      // resourceId -> { resourceGroup, cost, dataProcessedCost }, Load
                              // Balancer resources only, for the consolidation signal.
+  // Raw cell -> derived flags. Both columns hold a few dozen distinct values across hundreds of
+  // thousands of rows, so classifying per distinct value instead of per row removes ~1M
+  // throwaway lowercase/regex allocations on a large export — the same trick as byMeter above.
+  var catFlags = new Map();     // raw category cell -> { compute, lb }
+  var marketplaceFlag = new Map(); // raw publisherType cell -> boolean
   var computeByDay = new Map(); // raw date cell -> compute-only cost, for the weekend comparison
   var daysSeen = new Set();     // distinct raw date cells, to tell daily data from monthly
   var marketplaceCost = 0;
@@ -366,10 +374,16 @@ function buildModel(datasets, lang) {
         if (!tagVal || tagVal === "{}" || tagVal === "[]" || tagVal === "null") untaggedCost += cost;
       }
 
-      var cat = cols.category !== -1 ? (String(row[cols.category] || "").trim() || "(onbekend)") : "(alle)";
+      var cat = cols.category !== -1 ? (String(row[cols.category] || "").trim() || PH.unknown) : PH.all;
       byCategory.set(cat, (byCategory.get(cat) || 0) + cost);
-      var isCompute = COMPUTE_CATEGORIES[cat.toLowerCase()] === 1;
-      var isLB = cat.toLowerCase() === "load balancer";
+      var flags = catFlags.get(cat);
+      if (!flags) {
+        var catLower = cat.toLowerCase();
+        flags = { compute: COMPUTE_CATEGORIES[catLower] === 1, lb: catLower === "load balancer" };
+        catFlags.set(cat, flags);
+      }
+      var isCompute = flags.compute;
+      var isLB = flags.lb;
       var lbDataProcessed = false;
 
       if (cols.meterName !== -1) {
@@ -383,20 +397,28 @@ function buildModel(datasets, lang) {
         var msc = String(row[cols.meterSubCategory] || "").trim();
         if (msc) bySubCat.set(msc, (bySubCat.get(msc) || 0) + cost);
       }
-      if (cols.publisherType !== -1 && norm2(row[cols.publisherType]) === "marketplace") marketplaceCost += cost;
+      if (cols.publisherType !== -1) {
+        var pubRaw = row[cols.publisherType];
+        var isMarketplace = marketplaceFlag.get(pubRaw);
+        if (isMarketplace === undefined) {
+          isMarketplace = norm2(pubRaw) === "marketplace";
+          marketplaceFlag.set(pubRaw, isMarketplace);
+        }
+        if (isMarketplace) marketplaceCost += cost;
+      }
 
       if (cols.resourceGroup !== -1) {
-        var g = String(row[cols.resourceGroup] || "").trim() || "(geen)";
+        var g = String(row[cols.resourceGroup] || "").trim() || PH.none;
         byGroup.set(g, (byGroup.get(g) || 0) + cost);
       }
-      var sub = "(geen)";
+      var sub = PH.none;
       if (cols.subscription !== -1) {
-        sub = String(row[cols.subscription] || "").trim() || "(geen)";
+        sub = String(row[cols.subscription] || "").trim() || PH.none;
         bySubscription.set(sub, (bySubscription.get(sub) || 0) + cost);
       }
       if (cols.resource !== -1) {
         var resourceRaw = String(row[cols.resource] || "").trim();
-        var res = lastSegment(resourceRaw) || "(geen)";
+        var res = lastSegment(resourceRaw) || PH.none;
 
         var fkey = sub + "|" + (resourceRaw || res);
         var finding = byFinding.get(fkey);
@@ -405,7 +427,7 @@ function buildModel(datasets, lang) {
             resourceId: resourceRaw || res,
             name: res,
             subscription: sub,
-            resourceGroup: cols.resourceGroup !== -1 ? (String(row[cols.resourceGroup] || "").trim() || "(geen)") : "",
+            resourceGroup: cols.resourceGroup !== -1 ? (String(row[cols.resourceGroup] || "").trim() || PH.none) : "",
             category: cat,
             compute: isCompute,
             cost: 0,
@@ -553,8 +575,8 @@ function buildModel(datasets, lang) {
       nonProdCost += f.cost;
       nonProdCount++;
       if (f.compute) nonProdSchedulable += f.cost;
-      if (nonProdExamples.length < 3 && !nonProdExamples.some(function (e) { return e.name === f.name; })) {
-        nonProdExamples.push({ name: f.name, cost: f.cost, days: f.days.size });
+      if (nonProdExamples.length < 3 && nonProdExamples.indexOf(f.name) === -1) {
+        nonProdExamples.push(f.name);
       }
     });
   }
@@ -579,7 +601,6 @@ function buildModel(datasets, lang) {
     resourcesRankedAll: anyResource ? resourcesRanked : [],
     resourceCount: findings.length,
     subscriptions: anySub ? topN(bySubscription, 10) : [],
-    subscriptionCount: bySubscription.size,
     subscriptionMap: bySubscription,
     months: months,
     _catMovers: catMovers.slice(0, 5),
@@ -612,13 +633,10 @@ function buildModel(datasets, lang) {
     dayCount: daysSeen.size,
     hasDaily: hasDaily,
     weekendRatio: weekendRatio,
-    weekdayAvg: weekdayAvg,
-    weekendAvg: weekendAvg,
     nonProdCost: nonProdCost,
     nonProdSchedulable: nonProdSchedulable,
     nonProdCount: nonProdCount,
     nonProdExamples: nonProdExamples,
-    monthsCovered: months.length,
     generatedAt: new Date()
   };
 }
@@ -852,6 +870,9 @@ export function init(mount, lang) {
         win = window.open(url, "_blank");
         if (!win) { setStatus(S.status.popupBlocked, true); return; }
       }
+      // Hand the object URL back once the new tab has had time to navigate to it; without
+      // this every report pins its PDF in memory for the life of the document.
+      setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
       setStatus(isSample ? S.status.sampleDone(model.rowCount, fileNames.length) : S.status.analysisDone(model.rowCount, fileNames.length));
     } catch (err) {
       if (window.console) console.error(err);

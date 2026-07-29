@@ -1,21 +1,23 @@
 ---
 import { withBase } from "../lib/url";
+import { localeHome, type Locale } from "../lib/i18n";
 // Processed by Vite: minified, content-hashed, base-path aware. The @font-face
 // URL inside resolves relative to the stylesheet, so the woff2 is emitted as a
 // hashed asset too — no third-party font request either way.
 import "../assets/css/site.css";
 
 interface Props {
-  lang: string;
+  lang: Locale;
   title: string;
   description: string;
   scriptSrc: "'none'" | "'self'";
   nav: { contactLabel: string; contactHref: string };
-  /** Where the header logo links to — the homepage of the current locale, not always "/". */
-  homeHref: string;
 }
 
-const { lang, title, description, scriptSrc, nav, homeHref } = Astro.props;
+const { lang, title, description, scriptSrc, nav } = Astro.props;
+// Derived, not passed: the layout already knows the locale, and having callers compute this
+// meant the same rule was written out in every page component.
+const homeHref = localeHome(lang);
 const csp = `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'none'; img-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'none'`;
 ---
 <!doctype html>

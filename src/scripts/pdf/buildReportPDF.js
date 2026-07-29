@@ -6,7 +6,7 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { LOGO_PNG_BASE64 } from "./logo.js";
-import { makeMoney, buildSignals, periodText, buildOverview } from "../report-data.js";
+import { makeMoney, pct, buildSignals, periodText, buildOverview } from "../report-data.js";
 import { textFor } from "../strings.js";
 
 /* ------------------------------------------------------------------ layout */
@@ -235,10 +235,10 @@ function drawOverviewTable(doc, title, breakdown, money, S, startY, ensureChrome
   if (!breakdown.rows.length) return startY;
   var max = breakdown.rows[0].cost || 1;
   var body = breakdown.rows.map(function (r) {
-    return { name: r.name, cost: money(r.cost), pct: Math.round(r.pct * 100) + "%", bar: "", _pct: Math.max(0, Math.min(1, r.cost / max)), _isOther: false };
+    return { name: r.name, cost: money(r.cost), pct: pct(r.pct), bar: "", _pct: Math.max(0, Math.min(1, r.cost / max)), _isOther: false };
   });
   if (breakdown.othersCost > 0) {
-    body.push({ name: S.pdf.overview.other, cost: money(breakdown.othersCost), pct: Math.round(breakdown.othersPct * 100) + "%", bar: "", _pct: 0, _isOther: true });
+    body.push({ name: S.pdf.overview.other, cost: money(breakdown.othersCost), pct: pct(breakdown.othersPct), bar: "", _pct: 0, _isOther: true });
   }
 
   autoTable(doc, {
@@ -305,7 +305,7 @@ function drawOverviewPage(doc, overview, money, S, startY, ensureChromeForPage) 
     doc.setFont(undefined, "normal");
     doc.setFontSize(10);
     setTextRGB(doc, INK_DIM);
-    doc.text(S.pdf.overview.aiSpend(money(overview.aiSpend.cost), Math.round(overview.aiSpend.pct * 100) + "%"), MARGIN, y);
+    doc.text(S.pdf.overview.aiSpend(money(overview.aiSpend.cost), pct(overview.aiSpend.pct)), MARGIN, y);
     setTextRGB(doc, INK);
     y += 16;
   }
@@ -428,10 +428,10 @@ export async function buildReportPDF(m, fileNames, isSample, lang) {
     { val: period, lbl: S.kpi.period },
     { val: String(m.categoryCount), lbl: S.kpi.categories },
     m.hasCoverage
-      ? { val: Math.round(m.onDemandShare * 100) + "%", lbl: S.kpi.onDemand }
+      ? { val: pct(m.onDemandShare), lbl: S.kpi.onDemand }
       : { val: String(m.hasGroups ? m.groupCount : m.rowCount), lbl: m.hasGroups ? S.kpi.groups : S.kpi.rows }
   ];
-  if (m.hasTags) kpiTiles.push({ val: Math.round(m.untaggedShare * 100) + "%", lbl: S.kpi.untagged });
+  if (m.hasTags) kpiTiles.push({ val: pct(m.untaggedShare), lbl: S.kpi.untagged });
 
   y = drawKpiStrip(doc, kpiTiles, MARGIN, y, CONTENT_W) + 24;
 

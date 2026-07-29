@@ -10,8 +10,9 @@
 // A function can just say things in whatever order the language wants.
 "use strict";
 
+var NL_LOCALE = "nl-NL";
 var nl = {
-  locale: "nl-NL",
+  locale: NL_LOCALE,
 
   months: ["", "jan", "feb", "mrt", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec"],
   monthsJoinTwo: function (a, b) { return a + " + " + b; },
@@ -30,8 +31,11 @@ var nl = {
     subscriptions: "Uitgaven per subscription", groups: "Uitgaven per resourcegroep"
   },
 
+  // Row labels for cells the export left blank or columns it does not carry at all. They end
+  // up as table row names in the PDF, so they are copy like everything else here.
+  placeholders: { unknown: "(onbekend)", none: "(geen)", all: "(alle)" },
+
   sample: {
-    banner: "Dit is een voorbeeldrapport met verzonnen data — geen echte Azure-kosten.",
     pill: "VOORBEELD",
     sourceLabel: "Voorbeelddata (synthetisch)"
   },
@@ -158,7 +162,7 @@ var nl = {
     chooseFiles: "Kies .csv-bestanden.",
     removeFile: "Verwijder",
     reading: function (name) { return "‘" + name + "’ lezen…"; },
-    readingProgress: function (name, n) { return "‘" + name + "’ lezen… (" + n.toLocaleString("nl-NL") + " regels)"; },
+    readingProgress: function (name, n) { return "‘" + name + "’ lezen… (" + n.toLocaleString(NL_LOCALE) + " regels)"; },
     readingLarge: "bezig met lezen… (groot bestand, kan even duren)",
     readingPlain: "bezig met lezen…",
     noRows: "geen leesbare rijen",
@@ -173,14 +177,13 @@ var nl = {
     analyzingSample: "Voorbeeld analyseren…",
     analyzing: "Analyseren…",
     noCostRows: "Geen kostenregels gevonden in het bestand.",
-    sampleDone: function (rows, files) { return "Voorbeeld klaar — " + rows.toLocaleString("nl-NL") + " regels uit " + files + " bestand(en) verwerkt."; },
-    analysisDone: function (rows, files) { return "Analyse klaar — " + rows.toLocaleString("nl-NL") + " regels uit " + files + " bestand(en) verwerkt."; },
+    sampleDone: function (rows, files) { return "Voorbeeld klaar — " + rows.toLocaleString(NL_LOCALE) + " regels uit " + files + " bestand(en) verwerkt."; },
+    analysisDone: function (rows, files) { return "Analyse klaar — " + rows.toLocaleString(NL_LOCALE) + " regels uit " + files + " bestand(en) verwerkt."; },
     generatingPdf: "PDF genereren…",
     pdfModuleFailed: "PDF-module kon niet laden. Controleer je verbinding en probeer opnieuw, of ververs de pagina.",
     pdfError: "Er ging iets mis bij het maken van de PDF.",
     sampleReportError: "Er ging iets mis bij het maken van het voorbeeldrapport.",
-    popupBlocked: "Kon het voorbeeldrapport niet in een nieuw tabblad openen — check of pop-ups geblokkeerd worden.",
-    scannerLoadFailed: "De scanner kon niet laden. Ververs de pagina en probeer opnieuw."
+    popupBlocked: "Kon het voorbeeldrapport niet in een nieuw tabblad openen — check of pop-ups geblokkeerd worden."
   },
 
   pdf: {
@@ -196,8 +199,9 @@ var nl = {
   }
 };
 
+var EN_LOCALE = "en-US";
 var en = {
-  locale: "en-US",
+  locale: EN_LOCALE,
 
   months: ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
   monthsJoinTwo: function (a, b) { return a + " + " + b; },
@@ -216,8 +220,9 @@ var en = {
     subscriptions: "Spend by subscription", groups: "Spend by resource group"
   },
 
+  placeholders: { unknown: "(unknown)", none: "(none)", all: "(all)" },
+
   sample: {
-    banner: "This is a sample report with made-up data — not real Azure costs.",
     pill: "SAMPLE",
     sourceLabel: "Sample data (synthetic)"
   },
@@ -341,7 +346,7 @@ var en = {
     chooseFiles: "Choose .csv files.",
     removeFile: "Remove",
     reading: function (name) { return "Reading ‘" + name + "’…"; },
-    readingProgress: function (name, n) { return "Reading ‘" + name + "’… (" + n.toLocaleString("en-US") + " rows)"; },
+    readingProgress: function (name, n) { return "Reading ‘" + name + "’… (" + n.toLocaleString(EN_LOCALE) + " rows)"; },
     readingLarge: "reading… (large file, may take a moment)",
     readingPlain: "reading…",
     noRows: "no readable rows",
@@ -356,14 +361,13 @@ var en = {
     analyzingSample: "Analyzing sample…",
     analyzing: "Analyzing…",
     noCostRows: "No cost rows found in the file.",
-    sampleDone: function (rows, files) { return "Sample ready — " + rows.toLocaleString("en-US") + " rows from " + files + " file(s) processed."; },
-    analysisDone: function (rows, files) { return "Analysis done — " + rows.toLocaleString("en-US") + " rows from " + files + " file(s) processed."; },
+    sampleDone: function (rows, files) { return "Sample ready — " + rows.toLocaleString(EN_LOCALE) + " rows from " + files + " file(s) processed."; },
+    analysisDone: function (rows, files) { return "Analysis done — " + rows.toLocaleString(EN_LOCALE) + " rows from " + files + " file(s) processed."; },
     generatingPdf: "Generating PDF…",
     pdfModuleFailed: "The PDF module couldn't load. Check your connection and try again, or refresh the page.",
     pdfError: "Something went wrong generating the PDF.",
     sampleReportError: "Something went wrong generating the sample report.",
-    popupBlocked: "Couldn't open the sample report in a new tab — check whether pop-ups are blocked.",
-    scannerLoadFailed: "The scanner couldn't load. Refresh the page and try again."
+    popupBlocked: "Couldn't open the sample report in a new tab — check whether pop-ups are blocked."
   },
 
   pdf: {

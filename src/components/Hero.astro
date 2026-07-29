@@ -1,0 +1,38 @@
+---
+// The dark hero band shared by the home and Azure pages. Both used a byte-identical copy of
+// this markup, differing only in whether a second CTA sits beside the primary one — so that
+// difference is the slot, and the plane-visual stack and three-part headline convention now
+// have one definition instead of two that had to be edited in lockstep.
+import { withBase } from "../lib/url";
+
+interface Props {
+  hero: {
+    eyebrow: string;
+    headlinePre: string;
+    headlineEm: string;
+    headlinePost: string;
+    lede: string;
+    ctaPrimary: { label: string; href: string };
+  };
+}
+
+const { hero } = Astro.props;
+---
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-content">
+      <span class="eyebrow">{hero.eyebrow}</span>
+      <h1>{hero.headlinePre}<em>{hero.headlineEm}</em>{hero.headlinePost}</h1>
+      <p class="lede">{hero.lede}</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href={withBase(hero.ctaPrimary.href)}>{hero.ctaPrimary.label}</a>
+        <slot name="extra-cta" />
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="plane plane-1"></div>
+      <div class="plane plane-2"></div>
+      <div class="plane plane-3"></div>
+    </div>
+  </div>
+</section>

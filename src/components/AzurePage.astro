@@ -2,19 +2,20 @@
 import { getEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ProseText from "./ProseText.astro";
+import Hero from "./Hero.astro";
 import { withBase } from "../lib/url";
+import type { Locale } from "../lib/i18n";
 
 interface Props {
-  lang: "nl" | "en";
+  lang: Locale;
 }
 
 const { lang } = Astro.props;
-const homeHref = lang === "en" ? "/en/" : "/";
 
 const common = (await getEntry("common", lang))!.data;
 const azure = (await getEntry("azure", lang))!.data;
 ---
-<BaseLayout lang={lang} title={azure.meta.title} description={azure.meta.description} scriptSrc="'self'" nav={common.nav} homeHref={homeHref}>
+<BaseLayout lang={lang} title={azure.meta.title} description={azure.meta.description} scriptSrc="'self'" nav={common.nav}>
 
 <!-- 0. Connectivity indicator — sits in the sticky topbar next to the contact button, so it
      stays visible while the reader scrolls through the export steps and into the scan. Labels
@@ -47,25 +48,10 @@ const azure = (await getEntry("azure", lang))!.data;
 </Fragment>
 
 <!-- 1. Very short brief + two CTAs -->
-<section class="hero">
-  <div class="wrap hero-grid">
-    <div class="hero-content">
-      <span class="eyebrow">{azure.hero.eyebrow}</span>
-      <h1>{azure.hero.headlinePre}<em>{azure.hero.headlineEm}</em>{azure.hero.headlinePost}</h1>
-      <p class="lede">{azure.hero.lede}</p>
-      <div class="hero-ctas">
-        <a class="btn btn-primary" href={withBase(azure.hero.ctaPrimary.href)}>{azure.hero.ctaPrimary.label}</a>
-        <!-- A button, not a link: it navigates nothing on this page, it produces a report. -->
-        <button class="btn btn-ghost-dark" type="button" data-sample>{azure.app.sampleLabel}</button>
-      </div>
-    </div>
-    <div class="hero-visual" aria-hidden="true">
-      <div class="plane plane-1"></div>
-      <div class="plane plane-2"></div>
-      <div class="plane plane-3"></div>
-    </div>
-  </div>
-</section>
+<Hero hero={azure.hero}>
+  <!-- A button, not a link: it navigates nothing on this page, it produces a report. -->
+  <button slot="extra-cta" class="btn btn-ghost-dark" type="button" data-sample>{azure.app.sampleLabel}</button>
+</Hero>
 
 <!-- 2. What you'll get — leads worth investigating -->
 <section class="expect">
@@ -204,7 +190,7 @@ const azure = (await getEntry("azure", lang))!.data;
     // Fetch eagerly, but off the critical path. This deliberately replaces the earlier
     // load-on-scroll: the connectivity strip invites the reader to switch on airplane mode as
     // soon as it says "ready", and a scanner that only downloads once #scan nears the viewport
-    // would then fail to arrive. Idle time costs ~7 KB gzip after first paint and buys a page
+    // would then fail to arrive. Idle time costs ~16 KB gzip after first paint and buys a page
     // that genuinely works end-to-end with the network off.
     if ("requestIdleCallback" in window) {
       requestIdleCallback(load, { timeout: 2000 });

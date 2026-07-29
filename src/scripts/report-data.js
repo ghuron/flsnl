@@ -6,6 +6,10 @@
 
 import { textFor } from "./strings.js";
 
+// The single definition of how a share is rendered. buildSignals and the PDF both use it,
+// so a KPI tile and the table beneath it cannot round the same number differently.
+function pct(x) { return Math.round(x * 100) + "%"; }
+
 function makeMoney(currency, lang) {
   var locale = textFor(lang).locale;
   var valid = /^[A-Z]{3}$/.test(currency);
@@ -42,7 +46,6 @@ function buildSignals(m, money, lang) {
   var S = textFor(lang);
   var T = S.signals;
   var self = [], engineering = [], notes = [];
-  var pct = function (x) { return Math.round(x * 100) + "%"; };
 
   /* ---------------------------------------------- what your own team can settle */
 
@@ -122,8 +125,9 @@ function buildSignals(m, money, lang) {
   // environment keeps costing the same. Also self-service: a start/stop schedule or Azure
   // DevTest Labs handles this without touching the application.
   if (m.nonProdCount > 0 && m.nonProdCost / (m.total || 1) >= 0.05) {
-    var perMonth = m.monthsCovered > 0 ? m.nonProdSchedulable / m.monthsCovered : 0;
-    var examples = (m.nonProdExamples || []).map(function (e) { return e.name; }).join(", ");
+    var months = (m.months || []).length;
+    var perMonth = months > 0 ? m.nonProdSchedulable / months : 0;
+    var examples = (m.nonProdExamples || []).join(", ");
     self.push(Object.assign({ severity: "high" },
       T.alwaysOnNonProd(money(m.nonProdCost), pct(m.nonProdCost / m.total), m.nonProdCount, examples, perMonth > 0 ? money(perMonth) : "")));
   }
@@ -192,8 +196,11 @@ function buildSignals(m, money, lang) {
 // analysis (the detail tables elsewhere keep the full top-10 breakdown for that). Negative-cost
 // entries (a category or resource that nets below zero on refunds/credits) are dropped from
 // both the ranking and the Other bucket: a negative "top spender" reads as a bug, not a finding.
-function topFiveWithOther(rows, total) {
-  var positive = rows.filter(function (r) { return r.cost > 0; }).sort(function (a, b) { return b.cost - a.cost; });
+// `presorted` skips the sort for callers that already hand over a cost-descending list — the
+// resource ranking is tens of thousands of entries and was being re-sorted for nothing.
+function topFiveWithOther(rows, total, presorted) {
+  var positive = rows.filter(function (r) { return r.cost > 0; });
+  if (!presorted) positive.sort(function (a, b) { return b.cost - a.cost; });
   var top = positive.slice(0, 5);
   var othersCost = positive.slice(5).reduce(function (a, r) { return a + r.cost; }, 0);
   return {
@@ -215,7 +222,7 @@ function buildOverview(m) {
   return {
     months: { rows: monthRows, othersCost: 0, othersPct: 0 },
     categories: topFiveWithOther(mapToRows(m.categoryMap || new Map()), m.total),
-    resources: topFiveWithOther(m.resourcesRankedAll || [], m.total),
+    resources: topFiveWithOther(m.resourcesRankedAll || [], m.total, true),
     subscriptions: topFiveWithOther(mapToRows(m.subscriptionMap || new Map()), m.total),
     groups: topFiveWithOther(mapToRows(m.groupMap || new Map()), m.total),
     // A single AI-spend stat rather than the old narrative panel: the token-ratio/cache-share
@@ -234,4 +241,4 @@ function periodText(m, lang) {
   return f === l ? f : S.periodRange(f, l);
 }
 
-export { makeMoney, buildSignals, periodText, monthLabel, buildOverview };
+export { makeMoney, pct, buildSignals, periodText, monthLabel, buildOverview };

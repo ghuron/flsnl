@@ -1,37 +1,22 @@
 ---
 import { getEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "./Hero.astro";
 import { withBase } from "../lib/url";
+import type { Locale } from "../lib/i18n";
 
 interface Props {
-  lang: "nl" | "en";
+  lang: Locale;
 }
 
 const { lang } = Astro.props;
-const homeHref = lang === "en" ? "/en/" : "/";
 
 const nav = (await getEntry("common", lang))!.data.nav;
 const home = (await getEntry("home", lang))!.data;
 ---
-<BaseLayout lang={lang} title={home.meta.title} description={home.meta.description} scriptSrc="'none'" nav={nav} homeHref={homeHref}>
+<BaseLayout lang={lang} title={home.meta.title} description={home.meta.description} scriptSrc="'none'" nav={nav}>
 
-<section class="hero">
-  <div class="wrap hero-grid">
-    <div class="hero-content">
-      <span class="eyebrow">{home.hero.eyebrow}</span>
-      <h1>{home.hero.headlinePre}<em>{home.hero.headlineEm}</em>{home.hero.headlinePost}</h1>
-      <p class="lede">{home.hero.lede}</p>
-      <div class="hero-ctas">
-        <a class="btn btn-primary" href={withBase(home.hero.ctaPrimary.href)}>{home.hero.ctaPrimary.label}</a>
-      </div>
-    </div>
-    <div class="hero-visual" aria-hidden="true">
-      <div class="plane plane-1"></div>
-      <div class="plane plane-2"></div>
-      <div class="plane plane-3"></div>
-    </div>
-  </div>
-</section>
+<Hero hero={home.hero} />
 
 <div class="wrap">
   <div class="promo">
