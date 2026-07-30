@@ -150,11 +150,13 @@ var nl = {
     },
     clean: function () {
       return { title: "Op factuurniveau springt er niets uit",
-        body: "Dat is een compliment: commercieel zit het strak. Een geverifieerd oordeel vraagt meer dan een factuur — productietoegang, historie en je eigen engineers erbij. Dat is de aparte, betaalde stap." };
+        body: "Dat is een compliment: commercieel zit het strak. Een geverifieerd oordeel vraagt meer dan een factuur — productietoegang, historie en je eigen engineers erbij — " +
+              "en dat onderzoek zou je nu niets opleveren. We raden het dus niet aan; kom terug als je omgeving of je AI-plannen wezenlijk veranderen." };
     },
     noEngineeringOpportunity: function () {
-      return { title: "Geen kans voor herbouw gevonden",
-        body: "Op basis van deze factuurgegevens ziet First Line Software geen aannemelijke kans om kosten te besparen via herbouw. Zie jij die wel? Mail az@fls.dev voor een gratis gesprek van 30 minuten." };
+      return { title: "Niets dat herbouw rechtvaardigt",
+        body: "In deze facturen zien we geen patroon dat op de architectuur wijst — wat hierboven staat, kan je eigen team afhandelen. " +
+              "Een betaald onderzoek zou je nu niets opleveren, dus dat adviseren we niet; kom terug als je omgeving of je AI-plannen wezenlijk veranderen." };
     }
   },
 
@@ -334,11 +336,13 @@ var en = {
     },
     clean: function () {
       return { title: "Nothing stands out at the billing level",
-        body: "That's a compliment: commercially, this is tight. A verified verdict needs more than a bill — production access, history, and your own engineers in the room. That's the separate, paid step." };
+        body: "That's a compliment: commercially, this is tight. A verified verdict needs more than a bill — production access, history, and your own engineers in the room — " +
+              "and that study wouldn't earn you anything right now. We're not recommending it; come back if your estate or your AI plans change materially." };
     },
     noEngineeringOpportunity: function () {
-      return { title: "No re-engineering opportunity found",
-        body: "Based on this billing data, First Line Software doesn't see a plausible opportunity to cut costs through re-engineering. If you do see one, email az@fls.dev to schedule a free 30-minute call." };
+      return { title: "Nothing that justifies re-engineering",
+        body: "We see no pattern in this billing data that points at the architecture — what's above is for your own team to handle. " +
+              "A paid study wouldn't earn you anything right now, so we're not recommending one; come back if your estate or your AI plans change materially." };
     }
   },
 
