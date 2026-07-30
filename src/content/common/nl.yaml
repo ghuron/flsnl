@@ -1,5 +1,31 @@
 nav:
   contactLabel: Contact ons
   contactHref: https://firstlinesoftware.com/contact-us/
+  home: Home
+  solutionsLabel: Oplossingen
+  documentProcessing: Documentverwerking
+  dataIntegration: Data-ontsluiting
+  processAutomation: Procesautomatisering
+  offers: Aanbod
+  azureCheck: Azure-check
+  cases: Cases
+  trust: Vertrouwen
+  about: Over ons
+  contactPage: Contact
+  kennis: Kennis
+  privacy: Privacy
+  menuLabel: Menu
+  langSwitchLabel: EN
+facts:
+  legalName: First Line Software B.V.
+  kvk: "58362126"
+  btw: NL853005047B01
+  address: Zeestraat 70, 2518 AC Den Haag
+  phone: "+31 70 217 0112"
+  privacyLabel: Privacy & cookies
+  isoLabel: ISO 27001 · 9001 · 14001
+  isoHref: /vertrouwen/
+  microsoftPartnerLabel: Microsoft Solutions Partner
+  microsoftPartnerHref: "[link naar live Microsoft-partnerprofiel]"
 a11y:
   newTab: opent in een nieuw tabblad

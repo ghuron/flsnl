@@ -117,6 +117,7 @@ header.topbar .bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem 2rem;
   padding: 0.6rem 1.75rem;
 }
 header.topbar .bar-end { display: flex; align-items: center; gap: 1.1rem; }
@@ -137,6 +138,165 @@ header.topbar .contact-link {
   transition: border-color .15s ease, background-color .15s ease;
 }
 header.topbar .contact-link:hover { border-color: #fff; background: rgba(255,255,255,.08); }
+header.topbar .lang-switch {
+  color: #cfd3e6;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.3rem 0.5rem;
+}
+header.topbar .lang-switch:hover { color: #fff; }
+
+/* ---- primary nav ----
+   Two renders of the same nav, one active at a time by breakpoint — not one <details> forced
+   to look different at each width. An earlier version tried to keep a single <details>-wrapped
+   nav and override its closed-state hiding with `display: flex !important` at desktop; Chromium
+   kept computing that nav's width as 0 regardless — collapsed <details> content isn't reliably
+   un-collapsible via an author `display` rule. Splitting into an always-flex desktop nav
+   (`.primary-nav-desktop`, hidden below the breakpoint) and a plain <details> disclosure for
+   mobile (`.primary-nav-mobile`, hidden at/above it) means neither ever fights the browser's
+   own behavior. No script anywhere here, so marketing pages keep script-src 'none'. */
+/* Resets the global `details`/`summary` box styling (border, panel background, +/− marker) —
+   that styling is meant for the content-page collapsibles (FAQ, export notes), not the nav. */
+.nav-toggle, .nav-dropdown { border: none; background: none; padding: 0; margin: 0; }
+.nav-toggle-summary, .nav-dropdown summary { font-weight: 700; }
+.nav-toggle-summary::before, .nav-dropdown summary::before { content: none !important; }
+
+.nav-toggle-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+}
+.nav-toggle-summary::-webkit-details-marker { display: none; }
+.nav-toggle-icon, .nav-toggle-icon::before, .nav-toggle-icon::after {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+}
+.nav-toggle-icon { position: relative; }
+.nav-toggle-icon::before, .nav-toggle-icon::after { content: ""; position: absolute; left: 0; }
+.nav-toggle-icon::before { top: -7px; }
+.nav-toggle-icon::after { top: 7px; }
+
+.primary-nav { flex-direction: column; gap: 0.2rem; }
+.primary-nav > a, .nav-dropdown summary {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 0.7rem 0.5rem;
+  list-style: none;
+  cursor: pointer;
+}
+.nav-dropdown summary::-webkit-details-marker { display: none; }
+.nav-dropdown summary::after { content: " \25BE"; font-size: 0.75em; }
+.nav-dropdown-panel { display: flex; flex-direction: column; padding-left: 1rem; }
+.nav-dropdown-panel a { color: #cfd3e6; text-decoration: none; font-size: 0.9rem; padding: 0.45rem 0.5rem; }
+.nav-dropdown-panel a:hover { color: #fff; }
+
+.primary-nav-desktop { display: none; }
+.primary-nav-mobile {
+  position: absolute;
+  left: 0; right: 0; top: 100%;
+  background: var(--navy);
+  border-bottom: 1px solid #232842;
+  padding: 0.5rem 1.75rem 1rem;
+}
+.nav-toggle[open] .nav-toggle-summary { margin-bottom: 0.2rem; }
+
+@media (min-width: 960px) {
+  .nav-toggle { display: none; } /* the whole mobile disclosure, hamburger included */
+  .primary-nav-desktop {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .primary-nav-desktop > a, .primary-nav-desktop .nav-dropdown summary { padding: 0.5rem 0.7rem; }
+  .primary-nav-desktop .nav-dropdown { position: relative; }
+  .primary-nav-desktop .nav-dropdown-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--navy);
+    border: 1px solid #232842;
+    border-radius: 8px;
+    padding: 0.4rem;
+    min-width: 190px;
+    box-shadow: 0 12px 24px rgba(0,0,0,.25);
+  }
+}
+header.topbar .bar { flex-wrap: wrap; }
+@media (min-width: 960px) { header.topbar .bar { flex-wrap: nowrap; } }
+.bar-end { margin-left: auto; }
+@media (min-width: 960px) { .bar-end { margin-left: 0; } }
+
+/* ---- home: "Zo werken we" / track record / Azure teaser ---- */
+.how-we-work { margin: 4rem 0; }
+.how-we-work h2 { font-size: 1.7rem; margin: 0 0 1.5rem; }
+.how-we-work-steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; counter-reset: step; }
+@media (max-width: 900px) { .how-we-work-steps { grid-template-columns: 1fr; } }
+.how-we-work-steps li { counter-increment: step; position: relative; padding-left: 2.5rem; }
+.how-we-work-steps li::before {
+  content: counter(step);
+  position: absolute; left: 0; top: 0;
+  width: 1.7rem; height: 1.7rem; border-radius: 50%;
+  background: var(--blue); color: #fff; font-weight: 800; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.how-we-work-steps strong { display: block; margin-bottom: 0.3rem; }
+.how-we-work-steps p { color: var(--ink-dim); margin: 0; font-size: 0.92rem; }
+
+.track-record { max-width: 780px; margin: 3rem 0; padding: 1.5rem; background: var(--panel); border-radius: 12px; color: var(--ink-dim); }
+.track-record a { margin-left: 0.4rem; font-weight: 700; }
+
+.azure-teaser { text-align: center; max-width: 620px; margin: 4rem auto; }
+.azure-teaser h2 { font-size: 1.5rem; margin: 0 0 0.6rem; }
+.azure-teaser p { color: var(--ink-dim); margin: 0 0 1.5rem; }
+
+/* ---- azure: bridge to the paid Waste Audit ---- */
+.bridge { text-align: center; max-width: 620px; margin: 4rem auto; padding: 2.5rem; background: var(--panel); border-radius: 16px; }
+.bridge h2 { font-size: 1.4rem; margin: 0 0 0.6rem; }
+.bridge p { color: var(--ink-dim); margin: 0 0 1.5rem; }
+
+/* ---- kennis post list ---- */
+.post-list { list-style: none; padding: 0; margin: 2rem 0; }
+.post-list li { padding: 1.5rem 0; border-bottom: 1px solid var(--line); }
+.post-list li:first-child { padding-top: 0; }
+.post-date { color: var(--ink-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 0.3rem; }
+.post-list h2 { font-size: 1.2rem; margin: 0 0 0.4rem; }
+
+/* ---- contact card ---- */
+.contact-card { background: var(--panel); border-radius: 16px; padding: 2rem; max-width: 480px; }
+.contact-name { margin: 0 0 1rem; }
+.contact-details { list-style: none; padding: 0; margin: 0 0 1.5rem; display: grid; gap: 0.5rem; }
+
+/* ---- facts list (over ons) ---- */
+.facts-list { margin: 1rem 0 1.5rem; }
+.facts-list > div { display: grid; grid-template-columns: 220px 1fr; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--line); }
+@media (max-width: 640px) { .facts-list > div { grid-template-columns: 1fr; gap: 0.2rem; } }
+.facts-list dt { font-weight: 700; color: var(--ink-dim); margin: 0; }
+.facts-list dd { margin: 0; }
+
+/* ---- certificate table (vertrouwen) ---- */
+.table-scroll { overflow-x: auto; }
+.cert-table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.9rem; }
+.cert-table th {
+  text-align: left; color: var(--ink-dim); font-weight: 700; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em; padding: 0.5rem 0.7rem; border-bottom: 2px solid var(--line);
+}
+.cert-table td { padding: 0.6rem 0.7rem; border-bottom: 1px solid var(--line); }
+
+/* ---- footer facts block ---- */
+footer.site .facts { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #232842; }
+footer.site .facts p { margin: 0 0 0.4rem; }
+footer.site .facts-links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+footer.site .facts-links a { text-decoration: underline; text-underline-offset: 2px; }
 
 /* ---- connectivity indicator (azure page) ----
    Lives in the topbar's right-hand cluster, on the same baseline as the contact button.
@@ -210,6 +370,8 @@ section.hero .lede {
   margin: 0 0 2.25rem;
 }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+.hero-export-link { display: inline-block; margin-top: 1rem; color: #b9bac1; font-size: 0.88rem; text-decoration: underline; text-underline-offset: 2px; }
+.hero-export-link:hover { color: #fff; }
 
 /* ---- hero visual: tilted glass planes ---- */
 .hero-visual {
@@ -402,6 +564,77 @@ section.app .intro { color: var(--ink-dim); font-size: 1.05rem; max-width: 700px
   font-size: 1.1rem; line-height: 1; padding: 0 0.3rem;
 }
 .filelist button:hover { color: #c0392b; }
+.trust-microcopy { color: var(--ink-dim); font-size: 0.88rem; max-width: 640px; margin: 0 0 1.5rem; }
 .app-actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.5rem; align-items: center; }
 .app-status { color: var(--ink-dim); font-size: 0.9rem; }
 .app-status.error { color: #c0392b; }
+
+/* ---- capability cards (home) ---- */
+.capability-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 3rem 0; }
+@media (max-width: 900px) { .capability-cards { grid-template-columns: 1fr; } }
+.capability-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 1.75rem;
+}
+.capability-card h3 { font-size: 1.2rem; margin: 0 0 0.6rem; }
+.capability-card p { color: var(--ink-dim); margin: 0 0 1rem; }
+.capability-card-link { font-weight: 700; text-decoration: none; }
+
+/* ---- proof strip (home) ---- */
+.proof-strip {
+  display: flex; flex-wrap: wrap; gap: 2rem 2.5rem; align-items: center;
+  padding: 2rem 0; margin: 1rem 0;
+}
+.proof-item { display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+.proof-value { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+.proof-label { font-size: 0.8rem; color: var(--ink-dim); }
+a.proof-item:hover .proof-value { color: var(--blue); }
+
+/* ---- CTA block (every page) ---- */
+.cta-block { background: var(--navy); color: #fff; padding: 3.5rem 0; margin-top: 4rem; }
+.cta-block-inner {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 1.75rem;
+  justify-content: space-between;
+}
+.cta-block-person { display: flex; align-items: center; gap: 0.9rem; }
+.cta-photo { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; }
+.cta-photo-fallback {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--blue); color: #fff; font-weight: 800; font-size: 1.2rem;
+}
+.cta-name { margin: 0; font-weight: 700; }
+.cta-role { margin: 0; color: #b9bac1; font-size: 0.88rem; }
+.cta-block-text { flex: 1 1 320px; min-width: 240px; }
+.cta-block-text h2 { margin: 0 0 0.4rem; font-size: 1.3rem; }
+.cta-promise { margin: 0; color: #cfd3e6; font-size: 0.92rem; }
+
+/* ---- offer cards (aanbod) ---- */
+.offer-cards { display: grid; gap: 1.5rem; margin: 2.5rem 0; }
+.offer-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.75rem; }
+.offer-card h3 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+.offer-scope { color: var(--ink-dim); margin: 0 0 1rem; }
+.offer-deliverables { margin: 0 0 1rem; padding-left: 1.2rem; }
+.offer-deliverables li { margin-bottom: 0.4rem; }
+.offer-meta { display: flex; gap: 1.5rem; font-weight: 700; margin-bottom: 0.8rem; }
+.offer-duration { color: var(--ink-dim); font-weight: 400; }
+.offer-price { color: var(--blue-dark); }
+.offer-after { color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
+
+/* ---- case cards (cases) ---- */
+.case-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin: 2.5rem 0; }
+.case-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem; }
+.case-tags { display: flex; gap: 0.5rem; margin-bottom: 0.6rem; }
+.case-tag {
+  font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 0.15rem 0.5rem; border-radius: 4px; background: #e6ecff; color: var(--blue-dark);
+}
+.case-tag-sector { background: #fff; border: 1px solid var(--line); color: var(--ink-dim); }
+.case-card h3 { margin: 0 0 0.8rem; font-size: 1.1rem; }
+.case-fields { margin: 0 0 0.8rem; }
+.case-fields > div { margin-bottom: 0.6rem; }
+.case-fields dt { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-dim); margin: 0; }
+.case-fields dd { margin: 0.15rem 0 0; }
+.case-footer { color: var(--ink-dim); font-size: 0.85rem; margin: 0; }
+
+/* ---- FAQ accordion (reuses the global details/summary look) ---- */
+.faq details { margin-bottom: 0.75rem; }

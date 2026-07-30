@@ -1,0 +1,20 @@
+meta:
+  title: Odoo + AI-automatisering — First Line Software
+  description: AI-automatisering bovenop je Odoo-omgeving, of engineering-bankkracht voor Odoo-partners die AI willen aanbieden zonder zelf een team op te bouwen.
+heading: Odoo + AI-automatisering
+intro: "Twee ingangen, één antwoord: wij bouwen AI-automatisering die op Odoo aansluit — of je nu zelf Odoo draait, of het als partner aan klanten levert."
+audiences:
+  - heading: Draai je zelf Odoo?
+    body: Documentverwerking, data-ontsluiting en procesautomatisering die aansluiten op je bestaande Odoo-omgeving — vaste-scope start, werkende software in 4-6 weken.
+  - heading: Ben je Odoo-partner?
+    body: Wil je AI-automatisering aanbieden aan je klanten zonder zelf een AI-engineeringteam op te bouwen? Wij zijn de bank erachter — jij houdt het klantcontact.
+demoCase:
+  heading: Ons eigen bewijs
+  body: We hebben dit eerst op onszelf toegepast — onze eigen interne Odoo-implementatie draait inmiddels naast een intern AI-deliveryplatform dat we op dezelfde manier hebben gebouwd.
+cta:
+  heading: Praat over jouw Odoo-omgeving
+  name: Andrei Zaikin
+  role: Contactpersoon Nederland
+  bookingHref: "[boekingslink]"
+  bookingLabel: Plan een gesprek
+  responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.

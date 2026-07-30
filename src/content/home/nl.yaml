@@ -1,21 +1,68 @@
 meta:
-  title: First Line Software — praktische tools voor je cloudrekening
-  description: "First Line Software bouwt praktische tools voor je Azure-omgeving. Begin met de Azure Waste Scan: vind verspilling zonder iets te delen."
+  title: First Line Software — werkende AI in 4-6 weken
+  description: "First Line Software bouwt AI- en dataoplossingen die binnen 4-6 weken werken: documentverwerking, data-ontsluiting, procesautomatisering. Vaste prijs."
 hero:
   eyebrow: First Line Software
-  headlinePre: "Praktische tools voor je "
-  headlineEm: cloudrekening
-  headlinePost: "."
-  lede: We bouwen kleine, eerlijke tools die je meteen kunt gebruiken — zonder account, zonder je data uit handen te geven. De eerste staat hieronder klaar.
+  headlinePre: "Werkende AI in "
+  headlineEm: 4-6 weken
+  headlinePost: ": documenten verwerken, data ontsluiten, processen automatiseren. Vaste prijs."
+  lede: First Line Software bouwt en beheert AI- en dataoplossingen — met 300 engineers in eigen Europese deliverycentra en één vast aanspreekpunt in Nederland.
   ctaPrimary:
-    label: Naar de Azure Waste Scan
+    label: Plan een gesprek met Andrei Zaikin
+    href: "[boekingslink]"
+  ctaSecondary:
+    label: Doe de Azure-check
     href: /azure/
-promo:
-  tag: Nu beschikbaar
-  heading: Azure Waste Scan
-  body: Open je maandelijkse Azure-verbruiksbestand en zie binnen twee minuten waar geld weglekt. De analyse draait volledig in je eigen browser — geen account, geen upload, geen server. Deze pagina kan je factuur domweg niet zien.
-  cta:
-    label: Start de scan
-    href: /azure/
+capabilities:
+  - heading: Documentverwerking
+    body: Facturen, orders en rapporten die zichzelf uitlezen — met gemeten nauwkeurigheid per documenttype.
+    href: /documentverwerking/
+    label: Bekijk documentverwerking
+  - heading: Data-ontsluiting
+    body: Verspreide systemen ontsloten tot bruikbare data voor rapportage, sturing en AI.
+    href: /data-ontsluiting/
+    label: Bekijk data-ontsluiting
+  - heading: Procesautomatisering
+    body: AI-agents voor repeterende workflows — orderinvoer, documentstromen, klantprocessen.
+    href: /procesautomatisering/
+    label: Bekijk procesautomatisering
+howWeWork:
+  heading: Zo werken we
+  steps:
+    - heading: Vaste-scope start
+      body: 4-6 weken, werkende software in jouw eigen Azure-omgeving, met een evaluatierapport met gemeten prestaties.
+    - heading: Naar productie
+      body: Live zodra de cijfers kloppen — geen losse pilot die nergens landt.
+    - heading: Beheer per verwerkte eenheid
+      body: Daarna draaien we door en betaal je per verwerkte eenheid. Geen uurtje-factuurtje.
+proof:
+  metrics:
+    - value: "[x]"
+      label: afgeronde AI-projecten
+    - value: "[x%]"
+      label: gemiddeld sneller live dan bij een traditioneel traject
+    - value: ISO 27001 · 9001 · 14001
+      label: gecertificeerd
+      href: /vertrouwen/
+    - value: Microsoft Solutions Partner
+      label: Data & AI · Digital & App Innovation
+      href: "[link naar live Microsoft-partnerprofiel]"
+    - value: "[Clutch-score]"
+      label: Clutch-beoordeling
+      href: "[Clutch-profiel, indien beschikbaar]"
+trackRecord:
+  text: "Bewezen in de praktijk: EPD-ontsluiting en FHIR/OMOP-pipelines voor zorgorganisaties; catalogus-, order- en documentautomatisering voor commerce en logistiek."
+  linkLabel: Bekijk cases
+azureTeaser:
+  heading: Nieuwsgierig waar je Azure-budget lekt?
+  body: Upload je Azure-kostenexport en zie binnen twee minuten waar je budget lekt — en wat je ermee kunt bouwen.
+  linkLabel: Doe de Azure-check
+cta:
+  heading: Praat over jouw use case
+  name: Andrei Zaikin
+  role: Contactpersoon Nederland
+  bookingHref: "[boekingslink]"
+  bookingLabel: Plan een gesprek
+  responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
 footer:
   text: First Line Software — geen tracking, geen cookies, geen externe requests.

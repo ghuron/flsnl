@@ -1,0 +1,20 @@
+meta:
+  title: Privacy & cookies — First Line Software
+  description: Wat we bijhouden (bijna niets), hoe de Azure-check je bestand verwerkt (nergens, want het verlaat nooit je browser), en je rechten onder de AVG.
+heading: Privacy & cookies
+intro: In gewoon Nederlands, zonder juridisch jargon waar het niet nodig is.
+sections:
+  - heading: Website-statistieken
+    paragraphs:
+      - "We gebruiken op dit moment geen analytics op deze site. Als dat verandert, kiezen we voor een cookievrije oplossing en wordt deze pagina bijgewerkt voordat die live gaat."
+  - heading: De Azure-check
+    paragraphs:
+      - "Je Azure-kostenbestand verlaat nooit je browser. De analyse draait volledig lokaal — er wordt niets naar onze servers of die van derden verzonden. Omdat er niets verzonden wordt, is er ook niets om binnen de EER te verwerken, op te slaan, of achteraf te verwijderen."
+      - "Je hebt geen account en geen inloggegevens nodig — alleen het bestand zelf."
+  - heading: Contactgegevens
+    paragraphs:
+      - "Als je ons mailt of een gesprek plant, gebruiken we je gegevens alleen om te reageren op je vraag. We voegen je niet toe aan een mailinglijst zonder dat je daarom vraagt."
+  - heading: Jouw rechten onder de AVG
+    paragraphs:
+      - "Je hebt recht op inzage, correctie en verwijdering van persoonsgegevens die we over je hebben. Neem contact op via onderstaand adres om dat recht uit te oefenen."
+contact: "Privacyvragen: [privacycontact e-mailadres]"

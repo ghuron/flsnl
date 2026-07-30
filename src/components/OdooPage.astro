@@ -1,0 +1,41 @@
+---
+// Spec §4.14 — NL-first, conditional on the go/no-go decision in spec §6.7. Built per the
+// full-skeleton decision; flag this route's launch status to the owner separately.
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CtaBlock from "./CtaBlock.astro";
+
+const common = (await getEntry("common", "nl"))!.data;
+const odoo = (await getEntry("odoo", "nl"))!.data;
+---
+<BaseLayout lang="nl" page="odoo" title={odoo.meta.title} description={odoo.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<main class="prose">
+  <h1>{odoo.heading}</h1>
+  <p class="intro">{odoo.intro}</p>
+
+  {odoo.audiences.map((a) => (
+    <section class="content">
+      <h2>{a.heading}</h2>
+      <p>{a.body}</p>
+    </section>
+  ))}
+
+  <section class="content">
+    <h2>{odoo.demoCase.heading}</h2>
+    <p>{odoo.demoCase.body}</p>
+  </section>
+</main>
+</div>
+
+<CtaBlock
+  heading={odoo.cta.heading}
+  name={odoo.cta.name}
+  role={odoo.cta.role}
+  bookingHref={odoo.cta.bookingHref}
+  bookingLabel={odoo.cta.bookingLabel}
+  responsePromise={odoo.cta.responsePromise}
+/>
+
+</BaseLayout>

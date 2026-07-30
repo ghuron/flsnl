@@ -1,21 +1,68 @@
 meta:
-  title: First Line Software — practical tools for your cloud bill
-  description: First Line Software builds practical tools for your Azure environment. Start with the Azure Waste Scan — find waste without sharing anything.
+  title: First Line Software — working AI in 4-6 weeks
+  description: "First Line Software builds AI and data solutions that work within 4-6 weeks: document processing, data integration, process automation. Fixed price."
 hero:
   eyebrow: First Line Software
-  headlinePre: "Practical tools for your "
-  headlineEm: cloud bill
-  headlinePost: "."
-  lede: We build small, honest tools you can use right away — no account, no handing over your data. The first one is ready below.
+  headlinePre: "Working AI in "
+  headlineEm: 4-6 weeks
+  headlinePost: ": process documents, unlock data, automate processes. Fixed price."
+  lede: First Line Software builds and operates AI and data solutions — with 300 engineers in our own European delivery centers and one fixed point of contact in the Netherlands.
   ctaPrimary:
-    label: Go to the Azure Waste Scan
+    label: Book a call with Andrei Zaikin
+    href: "[booking link]"
+  ctaSecondary:
+    label: Run the Azure check
     href: /en/azure/
-promo:
-  tag: Available now
-  heading: Azure Waste Scan
-  body: Open your monthly Azure usage file and see within two minutes where money is leaking. The analysis runs entirely in your own browser — no account, no upload, no server. This page simply cannot see your bill.
-  cta:
-    label: Start the scan
-    href: /en/azure/
+capabilities:
+  - heading: Document processing
+    body: Invoices, orders and reports that read themselves out — with measured accuracy per document type.
+    href: /en/document-processing/
+    label: See document processing
+  - heading: Data integration
+    body: Scattered systems unlocked into usable data for reporting, steering and AI.
+    href: /en/data-integration/
+    label: See data integration
+  - heading: Process automation
+    body: AI agents for repetitive workflows — order entry, document flows, customer processes.
+    href: /en/process-automation/
+    label: See process automation
+howWeWork:
+  heading: How we work
+  steps:
+    - heading: Fixed-scope start
+      body: 4-6 weeks, working software in your own Azure environment, with an evaluation report of measured performance.
+    - heading: Into production
+      body: Live once the numbers hold up — not a one-off pilot that goes nowhere.
+    - heading: Run per processed unit
+      body: From there we keep going, and you pay per unit processed. No billable hours.
+proof:
+  metrics:
+    - value: "[x]"
+      label: completed AI projects
+    - value: "[x%]"
+      label: faster to live than a traditional trajectory, on average
+    - value: ISO 27001 · 9001 · 14001
+      label: certified
+      href: /en/trust/
+    - value: Microsoft Solutions Partner
+      label: Data & AI · Digital & App Innovation
+      href: "[link to live Microsoft partner profile]"
+    - value: "[Clutch score]"
+      label: Clutch rating
+      href: "[Clutch profile, if available]"
+trackRecord:
+  text: "Proven in practice: EHR integration and FHIR/OMOP pipelines for healthcare organizations; catalog, order and document automation for commerce and logistics."
+  linkLabel: See cases
+azureTeaser:
+  heading: Curious where your Azure budget is leaking?
+  body: Upload your Azure cost export and see within two minutes where your budget is leaking — and what you could build with it.
+  linkLabel: Run the Azure check
+cta:
+  heading: Talk through your use case
+  name: Andrei Zaikin
+  role: Netherlands contact
+  bookingHref: "[booking link]"
+  bookingLabel: Book a call
+  responsePromise: We reply within one business day — even when the answer is that we can't help.
 footer:
   text: First Line Software — no tracking, no cookies, no external requests.

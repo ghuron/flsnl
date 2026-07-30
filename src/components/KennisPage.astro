@@ -1,0 +1,36 @@
+---
+// Spec §4.12 — low-frequency engineering blog. Index only for now; individual post pages are a
+// follow-up once real topics exist (see the stub excerpts below).
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import type { Locale } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const common = (await getEntry("common", lang))!.data;
+const kennis = (await getEntry("kennis", lang))!.data;
+---
+<BaseLayout lang={lang} page="kennis" title={kennis.meta.title} description={kennis.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<main class="prose">
+  <h1>{kennis.heading}</h1>
+  <p class="intro">{kennis.intro}</p>
+
+  <ul class="post-list">
+    {kennis.posts.map((p) => (
+      <li>
+        <p class="post-date">{p.dateLabel}</p>
+        <h2>{p.title}</h2>
+        <p>{p.excerpt}</p>
+      </li>
+    ))}
+  </ul>
+</main>
+</div>
+
+</BaseLayout>

@@ -1,0 +1,65 @@
+meta:
+  title: Trust & compliance — First Line Software
+  description: Certifications, data processing, our EU AI Act approach and contract basis — honest and complete, for anyone who wants to know upfront.
+heading: Trust & compliance
+intro: This page is for anyone who wants to know upfront — procurement, security officers, and anyone who'd rather read first and ask later. No marketing language, just the facts.
+certificates:
+  heading: Certifications
+  scopeNote: "The certifications cover the entities that perform the work — Montenegro, Serbia and Czech Republic. The Dutch entity is the contracting party."
+  tableHeaders:
+    name: Certificate
+    scope: Scope
+    number: Number
+    validity: Validity
+    issuer: Issuer
+  items:
+    - name: ISO 27001
+      scope: Montenegro, Serbia, Czech Republic
+      number: "[certificate number]"
+      validity: "[validity date]"
+      issuer: "[issuing body]"
+    - name: ISO 9001
+      scope: Montenegro, Serbia, Czech Republic
+      number: "[certificate number]"
+      validity: "[validity date]"
+      issuer: "[issuing body]"
+    - name: ISO 14001
+      scope: Montenegro, Serbia, Czech Republic
+      number: "[certificate number]"
+      validity: "[validity date]"
+      issuer: "[issuing body]"
+avg:
+  heading: Data processing & GDPR
+  paragraphs:
+    - Processing takes place within the EEA. Exact data locations are stated in the data processing agreement.
+    - For work where we process personal data, we sign a data processing agreement. A list of sub-processors is available on request.
+  dpaLinkLabel: "Download the data processing agreement [once available]"
+  subprocessorsNote: Sub-processor list available on request.
+  privacyContact: "Privacy questions: [privacy contact email]"
+aiAct:
+  heading: EU AI Act
+  paragraphs:
+    - For every AI solution we build, we first determine the risk classification under the EU AI Act. Documentation and logging are standard, not bolted on afterward.
+    - Human review is built in at the points where it belongs. For high-risk applications, we design the solution to meet the requirements of the regulation.
+security:
+  heading: Security practices
+  body: "[Summary of security practices — to be validated with the security officer before publishing]"
+contractBasis:
+  heading: Contract basis
+  body: "We work under the NLdigital Terms and Conditions [pending legal sign-off]."
+insurance:
+  heading: Insurance
+  body: "[Insurance coverage — to be filled in]"
+whereWeWork:
+  heading: Where the work happens
+  body: "Delivery from our own European centers: Montenegro, Serbia, Slovakia, Czech Republic and Spain. No surprises later — this is here so you know upfront."
+questionnaire:
+  heading: Need a security questionnaire filled in?
+  body: "Send it over. We'll return it completed within [x] business days."
+cta:
+  heading: Questions about compliance?
+  name: Andrei Zaikin
+  role: Netherlands contact
+  bookingHref: "[booking link]"
+  bookingLabel: Book a call
+  responsePromise: We reply within one business day — even when the answer is that we can't help.

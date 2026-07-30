@@ -1,0 +1,93 @@
+---
+// Spec §4.8 — written for procurement/security readers. Hard constraint: never mention NEN 7510.
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CtaBlock from "./CtaBlock.astro";
+import type { Locale } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const common = (await getEntry("common", lang))!.data;
+const trust = (await getEntry("trust", lang))!.data;
+---
+<BaseLayout lang={lang} page="trust" title={trust.meta.title} description={trust.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<main class="prose">
+  <h1>{trust.heading}</h1>
+  <p class="intro">{trust.intro}</p>
+
+  <section class="content">
+    <h2>{trust.certificates.heading}</h2>
+    <p>{trust.certificates.scopeNote}</p>
+    <div class="table-scroll">
+      <table class="cert-table">
+        <thead><tr>
+          <th>{trust.certificates.tableHeaders.name}</th>
+          <th>{trust.certificates.tableHeaders.scope}</th>
+          <th>{trust.certificates.tableHeaders.number}</th>
+          <th>{trust.certificates.tableHeaders.validity}</th>
+          <th>{trust.certificates.tableHeaders.issuer}</th>
+        </tr></thead>
+        <tbody>
+          {trust.certificates.items.map((c) => (
+            <tr><td>{c.name}</td><td>{c.scope}</td><td>{c.number}</td><td>{c.validity}</td><td>{c.issuer}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="content">
+    <h2>{trust.avg.heading}</h2>
+    {trust.avg.paragraphs.map((p) => <p>{p}</p>)}
+    <p>{trust.avg.dpaLinkLabel} · {trust.avg.subprocessorsNote}</p>
+    <p>{trust.avg.privacyContact}</p>
+  </section>
+
+  <section class="content">
+    <h2>{trust.aiAct.heading}</h2>
+    {trust.aiAct.paragraphs.map((p) => <p>{p}</p>)}
+  </section>
+
+  <section class="content">
+    <h2>{trust.security.heading}</h2>
+    <p>{trust.security.body}</p>
+  </section>
+
+  <section class="content">
+    <h2>{trust.contractBasis.heading}</h2>
+    <p>{trust.contractBasis.body}</p>
+  </section>
+
+  <section class="content">
+    <h2>{trust.insurance.heading}</h2>
+    <p>{trust.insurance.body}</p>
+  </section>
+
+  <section class="content">
+    <h2>{trust.whereWeWork.heading}</h2>
+    <p>{trust.whereWeWork.body}</p>
+  </section>
+
+  <section class="content">
+    <h2>{trust.questionnaire.heading}</h2>
+    <p>{trust.questionnaire.body}</p>
+  </section>
+</main>
+</div>
+
+<CtaBlock
+  heading={trust.cta.heading}
+  name={trust.cta.name}
+  role={trust.cta.role}
+  bookingHref={trust.cta.bookingHref}
+  bookingLabel={trust.cta.bookingLabel}
+  responsePromise={trust.cta.responsePromise}
+/>
+
+</BaseLayout>

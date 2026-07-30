@@ -1,0 +1,52 @@
+meta:
+  title: Cases — First Line Software
+  description: Proven in practice — EHR integration and FHIR/OMOP pipelines for healthcare organizations, document automation for commerce and logistics, and our own internal AI delivery platform.
+heading: Cases
+intro: Three examples of where we've already built this. Numbers follow once the owner has verified them — we don't publish a figure we can't back up.
+items:
+  - title: EHR integration with FHIR/OMOP
+    sectorLabel: Healthcare
+    capabilityLabel: Data integration
+    capability: data-integration
+    sector: healthcare
+    situationLabel: Starting situation
+    situation: "[Nature and size of the healthcare organization — to be filled in by the owner], with patient data scattered across multiple EHR systems."
+    whatWeBuiltLabel: What we built
+    whatWeBuilt: FHIR/OMOP pipelines that unlock the EHR data for reporting and analysis — one of the toughest standards to meet.
+    resultLabel: Result
+    result: "[Numbers to follow once verified]"
+    duration: "[x]"
+    stack: Azure, FHIR, OMOP
+  - title: Catalog, order and document automation
+    sectorLabel: Commerce & logistics
+    capabilityLabel: Document processing
+    capability: document-processing
+    sector: commerce-logistics
+    situationLabel: Starting situation
+    situation: "[Nature and size of the organization — to be filled in by the owner], with manual processing of orders, catalogs and document flows."
+    whatWeBuiltLabel: What we built
+    whatWeBuilt: Automated extraction and processing of orders and catalog data, with document flows that now handle themselves.
+    resultLabel: Result
+    result: "[Numbers to follow once verified]"
+    duration: "[x]"
+    stack: "[Stack — to be filled in by the owner]"
+  - title: Our own internal AI delivery platform
+    sectorLabel: Our own stuff
+    capabilityLabel: Process automation
+    capability: process-automation
+    sector: internal
+    situationLabel: Starting situation
+    situation: Our own operations ran on the same scattered tools many clients have — including an internal Odoo implementation that had grown apart from the rest of the organization.
+    whatWeBuiltLabel: What we built
+    whatWeBuilt: An internal AI delivery platform connected to our Odoo implementation, built with the same approach we use for clients — we test our own offer on ourselves first.
+    resultLabel: Result
+    result: "[Numbers to follow once verified]"
+    duration: "[x]"
+    stack: Azure, Odoo
+cta:
+  heading: Talk through your situation
+  name: Andrei Zaikin
+  role: Netherlands contact
+  bookingHref: "[booking link]"
+  bookingLabel: Book a call
+  responsePromise: We reply within one business day — even when the answer is that we can't help.

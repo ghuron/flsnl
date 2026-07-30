@@ -1,0 +1,47 @@
+meta:
+  title: About us — First Line Software
+  description: Founded in 2010, HQ in Cambridge (US), delivery from our own European centers. The facts, the history, and who you'll talk to in the Netherlands.
+heading: About us
+facts:
+  heading: The facts
+  items:
+    - label: Founded
+      value: "2010"
+    - label: Headquarters
+      value: Cambridge, Massachusetts (US)
+    - label: Dutch entity
+      value: First Line Software B.V. · KvK 58362126 · Zeestraat 70, 2518 AC Den Haag
+    - label: Engineers
+      value: "300"
+    - label: Delivery centers
+      value: Montenegro, Serbia, Slovakia, Czech Republic, Spain
+    - label: Certifications
+      value: ISO 27001 · 9001 · 14001 (Montenegro, Serbia, Czech Republic)
+    - label: Microsoft designations
+      value: "Solutions Partner for Data & AI and Digital & App Innovation — [link to live Microsoft partner profile]"
+history:
+  heading: Our history
+  paragraphs:
+    - We come out of the early European agile movement — not a generic offshore bank of engineers, but teams that were used to building alongside the client from the start, not next to them.
+    - "There's a part of our history we'd rather tell you ourselves than have you read it elsewhere: delivery from Russia was fully wound down in 2022. Since then we work exclusively from the EU and EU-candidate member states — Montenegro, Serbia, Slovakia, Czech Republic and Spain."
+    - "[This paragraph is for the owner to fact-check for exact wording before publishing.]"
+team:
+  heading: Netherlands team
+  name: Andrei Zaikin
+  role: Netherlands contact
+  bio: "[Short bio — to be filled in by the owner]"
+  linkedinLabel: LinkedIn
+  linkedinHref: https://www.linkedin.com/in/zaikin/
+  bookingLabel: Book a call
+  bookingHref: "[booking link]"
+careers:
+  body: Looking for a job at First Line Software? Openings run through our global system.
+  linkLabel: See openings
+  href: "[link to global careers system]"
+cta:
+  heading: Talk to us
+  name: Andrei Zaikin
+  role: Netherlands contact
+  bookingHref: "[booking link]"
+  bookingLabel: Book a call
+  responsePromise: We reply within one business day — even when the answer is that we can't help.

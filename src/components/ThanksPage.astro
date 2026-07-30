@@ -1,0 +1,27 @@
+---
+// Spec §4.14 — post-conversion page, conversion-tracking target.
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../lib/url";
+import { routeFor, type Locale } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const common = (await getEntry("common", lang))!.data;
+const thanks = (await getEntry("thanks", lang))!.data;
+---
+<BaseLayout lang={lang} page="thanks" title={thanks.meta.title} description={thanks.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<main class="prose" style="text-align: center; margin: 4rem auto;">
+  <h1>{thanks.heading}</h1>
+  <p class="intro">{thanks.body}</p>
+  <p>{thanks.nextStep.body} <a class="btn btn-primary" href={withBase(routeFor("azure", lang))}>{thanks.nextStep.linkLabel}</a></p>
+</main>
+</div>
+
+</BaseLayout>

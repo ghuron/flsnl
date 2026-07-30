@@ -1,0 +1,20 @@
+meta:
+  title: Privacy & cookies — First Line Software
+  description: What we track (almost nothing), how the Azure check handles your file (nowhere, it never leaves your browser), and your rights under GDPR.
+heading: Privacy & cookies
+intro: In plain language, without legal jargon where it isn't needed.
+sections:
+  - heading: Website analytics
+    paragraphs:
+      - "We currently use no analytics on this site. If that changes, we'll pick a cookieless option and update this page before it goes live."
+  - heading: The Azure check
+    paragraphs:
+      - "Your Azure cost file never leaves your browser. The analysis runs entirely locally — nothing is sent to our servers or anyone else's. Because nothing is sent, there's also nothing to process within the EEA, store, or delete afterward."
+      - "You don't need an account or any credentials — just the file itself."
+  - heading: Contact details
+    paragraphs:
+      - "If you email us or book a call, we use your details only to respond to your request. We don't add you to a mailing list without you asking for it."
+  - heading: Your rights under GDPR
+    paragraphs:
+      - "You have the right to access, correct and delete personal data we hold about you. Contact us at the address below to exercise that right."
+contact: "Privacy questions: [privacy contact email]"

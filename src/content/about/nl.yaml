@@ -1,0 +1,47 @@
+meta:
+  title: Over ons — First Line Software
+  description: Opgericht in 2010, HQ in Cambridge (VS), delivery vanuit onze eigen Europese centra. De feiten, de geschiedenis, en wie je in Nederland spreekt.
+heading: Over ons
+facts:
+  heading: De feiten
+  items:
+    - label: Opgericht
+      value: "2010"
+    - label: Hoofdkantoor
+      value: Cambridge, Massachusetts (VS)
+    - label: Nederlandse entiteit
+      value: First Line Software B.V. · KvK 58362126 · Zeestraat 70, 2518 AC Den Haag
+    - label: Engineers
+      value: "300"
+    - label: Delivery centra
+      value: Montenegro, Servië, Slowakije, Tsjechië, Spanje
+    - label: Certificeringen
+      value: ISO 27001 · 9001 · 14001 (Montenegro, Servië, Tsjechië)
+    - label: Microsoft-designaties
+      value: "Solutions Partner voor Data & AI en Digital & App Innovation — [link naar live Microsoft-partnerprofiel]"
+history:
+  heading: Onze geschiedenis
+  paragraphs:
+    - We komen voort uit de vroege Europese agile-beweging — niet uit een generieke offshore-bank van engineers, maar uit teams die van meet af aan gewend waren om samen met de klant te bouwen, niet ernaast.
+    - "Een deel van onze geschiedenis vertellen we liever zelf dan dat je het ergens anders leest: delivery vanuit Rusland is in 2022 volledig afgebouwd. Sindsdien werken we uitsluitend vanuit de EU en EU-kandidaat-lidstaten — Montenegro, Servië, Slowakije, Tsjechië en Spanje."
+    - "[Deze paragraaf is door de eigenaar te controleren op exacte bewoording voordat publicatie.]"
+team:
+  heading: Team Nederland
+  name: Andrei Zaikin
+  role: Contactpersoon Nederland
+  bio: "[Korte bio — in te vullen door de eigenaar]"
+  linkedinLabel: LinkedIn
+  linkedinHref: https://www.linkedin.com/in/zaikin/
+  bookingLabel: Plan een gesprek
+  bookingHref: "[boekingslink]"
+careers:
+  body: Op zoek naar een baan bij First Line Software? Vacatures lopen via ons wereldwijde systeem.
+  linkLabel: Bekijk vacatures
+  href: "[link naar wereldwijd vacaturesysteem]"
+cta:
+  heading: Praat met ons
+  name: Andrei Zaikin
+  role: Contactpersoon Nederland
+  bookingHref: "[boekingslink]"
+  bookingLabel: Plan een gesprek
+  responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.

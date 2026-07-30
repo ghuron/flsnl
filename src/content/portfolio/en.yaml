@@ -1,0 +1,21 @@
+meta:
+  title: For PE portfolio CTOs — First Line Software
+  description: Fixed-price AI feature delivery, per product, with an engineering bench that's already built product software. One owner, no account team.
+heading: For PE portfolio CTOs
+intro: If someone introduced you to us, you probably don't need the pitch. Here's what working with us actually looks like.
+sections:
+  - heading: What we deliver
+    body: Fixed-price AI features shipped into your existing product — document processing, data integration, process automation — not a slide deck, working software with a measured evaluation report.
+  - heading: Where we come from
+    body: We're a product-engineering shop, not a consultancy that learned AI last year. 300 engineers, our own European delivery centers, and a track record of building software that ships.
+  - heading: How engagement works per portfolio company
+    body: Each portfolio company gets its own fixed-scope start and its own pricing — we don't run one blanket deal across a whole portfolio. What's true across all of them is the model — vaste-scope start, then run pricing, no billable hours.
+  - heading: Who you talk to
+    body: One person owns this relationship end to end — no account team, no handoffs.
+cta:
+  heading: Talk to Andrei directly
+  name: Andrei Zaikin
+  role: Netherlands contact
+  bookingHref: "[booking link]"
+  bookingLabel: Book a call
+  responsePromise: We reply within one business day — even when the answer is that we can't help.

@@ -1,0 +1,35 @@
+---
+// Spec §4.14 — EN-only, for PE portfolio CTOs after an intro. Peer-to-peer tone, no marketing.
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CtaBlock from "./CtaBlock.astro";
+
+const common = (await getEntry("common", "en"))!.data;
+const portfolio = (await getEntry("portfolio", "en"))!.data;
+---
+<BaseLayout lang="en" page="portfolio" title={portfolio.meta.title} description={portfolio.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<main class="prose">
+  <h1>{portfolio.heading}</h1>
+  <p class="intro">{portfolio.intro}</p>
+
+  {portfolio.sections.map((s) => (
+    <section class="content">
+      <h2>{s.heading}</h2>
+      <p>{s.body}</p>
+    </section>
+  ))}
+</main>
+</div>
+
+<CtaBlock
+  heading={portfolio.cta.heading}
+  name={portfolio.cta.name}
+  role={portfolio.cta.role}
+  bookingHref={portfolio.cta.bookingHref}
+  bookingLabel={portfolio.cta.bookingLabel}
+  responsePromise={portfolio.cta.responsePromise}
+/>
+
+</BaseLayout>

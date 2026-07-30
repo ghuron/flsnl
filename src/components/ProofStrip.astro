@@ -1,0 +1,39 @@
+---
+// Home page proof strip (spec §4.1 block 4): a row of verified numbers/marks, each clickable to
+// its evidence — never a bare claim. `href` is optional per metric since not everything has a
+// public verification link yet (e.g. an unconfirmed outcome number).
+import { withBase } from "../lib/url";
+
+interface Metric {
+  value: string;
+  label: string;
+  href?: string;
+}
+interface Props {
+  metrics: Metric[];
+}
+
+const { metrics } = Astro.props;
+---
+<div class="proof-strip">
+  {metrics.map((m) => (
+    m.href ? (
+      m.href.startsWith("http") ? (
+        <a class="proof-item" href={m.href} target="_blank" rel="noopener noreferrer">
+          <span class="proof-value">{m.value}</span>
+          <span class="proof-label">{m.label}</span>
+        </a>
+      ) : (
+        <a class="proof-item" href={withBase(m.href)}>
+          <span class="proof-value">{m.value}</span>
+          <span class="proof-label">{m.label}</span>
+        </a>
+      )
+    ) : (
+      <span class="proof-item">
+        <span class="proof-value">{m.value}</span>
+        <span class="proof-label">{m.label}</span>
+      </span>
+    )
+  ))}
+</div>

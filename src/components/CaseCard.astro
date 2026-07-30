@@ -1,0 +1,40 @@
+---
+// One case study card on /cases (spec §4.7). Strict format: starting situation -> what we
+// built -> result in numbers -> duration -> stack. `capability`/`sector` are exposed as data
+// attributes for a future filter UI (spec calls the grid "filterable"); no filtering script
+// exists yet, so today every card just renders in the grid.
+interface Props {
+  title: string;
+  sectorLabel: string;
+  capabilityLabel: string;
+  capability: string;
+  sector: string;
+  situationLabel: string;
+  situation: string;
+  whatWeBuiltLabel: string;
+  whatWeBuilt: string;
+  resultLabel: string;
+  result: string;
+  duration: string;
+  stack: string;
+}
+
+const {
+  title, sectorLabel, capabilityLabel, capability, sector,
+  situationLabel, situation, whatWeBuiltLabel, whatWeBuilt, resultLabel, result,
+  duration, stack,
+} = Astro.props;
+---
+<article class="case-card" data-capability={capability} data-sector={sector}>
+  <div class="case-tags">
+    <span class="case-tag">{capabilityLabel}</span>
+    <span class="case-tag case-tag-sector">{sectorLabel}</span>
+  </div>
+  <h3>{title}</h3>
+  <dl class="case-fields">
+    <div><dt>{situationLabel}</dt><dd>{situation}</dd></div>
+    <div><dt>{whatWeBuiltLabel}</dt><dd>{whatWeBuilt}</dd></div>
+    <div><dt>{resultLabel}</dt><dd>{result}</dd></div>
+  </dl>
+  <p class="case-footer">{duration} · {stack}</p>
+</article>

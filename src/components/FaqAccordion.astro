@@ -1,0 +1,18 @@
+---
+// CSS-only accordion (native <details>/<summary>, same pattern the export section already
+// uses) — used on the capability pages' FAQ block (spec §4.2-4.4) and wherever else a page
+// needs a handful of question/answer pairs without shipping script for it.
+interface Props {
+  items: { question: string; answer: string }[];
+}
+
+const { items } = Astro.props;
+---
+<div class="faq">
+  {items.map((item) => (
+    <details>
+      <summary>{item.question}</summary>
+      <p>{item.answer}</p>
+    </details>
+  ))}
+</div>

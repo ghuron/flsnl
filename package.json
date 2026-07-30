@@ -8,6 +8,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "astro": "^5.9.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8"

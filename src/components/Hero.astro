@@ -28,6 +28,7 @@ const { hero } = Astro.props;
         <a class="btn btn-primary" href={withBase(hero.ctaPrimary.href)}>{hero.ctaPrimary.label}</a>
         <slot name="extra-cta" />
       </div>
+      <slot name="below-ctas" />
     </div>
     <div class="hero-visual" aria-hidden="true">
       <div class="plane plane-1"></div>

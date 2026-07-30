@@ -1,0 +1,50 @@
+meta:
+  title: Document processing — First Line Software
+  description: Invoices, orders and reports that read themselves out — with measured accuracy per document type. Working software in 4-6 weeks, fixed price.
+hero:
+  eyebrow: Document processing
+  headlinePre: "Documents that "
+  headlineEm: process themselves
+  headlinePost: "."
+  lede: Extraction and classification of invoices, orders, reports and forms — with measured accuracy per document type. Where it's not quite certain enough, a human checks alongside it.
+  ctaPrimary:
+    label: Book a call
+    href: "[booking link]"
+whatItIs:
+  heading: What it is
+  paragraphs:
+    - Extraction and classification of invoices, orders, reports and forms. Every document type gets a measured accuracy — not a vague promise, a percentage we track.
+    - Where accuracy isn't quite high enough for full automation, a human still does the final check. That's not a shortcoming we hide — it's a choice we make with you upfront.
+howItLooks:
+  heading: What it looks like in your environment
+  paragraphs:
+    - The solution runs in your own Azure tenant, connected to the systems where the documents already arrive. Nothing leaves your environment to be processed somewhere else.
+    - Every run is logged and evaluated, so you can see where accuracy stands at any point. It's designed to be EU AI Act-compliant from the first line of code, not bolted on afterward.
+howWeStart:
+  heading: How we start
+  body: We start with a fixed-scope engagement of 4-6 weeks — working software in your own Azure environment, with an evaluation report of measured performance. From there we keep going, and you pay per document processed.
+  linkLabel: See the offer
+cases:
+  heading: Proven in practice
+  body: Document automation for commerce and logistics — orders, catalogs and document flows that now process themselves.
+  linkLabel: See the cases
+faq:
+  heading: Frequently asked questions
+  items:
+    - question: How accurate is the extraction?
+      answer: We measure that per document type and report it honestly, including the documents a human still needs to look at. No hidden margin of error.
+    - question: What if it doesn't work well enough for my documents?
+      answer: We'll say so after the first 4-6 weeks, backed by the evaluation report — not after a long implementation.
+    - question: Who owns the data?
+      answer: You do. The solution runs in your own Azure tenant; we build and operate it, but the data and the environment stay yours.
+    - question: How long does the engagement take?
+      answer: The first working version is there within 4-6 weeks. From there it's a matter of further development and paying per unit processed.
+    - question: What does it roughly cost?
+      answer: The fixed-scope start and the per-unit run pricing are on the offers page with a price indication.
+cta:
+  heading: Talk through your documents
+  name: Andrei Zaikin
+  role: Netherlands contact
+  bookingHref: "[booking link]"
+  bookingLabel: Book a call
+  responsePromise: We reply within one business day — even when the answer is that we can't help.

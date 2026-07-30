@@ -1,0 +1,50 @@
+meta:
+  title: Data-ontsluiting — First Line Software
+  description: Verspreide systemen ontsloten tot bruikbare data voor rapportage, sturing en AI. Bewezen met EPD-ontsluiting en FHIR/OMOP-pipelines. Werkende software in 4-6 weken.
+hero:
+  eyebrow: Data-ontsluiting
+  headlinePre: "Data die "
+  headlineEm: overal vandaan komt
+  headlinePost: ", op één plek bruikbaar."
+  lede: Koppelingen en pipelines die verspreide systemen bruikbaar maken voor rapportage, sturing en AI — bewezen met EPD-data en FHIR/OMOP-pipelines voor zorgorganisaties.
+  ctaPrimary:
+    label: Plan een gesprek
+    href: "[boekingslink]"
+whatItIs:
+  heading: Wat het is
+  paragraphs:
+    - Koppelingen en pipelines die verspreide systemen bruikbaar maken voor rapportage, sturing en AI. Data die nu in silo's vastzit, wordt herbruikbaar zonder dat de bronsystemen erop hoeven te wachten.
+    - "Bewezen voorbeeld: EPD-ontsluiting en FHIR/OMOP-pipelines voor zorgorganisaties — een van de zwaarste standaarden om aan te voldoen, en precies het soort werk dat we al hebben gedaan."
+howItLooks:
+  heading: Hoe het eruitziet in jouw omgeving
+  paragraphs:
+    - De pipelines draaien in je eigen Azure-tenant, met logging en evaluaties op elke stap. Je ziet niet alleen dát data is ontsloten, maar ook hoe volledig en hoe actueel die is.
+    - Het ontwerp is EU AI Act-conform vanaf de eerste regel code — relevant zodra de ontsloten data ook AI-toepassingen gaat voeden.
+howWeStart:
+  heading: Zo starten we
+  body: We beginnen met een vaste-scope traject van 4-6 weken — werkende pipelines in jouw eigen Azure-omgeving, met een evaluatierapport met gemeten prestaties. Daarna draaien we door en betaal je per verwerkte eenheid.
+  linkLabel: Bekijk het aanbod
+cases:
+  heading: Bewezen in de praktijk
+  body: EPD-ontsluiting en FHIR/OMOP-pipelines voor zorgorganisaties.
+  linkLabel: Bekijk de cases
+faq:
+  heading: Veelgestelde vragen
+  items:
+    - question: Welke bronsystemen kunnen jullie ontsluiten?
+      answer: Dat hangt af van wat je hebt staan — van EPD's met FHIR/OMOP tot interne databases en SaaS-systemen. We beginnen met een korte inventarisatie.
+    - question: Wat als de brondata rommelig of onvolledig is?
+      answer: Dat zien we vaak. De pipeline maakt zichtbaar waar de data hiaten heeft in plaats van dat te verbergen — dat hoort bij het evaluatierapport.
+    - question: Wie is eigenaar van de ontsloten data?
+      answer: Jij. Alles draait in jouw eigen Azure-tenant; wij bouwen en beheren de pipelines, maar de data blijft van jou.
+    - question: Hoe lang duurt het traject?
+      answer: De eerste werkende pipelines staan er binnen 4-6 weken. Daarna is het een kwestie van doorontwikkelen en per verwerkte eenheid betalen.
+    - question: Wat kost het ongeveer?
+      answer: De vaste-scope start en het beheer per verwerkte eenheid staan met prijsindicatie op de aanbodpagina.
+cta:
+  heading: Praat over jouw databronnen
+  name: Andrei Zaikin
+  role: Contactpersoon Nederland
+  bookingHref: "[boekingslink]"
+  bookingLabel: Plan een gesprek
+  responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.

@@ -1,0 +1,39 @@
+---
+// The closing CTA every page ends on (spec §2: "every page ends with a single clear CTA —
+// usually: book a call with [NAME], photo included"). One definition so the promise, the
+// booking link and the photo treatment can't drift page to page.
+import { withBase } from "../lib/url";
+
+interface Props {
+  heading: string;
+  name: string;
+  role: string;
+  /** Absolute path under public/, or empty to fall back to an initials avatar — no photo exists
+   *  yet (spec §6.3), so this must degrade cleanly rather than render a broken <img>. */
+  photoSrc?: string;
+  bookingHref: string;
+  bookingLabel: string;
+  responsePromise: string;
+}
+
+const { heading, name, role, photoSrc, bookingHref, bookingLabel, responsePromise } = Astro.props;
+const initials = name.split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase();
+---
+<section class="cta-block">
+  <div class="wrap cta-block-inner">
+    <div class="cta-block-person">
+      {photoSrc
+        ? <img class="cta-photo" src={withBase(photoSrc)} alt={name} width="72" height="72">
+        : <span class="cta-photo cta-photo-fallback" aria-hidden="true">{initials}</span>}
+      <div>
+        <p class="cta-name">{name}</p>
+        <p class="cta-role">{role}</p>
+      </div>
+    </div>
+    <div class="cta-block-text">
+      <h2>{heading}</h2>
+      <p class="cta-promise">{responsePromise}</p>
+    </div>
+    <a class="btn btn-primary" href={bookingHref}>{bookingLabel}</a>
+  </div>
+</section>

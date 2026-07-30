@@ -1,0 +1,62 @@
+---
+// Spec §4.9.
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CtaBlock from "./CtaBlock.astro";
+import type { Locale } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const common = (await getEntry("common", lang))!.data;
+const about = (await getEntry("about", lang))!.data;
+---
+<BaseLayout lang={lang} page="about" title={about.meta.title} description={about.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<main class="prose">
+  <h1>{about.heading}</h1>
+
+  <section class="content">
+    <h2>{about.facts.heading}</h2>
+    <dl class="facts-list">
+      {about.facts.items.map((f) => (
+        <div><dt>{f.label}</dt><dd>{f.value}</dd></div>
+      ))}
+    </dl>
+  </section>
+
+  <section class="content">
+    <h2>{about.history.heading}</h2>
+    {about.history.paragraphs.map((p) => <p>{p}</p>)}
+  </section>
+
+  <section class="content">
+    <h2>{about.team.heading}</h2>
+    <p><strong>{about.team.name}</strong> — {about.team.role}</p>
+    <p>{about.team.bio}</p>
+    <p>
+      <a href={about.team.linkedinHref} target="_blank" rel="noopener noreferrer">{about.team.linkedinLabel}</a>
+      · <a href={about.team.bookingHref}>{about.team.bookingLabel}</a>
+    </p>
+  </section>
+
+  <section class="content">
+    <p>{about.careers.body} <a href={about.careers.href}>{about.careers.linkLabel}</a></p>
+  </section>
+</main>
+</div>
+
+<CtaBlock
+  heading={about.cta.heading}
+  name={about.cta.name}
+  role={about.cta.role}
+  bookingHref={about.cta.bookingHref}
+  bookingLabel={about.cta.bookingLabel}
+  responsePromise={about.cta.responsePromise}
+/>
+
+</BaseLayout>

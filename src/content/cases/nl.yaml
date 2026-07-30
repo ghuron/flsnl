@@ -1,0 +1,52 @@
+meta:
+  title: Cases — First Line Software
+  description: Bewezen in de praktijk — EPD-ontsluiting en FHIR/OMOP-pipelines voor zorgorganisaties, documentautomatisering voor commerce en logistiek, en ons eigen interne AI-deliveryplatform.
+heading: Cases
+intro: Drie voorbeelden van waar we dit al hebben gebouwd. Cijfers volgen zodra de eigenaar ze heeft geverifieerd — we publiceren geen getal dat we niet kunnen staven.
+items:
+  - title: EPD-ontsluiting met FHIR/OMOP
+    sectorLabel: Zorg
+    capabilityLabel: Data-ontsluiting
+    capability: data-integration
+    sector: healthcare
+    situationLabel: Uitgangssituatie
+    situation: "[Aard en omvang van de zorgorganisatie — in te vullen door de eigenaar], met patiëntdata verspreid over meerdere EPD-systemen."
+    whatWeBuiltLabel: Wat we bouwden
+    whatWeBuilt: FHIR/OMOP-pipelines die de EPD-data ontsluiten voor rapportage en analyse — een van de zwaarste standaarden om aan te voldoen.
+    resultLabel: Resultaat
+    result: "[Cijfers volgen zodra geverifieerd]"
+    duration: "[x]"
+    stack: Azure, FHIR, OMOP
+  - title: Catalogus-, order- en documentautomatisering
+    sectorLabel: Commerce & logistiek
+    capabilityLabel: Documentverwerking
+    capability: document-processing
+    sector: commerce-logistics
+    situationLabel: Uitgangssituatie
+    situation: "[Aard en omvang van de organisatie — in te vullen door de eigenaar], met handmatige verwerking van orders, catalogi en documentstromen."
+    whatWeBuiltLabel: Wat we bouwden
+    whatWeBuilt: Geautomatiseerde extractie en verwerking van orders en catalogusdata, met documentstromen die nu zichzelf afhandelen.
+    resultLabel: Resultaat
+    result: "[Cijfers volgen zodra geverifieerd]"
+    duration: "[x]"
+    stack: "[Stack — in te vullen door de eigenaar]"
+  - title: Ons eigen interne AI-deliveryplatform
+    sectorLabel: Wij op ons eigen spul
+    capabilityLabel: Procesautomatisering
+    capability: process-automation
+    sector: internal
+    situationLabel: Uitgangssituatie
+    situation: Onze eigen bedrijfsvoering draaide op dezelfde verspreide tools als bij veel klanten — waaronder een interne Odoo-implementatie die apart was gegroeid van de rest van de organisatie.
+    whatWeBuiltLabel: Wat we bouwden
+    whatWeBuilt: Een intern AI-deliveryplatform gekoppeld aan onze Odoo-implementatie, gebouwd met dezelfde aanpak die we bij klanten toepassen — we testen ons eigen aanbod eerst op onszelf.
+    resultLabel: Resultaat
+    result: "[Cijfers volgen zodra geverifieerd]"
+    duration: "[x]"
+    stack: Azure, Odoo
+cta:
+  heading: Praat over jouw situatie
+  name: Andrei Zaikin
+  role: Contactpersoon Nederland
+  bookingHref: "[boekingslink]"
+  bookingLabel: Plan een gesprek
+  responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.

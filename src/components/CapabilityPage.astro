@@ -1,0 +1,65 @@
+---
+// One shared template for the three capability pages (spec §4.2-4.4): documentverwerking,
+// data-ontsluiting, procesautomatisering. `slug` picks which capability entry to render.
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "./Hero.astro";
+import FaqAccordion from "./FaqAccordion.astro";
+import CtaBlock from "./CtaBlock.astro";
+import { withBase } from "../lib/url";
+import { routeFor, type Locale, type PageKey } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+  slug: string;
+  page: PageKey;
+}
+
+const { lang, slug, page } = Astro.props;
+
+const common = (await getEntry("common", lang))!.data;
+const cap = (await getEntry("capability", `${slug}-${lang}`))!.data;
+---
+<BaseLayout lang={lang} page={page} title={cap.meta.title} description={cap.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<Hero hero={cap.hero} />
+
+<div class="wrap">
+<main class="prose">
+  <section class="content">
+    <h2>{cap.whatItIs.heading}</h2>
+    {cap.whatItIs.paragraphs.map((p) => <p>{p}</p>)}
+  </section>
+
+  <section class="content">
+    <h2>{cap.howItLooks.heading}</h2>
+    {cap.howItLooks.paragraphs.map((p) => <p>{p}</p>)}
+  </section>
+
+  <section class="content">
+    <h2>{cap.howWeStart.heading}</h2>
+    <p>{cap.howWeStart.body} <a href={withBase(routeFor("offers", lang))}>{cap.howWeStart.linkLabel}</a></p>
+  </section>
+
+  <section class="content">
+    <h2>{cap.cases.heading}</h2>
+    <p>{cap.cases.body} <a href={withBase(routeFor("cases", lang))}>{cap.cases.linkLabel}</a></p>
+  </section>
+
+  <section class="content">
+    <h2>{cap.faq.heading}</h2>
+    <FaqAccordion items={cap.faq.items} />
+  </section>
+</main>
+</div>
+
+<CtaBlock
+  heading={cap.cta.heading}
+  name={cap.cta.name}
+  role={cap.cta.role}
+  bookingHref={cap.cta.bookingHref}
+  bookingLabel={cap.cta.bookingLabel}
+  responsePromise={cap.cta.responsePromise}
+/>
+
+</BaseLayout>

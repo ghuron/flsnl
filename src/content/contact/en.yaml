@@ -1,0 +1,23 @@
+meta:
+  title: Contact — First Line Software
+  description: Book a call directly with Andrei Zaikin, or send an email. We reply within one business day — even when the answer is that we can't help.
+heading: Contact
+intro: No form — book a call directly, or email. You'll get a personal reply from Andrei Zaikin, no queue.
+name: Andrei Zaikin
+role: Netherlands contact
+email: "[email address]"
+phone: "+31 70 217 0112"
+linkedinLabel: LinkedIn
+linkedinHref: https://www.linkedin.com/in/zaikin/
+bookingHref: "[booking link]"
+bookingLabel: Book a 30-minute call
+responsePromise: We reply within one business day — even when the answer is that we can't help.
+address:
+  heading: Visiting address
+  lines:
+    - First Line Software B.V.
+    - Zeestraat 70
+    - 2518 AC Den Haag, Netherlands
+procurement:
+  body: Procurement or security questions? Check our trust & compliance page first — it already answers most of them.
+  linkLabel: Go to Trust & compliance

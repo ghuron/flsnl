@@ -1,0 +1,51 @@
+---
+// Spec §4.11 — unlisted in nav, the URL handed directly to Microsoft sellers. Single locale
+// (English-first, no NL variant — see ROUTES.microsoft in src/lib/i18n.ts).
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../lib/url";
+import { routeFor } from "../lib/i18n";
+
+const common = (await getEntry("common", "en"))!.data;
+const ms = (await getEntry("microsoft", "en"))!.data;
+---
+<BaseLayout lang="en" page="microsoft" title={ms.meta.title} description={ms.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<main class="prose">
+  <h1>{ms.heading}</h1>
+  <p class="intro">{ms.intro}</p>
+
+  <section class="content">
+    <h2>{ms.designations.heading}</h2>
+    <ul>
+      {ms.designations.items.map((d) => (
+        <li><a href={d.href} target="_blank" rel="noopener noreferrer">{d.name}</a></li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="content">
+    <h2>{ms.marketplace.heading}</h2>
+    <p>{ms.marketplace.body} <a href={ms.marketplace.href} target="_blank" rel="noopener noreferrer">{ms.marketplace.linkLabel}</a></p>
+  </section>
+
+  <section class="content">
+    <h2>{ms.offers.heading}</h2>
+    <p>{ms.offers.body} <a href={withBase(routeFor("offers", "en"))}>{ms.offers.linkLabel}</a></p>
+  </section>
+
+  <section class="content">
+    <h2>{ms.architecture.heading}</h2>
+    <p>{ms.architecture.body}</p>
+  </section>
+
+  <section class="content">
+    <h2>{ms.contact.heading}</h2>
+    <p>{ms.contact.name} — {ms.contact.role}</p>
+    <a class="btn btn-primary" href={ms.contact.bookingHref}>{ms.contact.bookingLabel}</a>
+  </section>
+</main>
+</div>
+
+</BaseLayout>

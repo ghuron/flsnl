@@ -1,0 +1,12 @@
+meta:
+  title: Notes — First Line Software
+  description: Engineering notes from our own delivery leads — evaluation methodology, document-pipeline architecture, honest post-mortems, Azure cost engineering. Not a content mill, only when there's something to say.
+heading: Notes
+intro: Not a content mill — occasionally an article from one of our own delivery leads, only when there's something worth saying.
+posts:
+  - title: "[Topic to be chosen — evaluation methodology, document-pipeline architecture, or Azure cost engineering]"
+    dateLabel: "[Publish date to follow]"
+    excerpt: "[This article will be published once the owner has chosen the topic.]"
+  - title: "[Second article — topic to be chosen]"
+    dateLabel: "[Publish date to follow]"
+    excerpt: "[This article will be published once the owner has chosen the topic.]"

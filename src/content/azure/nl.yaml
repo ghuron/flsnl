@@ -10,6 +10,7 @@ hero:
   ctaPrimary:
     label: Start de analyse
     href: "#scan"
+heroExportLinkLabel: Zo kom je in 30 seconden aan je verbruiksbestand
 expect:
   heading: Wat je krijgt
   intro: "De scan leest je verbruiksbestanden en wijst uitgavepatronen aan die een nadere blik verdienen. Geen oordeel — een korte lijst aanknopingspunten, elk met een bedrag erbij. Het soort vragen dat op tafel komt:"
@@ -55,6 +56,14 @@ app:
   analyzeLabel: Genereer rapport
   loadError: De scanner kon niet laden. Ververs de pagina en probeer opnieuw.
   noscript: De scan draait op JavaScript in je eigen browser (er wordt nog steeds niets verzonden). Zet JavaScript aan om je bestand te analyseren.
+trust:
+  body: "Je bestand verlaat nooit je browser: er wordt niets verzonden, dus ook niets om binnen de EER te verwerken of achteraf te verwijderen. Je hebt geen inloggegevens nodig — alleen het bestand zelf."
+  privacyLabel: Privacybeleid
+  vertrouwenLabel: Meer over vertrouwen & compliance
+bridge:
+  heading: Van verspilling naar AI-budget
+  body: Zien de aanknopingspunten uit deze scan er economisch de moeite waard uit? De Azure Waste Audit maakt er een gekwantificeerde besparingsinventaris van — en een lijst AI-use-cases die je uit die besparing kunt financieren.
+  linkLabel: Bekijk de Azure Waste Audit
 footer:
   text: First Line Software — broncode en meer op GitHub.
   backLink:

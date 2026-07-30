@@ -2,8 +2,11 @@
 import { getEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Hero from "./Hero.astro";
+import CapabilityCard from "./CapabilityCard.astro";
+import ProofStrip from "./ProofStrip.astro";
+import CtaBlock from "./CtaBlock.astro";
 import { withBase } from "../lib/url";
-import type { Locale } from "../lib/i18n";
+import { routeFor, type Locale } from "../lib/i18n";
 
 interface Props {
   lang: Locale;
@@ -11,24 +14,51 @@ interface Props {
 
 const { lang } = Astro.props;
 
-const nav = (await getEntry("common", lang))!.data.nav;
+const common = (await getEntry("common", lang))!.data;
 const home = (await getEntry("home", lang))!.data;
 ---
-<BaseLayout lang={lang} title={home.meta.title} description={home.meta.description} scriptSrc="'none'" nav={nav}>
+<BaseLayout lang={lang} page="home" title={home.meta.title} description={home.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
 
-<Hero hero={home.hero} />
+<Hero hero={home.hero}>
+  <a slot="extra-cta" class="btn btn-ghost-dark" href={withBase(home.hero.ctaSecondary.href)}>{home.hero.ctaSecondary.label}</a>
+</Hero>
 
 <div class="wrap">
-  <div class="promo">
-    <div>
-      <span class="tag">{home.promo.tag}</span>
-      <h2>{home.promo.heading}</h2>
-      <p>{home.promo.body}</p>
-      <a class="btn btn-primary" href={withBase(home.promo.cta.href)}>{home.promo.cta.label}</a>
-    </div>
-    <div class="promo-visual" aria-hidden="true"></div>
+  <div class="capability-cards">
+    {home.capabilities.map((c) => <CapabilityCard heading={c.heading} body={c.body} href={c.href} label={c.label} />)}
   </div>
+
+  <section class="how-we-work">
+    <h2>{home.howWeWork.heading}</h2>
+    <ol class="how-we-work-steps">
+      {home.howWeWork.steps.map((s) => (
+        <li><strong>{s.heading}</strong><p>{s.body}</p></li>
+      ))}
+    </ol>
+  </section>
+
+  <ProofStrip metrics={home.proof.metrics} />
+
+  <p class="track-record">
+    {home.trackRecord.text}
+    <a href={withBase(routeFor("cases", lang))}>{home.trackRecord.linkLabel}</a>
+  </p>
+
+  <section class="azure-teaser">
+    <h2>{home.azureTeaser.heading}</h2>
+    <p>{home.azureTeaser.body}</p>
+    <a class="btn btn-primary" href={withBase(routeFor("azure", lang))}>{home.azureTeaser.linkLabel}</a>
+  </section>
 </div>
+
+<CtaBlock
+  heading={home.cta.heading}
+  name={home.cta.name}
+  role={home.cta.role}
+  bookingHref={home.cta.bookingHref}
+  bookingLabel={home.cta.bookingLabel}
+  responsePromise={home.cta.responsePromise}
+/>
 
 <Fragment slot="footer">{home.footer.text}</Fragment>
 </BaseLayout>

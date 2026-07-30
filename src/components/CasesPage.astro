@@ -1,0 +1,55 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CaseCard from "./CaseCard.astro";
+import CtaBlock from "./CtaBlock.astro";
+import type { Locale } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const common = (await getEntry("common", lang))!.data;
+const cases = (await getEntry("cases", lang))!.data;
+---
+<BaseLayout lang={lang} page="cases" title={cases.meta.title} description={cases.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<main class="prose" style="max-width: 1000px;">
+  <h1>{cases.heading}</h1>
+  <p class="intro">{cases.intro}</p>
+
+  <div class="case-cards">
+    {cases.items.map((c) => (
+      <CaseCard
+        title={c.title}
+        sectorLabel={c.sectorLabel}
+        capabilityLabel={c.capabilityLabel}
+        capability={c.capability}
+        sector={c.sector}
+        situationLabel={c.situationLabel}
+        situation={c.situation}
+        whatWeBuiltLabel={c.whatWeBuiltLabel}
+        whatWeBuilt={c.whatWeBuilt}
+        resultLabel={c.resultLabel}
+        result={c.result}
+        duration={c.duration}
+        stack={c.stack}
+      />
+    ))}
+  </div>
+</main>
+</div>
+
+<CtaBlock
+  heading={cases.cta.heading}
+  name={cases.cta.name}
+  role={cases.cta.role}
+  bookingHref={cases.cta.bookingHref}
+  bookingLabel={cases.cta.bookingLabel}
+  responsePromise={cases.cta.responsePromise}
+/>
+
+</BaseLayout>

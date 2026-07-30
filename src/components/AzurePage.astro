@@ -4,7 +4,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import ProseText from "./ProseText.astro";
 import Hero from "./Hero.astro";
 import { withBase } from "../lib/url";
-import type { Locale } from "../lib/i18n";
+import { routeFor, type Locale } from "../lib/i18n";
 
 interface Props {
   lang: Locale;
@@ -15,7 +15,7 @@ const { lang } = Astro.props;
 const common = (await getEntry("common", lang))!.data;
 const azure = (await getEntry("azure", lang))!.data;
 ---
-<BaseLayout lang={lang} title={azure.meta.title} description={azure.meta.description} scriptSrc="'self'" nav={common.nav}>
+<BaseLayout lang={lang} page="azure" title={azure.meta.title} description={azure.meta.description} scriptSrc="'self'" nav={common.nav} facts={common.facts}>
 
 <!-- 0. Connectivity indicator — sits in the sticky topbar next to the contact button, so it
      stays visible while the reader scrolls through the export steps and into the scan. Labels
@@ -51,6 +51,7 @@ const azure = (await getEntry("azure", lang))!.data;
 <Hero hero={azure.hero}>
   <!-- A button, not a link: it navigates nothing on this page, it produces a report. -->
   <button slot="extra-cta" class="btn btn-ghost-dark" type="button" data-sample>{azure.app.sampleLabel}</button>
+  <a slot="below-ctas" class="hero-export-link" href="#export">{azure.heroExportLinkLabel}</a>
 </Hero>
 
 <!-- 2. What you'll get — leads worth investigating -->
@@ -106,6 +107,12 @@ const azure = (await getEntry("azure", lang))!.data;
   <h2>{azure.app.heading}</h2>
   <p class="intro">{azure.app.intro}</p>
 
+  <p class="trust-microcopy">
+    {azure.trust.body}
+    <a href={withBase(routeFor("privacy", lang))}>{azure.trust.privacyLabel}</a> ·
+    <a href={withBase(routeFor("trust", lang))}>{azure.trust.vertrouwenLabel}</a>
+  </p>
+
   <div id="scan-app" data-scan-app data-load-error={azure.app.loadError}>
     <div class="dropzone" data-dropzone tabindex="0" role="button" aria-label={azure.app.dropzone.ariaLabel}>
       <p><strong>{azure.app.dropzone.title}</strong> {azure.app.dropzone.suffix}</p>
@@ -124,6 +131,15 @@ const azure = (await getEntry("azure", lang))!.data;
       <div class="note">{azure.app.noscript}</div>
     </noscript>
   </div>
+</section>
+</div>
+
+<!-- 6. Bridge to the paid Azure Waste Audit -->
+<div class="wrap">
+<section class="bridge">
+  <h2>{azure.bridge.heading}</h2>
+  <p>{azure.bridge.body}</p>
+  <a class="btn btn-primary" href={withBase(routeFor("offers", lang))}>{azure.bridge.linkLabel}</a>
 </section>
 </div>
 

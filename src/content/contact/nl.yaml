@@ -1,0 +1,23 @@
+meta:
+  title: Contact — First Line Software
+  description: Plan direct een gesprek met Andrei Zaikin, of stuur een mail. We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
+heading: Contact
+intro: Geen formulier — plan direct een gesprek, of mail. Je krijgt persoonlijk antwoord van Andrei Zaikin, geen wachtrij.
+name: Andrei Zaikin
+role: Contactpersoon Nederland
+email: "[e-mailadres]"
+phone: "+31 70 217 0112"
+linkedinLabel: LinkedIn
+linkedinHref: https://www.linkedin.com/in/zaikin/
+bookingHref: "[boekingslink]"
+bookingLabel: Plan een gesprek van 30 minuten
+responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
+address:
+  heading: Bezoekadres
+  lines:
+    - First Line Software B.V.
+    - Zeestraat 70
+    - 2518 AC Den Haag
+procurement:
+  body: Procurement- of securityvragen? Bekijk eerst onze pagina over vertrouwen & compliance — die beantwoordt de meeste vragen al.
+  linkLabel: Naar Vertrouwen & compliance

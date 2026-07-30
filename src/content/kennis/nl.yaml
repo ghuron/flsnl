@@ -1,0 +1,12 @@
+meta:
+  title: Kennis — First Line Software
+  description: Engineering notes van onze eigen delivery leads — evaluatiemethodiek, documentpijplijn-architectuur, eerlijke post-mortems, Azure cost engineering. Geen contentfabriek, af en toe een artikel dat het waard is.
+heading: Kennis
+intro: Geen contentfabriek — af en toe een artikel van een van onze eigen delivery leads, alleen als er iets te zeggen is.
+posts:
+  - title: "[Onderwerp nog te kiezen — evaluatiemethodiek, documentpijplijn-architectuur, of Azure cost engineering]"
+    dateLabel: "[Publicatiedatum volgt]"
+    excerpt: "[Dit artikel wordt gepubliceerd zodra de eigenaar het onderwerp heeft gekozen.]"
+  - title: "[Tweede artikel — onderwerp nog te kiezen]"
+    dateLabel: "[Publicatiedatum volgt]"
+    excerpt: "[Dit artikel wordt gepubliceerd zodra de eigenaar het onderwerp heeft gekozen.]"

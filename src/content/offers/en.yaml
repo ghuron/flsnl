@@ -1,0 +1,56 @@
+meta:
+  title: Offers & pricing — First Line Software
+  description: Fixed-scope start, per-unit run pricing, no billable hours. See our productized offers with real prices — including the Azure Waste Audit.
+heading: Offers & pricing
+intro:
+  heading: How we price
+  body: Every engagement starts with a fixed-scope start — a fixed amount for a fixed period, resulting in an evaluation report of measured performance. From there comes per-unit run pricing, sometimes paired with a subscription. No billable hours, no open-ended scope. AI that delivers work, not slides.
+cards:
+  - name: "Azure Waste Audit: 2-Wk Assessment"
+    scope: A thorough analysis of your Azure spend — what you're paying, why, and where it could be different.
+    deliverables:
+      - A quantified savings inventory, with an amount per finding
+      - A signed baseline and measurement methodology
+      - A list of AI use cases you could fund from the savings
+    duration: 2 weeks
+    price: "€7,500 – €12,500, fixed price"
+    afterNote: "From there you choose: a fixed-price implementation, or gainshare — 50% of verified savings for 6 months (commercial levers such as reservations count for [15–20%]; a floor applies from [€80–100k]/month Azure spend). From month 7, a Cost Guardrail subscription [€x/month]."
+  - name: "[Document processing PoC offer]: 4-6-Wk Proof of Concept"
+    scope: A working document processing solution in your own Azure environment, with measured accuracy per document type.
+    deliverables:
+      - Working solution in your own tenant
+      - Evaluation report of measured performance
+      - Clarity on the follow-on cost per unit processed
+    duration: 4-6 weeks
+    price: "[€x], fixed price"
+    afterNote: "From there, per-unit run pricing, [€x per document/order]."
+  - name: "[AI offer 3 — name and scope to be determined]"
+    scope: "[Scope to be determined by the owner]"
+    deliverables:
+      - "[To be drafted]"
+    duration: "[x]"
+    price: "[x]"
+    afterNote: "[x]"
+  - name: AI Operations
+    scope: "A run subscription for AI in production: monitoring, evaluations, cost control and further development."
+    deliverables:
+      - Ongoing monitoring of model performance
+      - Periodic evaluations
+      - Cost control on AI spend
+      - Further development where needed
+    duration: Ongoing
+    price: "[€x/month or % of run volume]"
+    afterNote: Runs for as long as the AI solution stays in production.
+guarantee:
+  heading: What we guarantee — and what we don't
+  body: An evaluation report of measured performance is always part of every engagement. No result? We'll say so — we don't sell a follow-on engagement on a story, only on numbers.
+marketplace:
+  heading: Also on Microsoft Marketplace
+  body: "These offers are — or will be — also visible and purchasable via Microsoft Marketplace [links to follow once live]."
+cta:
+  heading: Talk through which offer fits
+  name: Andrei Zaikin
+  role: Netherlands contact
+  bookingHref: "[booking link]"
+  bookingLabel: Book a call
+  responsePromise: We reply within one business day — even when the answer is that we can't help.

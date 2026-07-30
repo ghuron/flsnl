@@ -1,0 +1,56 @@
+---
+// Spec §4.5 — the anti-body-shop statement: productized offers with real prices.
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import OfferCard from "./OfferCard.astro";
+import CtaBlock from "./CtaBlock.astro";
+import type { Locale } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const common = (await getEntry("common", lang))!.data;
+const offers = (await getEntry("offers", lang))!.data;
+---
+<BaseLayout lang={lang} page="offers" title={offers.meta.title} description={offers.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<main class="prose" style="max-width: 900px;">
+  <h1>{offers.heading}</h1>
+
+  <section class="content">
+    <h2>{offers.intro.heading}</h2>
+    <p>{offers.intro.body}</p>
+  </section>
+
+  <div class="offer-cards">
+    {offers.cards.map((c) => (
+      <OfferCard name={c.name} scope={c.scope} deliverables={c.deliverables} duration={c.duration} price={c.price} afterNote={c.afterNote} />
+    ))}
+  </div>
+
+  <section class="content">
+    <h2>{offers.guarantee.heading}</h2>
+    <p>{offers.guarantee.body}</p>
+  </section>
+
+  <section class="content">
+    <h2>{offers.marketplace.heading}</h2>
+    <p>{offers.marketplace.body}</p>
+  </section>
+</main>
+</div>
+
+<CtaBlock
+  heading={offers.cta.heading}
+  name={offers.cta.name}
+  role={offers.cta.role}
+  bookingHref={offers.cta.bookingHref}
+  bookingLabel={offers.cta.bookingLabel}
+  responsePromise={offers.cta.responsePromise}
+/>
+
+</BaseLayout>

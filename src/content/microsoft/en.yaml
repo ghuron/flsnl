@@ -1,0 +1,30 @@
+meta:
+  title: First Line Software × Microsoft
+  description: 30-second diligence page for Microsoft field sellers and Azure-committed architects — designations, Marketplace listing, offers, and a direct contact.
+heading: First Line Software × Microsoft
+intro: This page exists for one reason — to make diligence fast for Microsoft sellers and architects checking us out before a referral.
+designations:
+  heading: Solutions Partner designations
+  items:
+    - name: "Data & AI"
+      href: "[link to verifiable partner-directory entry]"
+    - name: "Digital & App Innovation"
+      href: "[link to verifiable partner-directory entry]"
+marketplace:
+  heading: Marketplace
+  body: Our NL business profile is live on Microsoft Marketplace.
+  linkLabel: View the Marketplace profile
+  href: "[link to live NL Marketplace business profile]"
+offers:
+  heading: Consulting service offers
+  body: Productized offers, including the Azure Waste Audit, are listed with fixed scope and price bands.
+  linkLabel: See the offers
+architecture:
+  heading: Reference architecture
+  body: "[One reference architecture per flagship offer — words + a simple diagram, to be added once the flagship offer's technical write-up is ready]"
+contact:
+  heading: Partner-alliance contact
+  name: Andrei Zaikin
+  role: Netherlands contact
+  bookingLabel: Book a call
+  bookingHref: "[booking link]"

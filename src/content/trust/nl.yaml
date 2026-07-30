@@ -1,0 +1,65 @@
+meta:
+  title: Vertrouwen & compliance — First Line Software
+  description: Certificeringen, gegevensverwerking, EU AI Act-aanpak en contractbasis — eerlijk en compleet, voor wie dat vooraf wil weten.
+heading: Vertrouwen & compliance
+intro: Deze pagina is er voor wie dat vooraf wil weten — procurement, security officers, en iedereen die liever eerst leest dan vraagt. Geen marketingtaal, gewoon de feiten.
+certificates:
+  heading: Certificeringen
+  scopeNote: "De certificeringen gelden voor de entiteiten die het werk uitvoeren — Montenegro, Servië en Tsjechië. De Nederlandse entiteit is de contractpartij."
+  tableHeaders:
+    name: Certificaat
+    scope: Scope
+    number: Nummer
+    validity: Geldigheid
+    issuer: Uitgever
+  items:
+    - name: ISO 27001
+      scope: Montenegro, Servië, Tsjechië
+      number: "[certificaatnummer]"
+      validity: "[geldigheidsdatum]"
+      issuer: "[certificerende instantie]"
+    - name: ISO 9001
+      scope: Montenegro, Servië, Tsjechië
+      number: "[certificaatnummer]"
+      validity: "[geldigheidsdatum]"
+      issuer: "[certificerende instantie]"
+    - name: ISO 14001
+      scope: Montenegro, Servië, Tsjechië
+      number: "[certificaatnummer]"
+      validity: "[geldigheidsdatum]"
+      issuer: "[certificerende instantie]"
+avg:
+  heading: Gegevensverwerking & AVG
+  paragraphs:
+    - Verwerking vindt plaats binnen de EER. Exacte datalocaties staan in de verwerkersovereenkomst.
+    - Voor werk waarbij wij persoonsgegevens verwerken, sluiten we een verwerkersovereenkomst af. Een lijst van subverwerkers is op aanvraag beschikbaar.
+  dpaLinkLabel: "Verwerkersovereenkomst downloaden [wanneer beschikbaar]"
+  subprocessorsNote: Subverwerkerslijst op aanvraag.
+  privacyContact: "Privacyvragen: [privacycontact e-mailadres]"
+aiAct:
+  heading: EU AI Act
+  paragraphs:
+    - Voor elke AI-oplossing die we bouwen, bepalen we eerst de risicoclassificatie onder de EU AI Act. Documentatie en logging horen standaard bij de oplossing, niet als losse toevoeging achteraf.
+    - Menselijke controle is ingebouwd op de punten waar dat hoort. Voor hoog-risico-toepassingen richten we de oplossing in conform de eisen van de verordening.
+security:
+  heading: Security practices
+  body: "[Samenvatting van security-praktijken — te valideren met de security officer voordat publicatie]"
+contractBasis:
+  heading: Contractbasis
+  body: "We werken op basis van de NLdigital Voorwaarden [in afwachting van juridische goedkeuring]."
+insurance:
+  heading: Verzekering
+  body: "[Verzekeringsdekking — in te vullen]"
+whereWeWork:
+  heading: Waar het werk gebeurt
+  body: "Delivery vanuit onze eigen Europese centra: Montenegro, Servië, Slowakije, Tsjechië en Spanje. Geen verrassingen achteraf — dit staat hier zodat je het vooraf weet."
+questionnaire:
+  heading: Security-vragenlijst nodig?
+  body: "Stuur 'm door. We sturen ingevuld terug binnen [x] werkdagen."
+cta:
+  heading: Vragen over compliance?
+  name: Andrei Zaikin
+  role: Contactpersoon Nederland
+  bookingHref: "[boekingslink]"
+  bookingLabel: Plan een gesprek
+  responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.

@@ -1,0 +1,50 @@
+meta:
+  title: Data integration — First Line Software
+  description: Scattered systems unlocked into usable data for reporting, steering and AI. Proven with EHR integration and FHIR/OMOP pipelines. Working software in 4-6 weeks.
+hero:
+  eyebrow: Data integration
+  headlinePre: "Data from "
+  headlineEm: everywhere
+  headlinePost: ", usable in one place."
+  lede: Connections and pipelines that make scattered systems usable for reporting, steering and AI — proven with EHR data and FHIR/OMOP pipelines for healthcare organizations.
+  ctaPrimary:
+    label: Book a call
+    href: "[booking link]"
+whatItIs:
+  heading: What it is
+  paragraphs:
+    - Connections and pipelines that make scattered systems usable for reporting, steering and AI. Data currently stuck in silos becomes reusable without the source systems having to wait for it.
+    - "Proven example: EHR integration and FHIR/OMOP pipelines for healthcare organizations — one of the toughest standards to meet, and exactly the kind of work we've already done."
+howItLooks:
+  heading: What it looks like in your environment
+  paragraphs:
+    - The pipelines run in your own Azure tenant, with logging and evaluations at every step. You don't just see that data has been unlocked, but how complete and how current it is.
+    - It's designed to be EU AI Act-compliant from the first line of code — relevant as soon as the unlocked data also starts feeding AI applications.
+howWeStart:
+  heading: How we start
+  body: We start with a fixed-scope engagement of 4-6 weeks — working pipelines in your own Azure environment, with an evaluation report of measured performance. From there we keep going, and you pay per unit processed.
+  linkLabel: See the offer
+cases:
+  heading: Proven in practice
+  body: EHR integration and FHIR/OMOP pipelines for healthcare organizations.
+  linkLabel: See the cases
+faq:
+  heading: Frequently asked questions
+  items:
+    - question: Which source systems can you integrate?
+      answer: That depends on what you're running — from EHRs with FHIR/OMOP to internal databases and SaaS systems. We start with a short inventory.
+    - question: What if the source data is messy or incomplete?
+      answer: We see that often. The pipeline surfaces where the data has gaps rather than hiding them — that's part of the evaluation report.
+    - question: Who owns the unlocked data?
+      answer: You do. Everything runs in your own Azure tenant; we build and operate the pipelines, but the data stays yours.
+    - question: How long does the engagement take?
+      answer: The first working pipelines are there within 4-6 weeks. From there it's a matter of further development and paying per unit processed.
+    - question: What does it roughly cost?
+      answer: The fixed-scope start and the per-unit run pricing are on the offers page with a price indication.
+cta:
+  heading: Talk through your data sources
+  name: Andrei Zaikin
+  role: Netherlands contact
+  bookingHref: "[booking link]"
+  bookingLabel: Book a call
+  responsePromise: We reply within one business day — even when the answer is that we can't help.

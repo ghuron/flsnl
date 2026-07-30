@@ -10,6 +10,7 @@ hero:
   ctaPrimary:
     label: Start the analysis
     href: "#scan"
+heroExportLinkLabel: Get your usage file in 30 seconds
 expect:
   heading: What you'll get
   intro: "The scan reads your usage files and points at spending patterns worth a closer look. Not a verdict — a short list of leads, each with a number attached. The kind of questions it puts on the table:"
@@ -55,6 +56,14 @@ app:
   analyzeLabel: Produce report
   loadError: The scanner couldn't load. Reload the page and try again.
   noscript: The scan runs on JavaScript in your own browser (still nothing is sent anywhere). Turn on JavaScript to analyze your file.
+trust:
+  body: "Your file never leaves your browser: nothing is sent anywhere, so there's nothing to process within the EEA or delete afterward. You don't need any credentials — just the file itself."
+  privacyLabel: Privacy policy
+  vertrouwenLabel: More on trust & compliance
+bridge:
+  heading: From waste to AI budget
+  body: Do the leads from this scan look economically worth it? The Azure Waste Audit turns them into a quantified savings inventory — and a list of AI use cases you could fund from that savings.
+  linkLabel: See the Azure Waste Audit
 footer:
   text: First Line Software — source code and more on GitHub.
   backLink:

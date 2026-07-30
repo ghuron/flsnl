@@ -1,0 +1,47 @@
+---
+// Spec §4.10 — form-free by design: booking link + mailto, not a contact form.
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { withBase } from "../lib/url";
+import { routeFor, type Locale } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const common = (await getEntry("common", lang))!.data;
+const contact = (await getEntry("contact", lang))!.data;
+const mailtoHref = contact.email.startsWith("[") ? undefined : `mailto:${contact.email}`;
+---
+<BaseLayout lang={lang} page="contact" title={contact.meta.title} description={contact.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<main class="prose">
+  <h1>{contact.heading}</h1>
+  <p class="intro">{contact.intro}</p>
+
+  <section class="content contact-card">
+    <p class="contact-name"><strong>{contact.name}</strong> — {contact.role}</p>
+    <ul class="contact-details">
+      <li>{mailtoHref ? <a href={mailtoHref}>{contact.email}</a> : contact.email}</li>
+      <li>{contact.phone}</li>
+      <li><a href={contact.linkedinHref} target="_blank" rel="noopener noreferrer">{contact.linkedinLabel}</a></li>
+    </ul>
+    <a class="btn btn-primary" href={contact.bookingHref}>{contact.bookingLabel}</a>
+    <p class="cta-promise" style="margin-top: 1rem; color: var(--ink-dim);">{contact.responsePromise}</p>
+  </section>
+
+  <section class="content">
+    <h2>{contact.address.heading}</h2>
+    {contact.address.lines.map((l) => <p style="margin: 0;">{l}</p>)}
+  </section>
+
+  <section class="content">
+    <p>{contact.procurement.body} <a href={withBase(routeFor("trust", lang))}>{contact.procurement.linkLabel}</a></p>
+  </section>
+</main>
+</div>
+
+</BaseLayout>
