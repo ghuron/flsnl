@@ -26,6 +26,7 @@ files:
     - "Een Azure-verbruiksbestand is het rekenblad achter je maandelijkse rekening: één regel per resource per periode — naam, resourcegroep, subscription, type dienst, en wat het kostte. Microsoft maakt het elke maand, of iemand het nu leest of niet."
     - "Het verdient zorgvuldigheid: het bevat namen van resources en subscriptions, kostenbedragen, en tags — die soms de naam van de resource-eigenaar bevatten. Het bevat geen wachtwoorden, broncode, of klantdata."
     - "Hier blijft het op je eigen machine. De analyse draait volledig in je browser — en dat hoef je niet op ons woord te geloven. Zodra je bestanden gedownload zijn, zet je je machine gerust in vliegtuigmodus en draai je de scan offline — die werkt precies hetzelfde, want er is nooit een verbinding nodig."
+  verifyNote: "Twijfel je aan de cijfers? Zet dezelfde bestanden in een AI-model van je keuze en vergelijk de uitkomst gerust — daar schrikken we niet van. Let wel: in tegenstelling tot deze scan verlaat het bestand dan wél je browser, dus weeg dat zelf mee."
 free:
   heading: Waarom is dit gratis?
   paragraphs:

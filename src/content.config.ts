@@ -122,6 +122,7 @@ const azure = defineCollection({
     files: z.object({
       heading: z.string(),
       paragraphs: z.array(z.string()).length(3),
+      verifyNote: z.string(),
     }),
     free: z.object({
       heading: z.string(),

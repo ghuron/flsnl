@@ -74,6 +74,7 @@ const azure = (await getEntry("azure", lang))!.data;
     {azure.files.paragraphs.map((p) => (
       <p><ProseText text={p} newTabLabel={common.a11y.newTab} /></p>
     ))}
+    <div class="note">{azure.files.verifyNote}</div>
   </section>
 
   <section class="content">
