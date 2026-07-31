@@ -99,6 +99,17 @@ var nl = {
       return { title: "Je uitgaven zijn geconcentreerd",
         body: "De vijf duurste resources zijn samen " + pct + " van je totale rekening. Dat is waar een optimalisatie het meeste oplevert — begin daar." };
     },
+    idleCapacity: function (totalMoney, pct, categoryName, count, examples, isContainerApps) {
+      var detail = categoryName
+        ? "Vooral bij " + categoryName + " (" + count + " resources" + (examples ? ", bijvoorbeeld " + examples : "") + "). "
+        : "";
+      var fix = isContainerApps
+        ? "Zet minReplicas op 0 voor wat niet continu bereikbaar hoeft te zijn — dan schaalt het vanzelf naar nul zodra er geen verkeer is."
+        : "Vraag je platformteam of deze workload naar nul kan schalen zodra er geen verkeer is.";
+      return { title: "Je factuur noemt het zelf: 'Idle Usage'",
+        body: totalMoney + " (" + pct + " van je rekening) staat onder de post 'Idle Usage' — Azure's eigen naam voor gereserveerde capaciteit die niets verwerkt. " + detail +
+              "Dit hoef je nergens uit af te leiden: de factuur zegt het letterlijk. " + fix };
+    },
     weekendFlatness: function (pct, dayCount) {
       return { title: "Je rekening kent geen weekend",
         body: "Compute kost op een weekenddag " + pct + " van wat het op een werkdag kost — er zit geen dal in, " + dayCount + " dagen lang. " +
@@ -284,6 +295,17 @@ var en = {
     concentration: function (pct) {
       return { title: "Your spend is concentrated",
         body: "The five priciest resources together are " + pct + " of your total bill. That's where optimisation pays off most — start there." };
+    },
+    idleCapacity: function (totalMoney, pct, categoryName, count, examples, isContainerApps) {
+      var detail = categoryName
+        ? "Mostly in " + categoryName + " (" + count + " resources" + (examples ? ", for example " + examples : "") + "). "
+        : "";
+      var fix = isContainerApps
+        ? "Set minReplicas to 0 for anything that doesn't need to be reachable around the clock — it scales to zero the moment traffic stops."
+        : "Ask your platform team whether this workload can scale to zero once traffic stops.";
+      return { title: "Your bill already says it: 'Idle Usage'",
+        body: totalMoney + " (" + pct + " of your bill) sits under the 'Idle Usage' line — Azure's own name for reserved capacity that's processing nothing. " + detail +
+              "There's no inference here: the bill states it outright. " + fix };
     },
     weekendFlatness: function (pct, dayCount) {
       return { title: "Your bill doesn't know it's the weekend",

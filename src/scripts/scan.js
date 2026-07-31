@@ -252,6 +252,10 @@ var IAAS_CATEGORIES = {
 var AI_CATEGORY_RE = /openai|foundry|cognitive services|machine learning|azure ai(?! search)|document intelligence|form recognizer/i;
 var EGRESS_METER_RE = /data transfer out|egress/i;
 var LICENSE_RE = /windows|sql server (licen|edition)/i;
+// Some Azure services (Container Apps' consumption plan today) bill reserved-but-unused
+// capacity under its own meter name — "Standard vCPU Idle Usage" alongside "...Active Usage".
+// A direct, stated cost rather than something inferred from uptime or a resource's name.
+var IDLE_METER_RE = /\bidle\b/i;
 // Load Balancer meters split into the flat "included rules" base fee and actual data-processed
 // volume — the base fee bills the same whether the LB carries any traffic or not, so a set of
 // LBs whose cost is almost entirely base fee is the signal that they're each running well under
@@ -315,6 +319,7 @@ function buildModel(datasets, lang) {
   // throwaway lowercase/regex allocations on a large export — the same trick as byMeter above.
   var catFlags = new Map();     // raw category cell -> { compute, lb }
   var marketplaceFlag = new Map(); // raw publisherType cell -> boolean
+  var idleMeterFlag = new Map();   // raw meterName cell -> boolean
   var computeByDay = new Map(); // raw date cell -> compute-only cost, for the weekend comparison
   var daysSeen = new Set();     // distinct raw date cells, to tell daily data from monthly
   var marketplaceCost = 0;
@@ -385,11 +390,17 @@ function buildModel(datasets, lang) {
       var isCompute = flags.compute;
       var isLB = flags.lb;
       var lbDataProcessed = false;
+      var isIdleMeter = false;
 
       if (cols.meterName !== -1) {
         var mn = String(row[cols.meterName] || "").trim();
         if (mn) {
           if (isLB) lbDataProcessed = LB_DATA_PROCESSED_RE.test(mn);
+          isIdleMeter = idleMeterFlag.get(mn);
+          if (isIdleMeter === undefined) {
+            isIdleMeter = IDLE_METER_RE.test(mn);
+            idleMeterFlag.set(mn, isIdleMeter);
+          }
           byMeter.set(mn, (byMeter.get(mn) || 0) + cost);
         }
       }
@@ -432,6 +443,7 @@ function buildModel(datasets, lang) {
             compute: isCompute,
             cost: 0,
             unusedReservationCost: 0,
+            idleCost: 0,
             days: null // filled below only when the export carries dates
           };
           byFinding.set(fkey, finding);
@@ -441,6 +453,7 @@ function buildModel(datasets, lang) {
         // if any of them is compute.
         if (isCompute) finding.compute = true;
         if (isUnused) finding.unusedReservationCost += cost;
+        if (isIdleMeter) finding.idleCost += cost;
         if (isLB) {
           var lbKey = resourceRaw || res;
           var lb = byLB.get(lbKey);
@@ -581,6 +594,24 @@ function buildModel(datasets, lang) {
     });
   }
 
+  // Idle capacity, read straight off byMeter — no per-row work beyond the classification
+  // already done above. The category/example breakdown asks which resources it sits on; the
+  // total itself doesn't need that and is already correct even without a resource column.
+  var idleCost = sumMatching(byMeter, IDLE_METER_RE);
+  var idleCount = 0, idleExamples = [], idleByCategory = new Map();
+  if (idleCost > 0) {
+    findings.forEach(function (f) {
+      if (!f.idleCost) return;
+      idleCount++;
+      idleByCategory.set(f.category, (idleByCategory.get(f.category) || 0) + f.idleCost);
+      if (idleExamples.length < 3 && idleExamples.indexOf(f.name) === -1) idleExamples.push(f.name);
+    });
+  }
+  var idleCategory = "";
+  if (idleByCategory.size) {
+    idleCategory = Array.from(idleByCategory.entries()).sort(function (a, b) { return b[1] - a[1]; })[0][0];
+  }
+
   return {
     ok: anyCost && rowCount > 0,
     total: total,
@@ -637,6 +668,10 @@ function buildModel(datasets, lang) {
     nonProdSchedulable: nonProdSchedulable,
     nonProdCount: nonProdCount,
     nonProdExamples: nonProdExamples,
+    idleCost: idleCost,
+    idleCount: idleCount,
+    idleCategory: idleCategory,
+    idleExamples: idleExamples,
     generatedAt: new Date()
   };
 }

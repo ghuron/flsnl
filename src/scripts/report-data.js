@@ -111,6 +111,16 @@ function buildSignals(m, money, lang) {
     self.push(Object.assign({ severity: "info" }, T.concentration(pct(m.concentrationTop5))));
   }
 
+  // Idle capacity, read straight off a meter Azure itself labels "Idle Usage" (Container Apps'
+  // consumption plan, today) — a stated cost, not an inference from uptime or a resource's
+  // name the way the two signals below it are. Self-service: the fix is a scaling setting.
+  if (m.idleCost > 0 && m.idleCost / (m.total || 1) >= 0.05) {
+    var isContainerApps = /container apps/i.test(m.idleCategory || "");
+    self.push(Object.assign({ severity: "high" },
+      T.idleCapacity(money(m.idleCost), pct(m.idleCost / m.total), m.idleCategory, m.idleCount,
+        (m.idleExamples || []).join(", "), isContainerApps)));
+  }
+
   // Weekend flatness. The clearest thing a bill can say about whether a workload follows
   // demand at all: if Sunday costs what Tuesday costs, nothing is scaling down. This is a
   // scheduling job (auto-shutdown, scale-to-zero), not a rebuild — self-service, not engineering.
