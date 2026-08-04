@@ -8,6 +8,10 @@ interface Metric {
   value: string;
   label: string;
   href?: string;
+  /** Badge artwork (Microsoft/Anthropic partner logos) — replaces the plain-text value when
+   *  set, since the logo itself is the verification. */
+  imageSrc?: string;
+  imageAlt?: string;
 }
 interface Props {
   metrics: Metric[];
@@ -16,24 +20,29 @@ interface Props {
 const { metrics } = Astro.props;
 ---
 <div class="proof-strip">
-  {metrics.map((m) => (
-    m.href ? (
+  {metrics.map((m) => {
+    const inner = m.imageSrc ? (
+      <img class="proof-badge" src={withBase(m.imageSrc)} alt={m.imageAlt || m.value} loading="lazy">
+    ) : (
+      <span class="proof-value">{m.value}</span>
+    );
+    return m.href ? (
       m.href.startsWith("http") ? (
         <a class="proof-item" href={m.href} target="_blank" rel="noopener noreferrer">
-          <span class="proof-value">{m.value}</span>
+          {inner}
           <span class="proof-label">{m.label}</span>
         </a>
       ) : (
         <a class="proof-item" href={withBase(m.href)}>
-          <span class="proof-value">{m.value}</span>
+          {inner}
           <span class="proof-label">{m.label}</span>
         </a>
       )
     ) : (
       <span class="proof-item">
-        <span class="proof-value">{m.value}</span>
+        {inner}
         <span class="proof-label">{m.label}</span>
       </span>
-    )
-  ))}
+    );
+  })}
 </div>

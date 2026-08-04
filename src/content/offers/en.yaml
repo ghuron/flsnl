@@ -6,8 +6,19 @@ intro:
   heading: How we price
   body: Every engagement starts with a fixed-scope start — a fixed amount for a fixed period, resulting in an evaluation report of measured performance. From there comes per-unit run pricing, sometimes paired with a subscription. No billable hours, no open-ended scope. AI that delivers work, not slides.
 cards:
-  - name: "Azure Waste Audit: 2-Wk Assessment"
-    scope: A thorough analysis of your Azure spend — what you're paying, why, and where it could be different.
+  - name: "Azure Waste Scan: Step 1, Free Self-Scan"
+    scope: Run it yourself, right in your own browser — no upload, no sign-up. See within minutes where your Azure spend leaks.
+    deliverables:
+      - A short list of waste patterns worth a closer look, each with an amount attached
+      - A downloadable PDF report
+      - Nothing sent anywhere — the scan reads your files locally and we never see them
+    duration: 2 minutes, self-service
+    price: Free
+    afterNote: See something worth investigating? Step 2 turns it into a quantified savings case.
+    ctaHref: /en/azure/
+    ctaLabel: Run the free scan
+  - name: "Azure Waste Audit: Step 2, 2-Wk Assessment"
+    scope: A thorough, human-led analysis of your Azure spend — what you're paying, why, and where it could be different.
     deliverables:
       - A quantified savings inventory, with an amount per finding
       - A signed baseline and measurement methodology
@@ -49,8 +60,9 @@ marketplace:
   body: "These offers are — or will be — also visible and purchasable via Microsoft Marketplace [links to follow once live]."
 cta:
   heading: Talk through which offer fits
-  name: Andrei Zaikin
-  role: Netherlands contact
-  bookingHref: "[booking link]"
+  name: Larisa Koroteeva
+  role: Client Relations Manager
+  bookingHref: "[booking link Larisa]"
   bookingLabel: Book a call
   responsePromise: We reply within one business day — even when the answer is that we can't help.
+  photoSrc: /assets/img/photo-larisa-koroteeva.jpg

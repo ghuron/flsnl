@@ -8,9 +8,8 @@ import "../assets/css/site.css";
 
 interface NavContent {
   contactLabel: string; contactHref: string;
-  home: string; solutionsLabel: string;
-  documentProcessing: string; dataIntegration: string; processAutomation: string;
-  offers: string; azureCheck: string; cases: string; trust: string; about: string;
+  home: string;
+  offers: string; cases: string; trust: string; about: string;
   contactPage: string; kennis: string; privacy: string;
   menuLabel: string; langSwitchLabel: string;
 }
@@ -18,6 +17,7 @@ interface FactsContent {
   legalName: string; kvk: string; btw: string; address: string; phone: string;
   privacyLabel: string; isoLabel: string; isoHref: string;
   microsoftPartnerLabel: string; microsoftPartnerHref: string;
+  anthropicPartnerLabel: string; anthropicPartnerHref: string;
 }
 
 interface Props {
@@ -42,15 +42,9 @@ const altHref = altRouteFor(page, lang);
 // Nav items shared by desktop and the mobile disclosure — one list, not two kept in lockstep.
 const links = [
   { href: routeFor("offers", lang), label: nav.offers },
-  { href: routeFor("azure", lang), label: nav.azureCheck },
   { href: routeFor("cases", lang), label: nav.cases },
   { href: routeFor("trust", lang), label: nav.trust },
   { href: routeFor("about", lang), label: nav.about },
-];
-const solutions = [
-  { href: routeFor("documentProcessing", lang), label: nav.documentProcessing },
-  { href: routeFor("dataIntegration", lang), label: nav.dataIntegration },
-  { href: routeFor("processAutomation", lang), label: nav.processAutomation },
 ];
 ---
 <!doctype html>
@@ -88,12 +82,6 @@ const solutions = [
          script anywhere here, so marketing pages keep script-src 'none'. -->
     <nav class="primary-nav primary-nav-desktop" aria-label={nav.menuLabel}>
       <a href={withBase(routeFor("home", lang))}>{nav.home}</a>
-      <details class="nav-dropdown">
-        <summary>{nav.solutionsLabel}</summary>
-        <div class="nav-dropdown-panel">
-          {solutions.map((s) => <a href={withBase(s.href)}>{s.label}</a>)}
-        </div>
-      </details>
       {links.map((l) => <a href={withBase(l.href)}>{l.label}</a>)}
     </nav>
 
@@ -103,12 +91,6 @@ const solutions = [
       </summary>
       <nav class="primary-nav primary-nav-mobile" aria-label={nav.menuLabel}>
         <a href={withBase(routeFor("home", lang))}>{nav.home}</a>
-        <details class="nav-dropdown">
-          <summary>{nav.solutionsLabel}</summary>
-          <div class="nav-dropdown-panel">
-            {solutions.map((s) => <a href={withBase(s.href)}>{s.label}</a>)}
-          </div>
-        </details>
         {links.map((l) => <a href={withBase(l.href)}>{l.label}</a>)}
       </nav>
     </details>
@@ -133,8 +115,11 @@ const solutions = [
       <p class="facts-contact">{facts.address} · {facts.phone}</p>
       <p class="facts-links">
         <a href={withBase(facts.isoHref)}>{facts.isoLabel}</a>
-        <a href={facts.microsoftPartnerHref}>{facts.microsoftPartnerLabel}</a>
         <a href={withBase(routeFor("privacy", lang))}>{facts.privacyLabel}</a>
+      </p>
+      <p class="facts-badges">
+        <a href={facts.microsoftPartnerHref}><img class="facts-badge" src={withBase("/assets/img/badge-microsoft-partner.png")} alt={facts.microsoftPartnerLabel} loading="lazy"></a>
+        <a href={facts.anthropicPartnerHref}><img class="facts-badge facts-badge-wide" src={withBase("/assets/img/badge-anthropic-partner.svg")} alt={facts.anthropicPartnerLabel} loading="lazy"></a>
       </p>
     </div>
     <p class="copyright">Copyright © 2026 First Line Software B.V.</p>

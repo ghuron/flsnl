@@ -1,16 +1,26 @@
 meta:
   title: Contact — First Line Software
-  description: Book a call directly with Andrei Zaikin, or send an email. We reply within one business day — even when the answer is that we can't help.
+  description: Book a call directly with Larisa Koroteeva or Andrei Zaikin, or send an email. We reply within one business day — even when the answer is that we can't help.
 heading: Contact
-intro: No form — book a call directly, or email. You'll get a personal reply from Andrei Zaikin, no queue.
-name: Andrei Zaikin
-role: Netherlands contact
-email: "[email address]"
-phone: "+31 70 217 0112"
-linkedinLabel: LinkedIn
-linkedinHref: https://www.linkedin.com/in/zaikin/
-bookingHref: "[booking link]"
-bookingLabel: Book a 30-minute call
+intro: No form — call, email, or book a call directly. Larisa is your first point of contact for general and phone inquiries; Andrei for technical depth. Both reply personally, no queue.
+contacts:
+  - name: Larisa Koroteeva
+    role: Client Relations Manager
+    email: "[email address Larisa]"
+    phone: "+31 70 217 0112"
+    linkedinLabel: LinkedIn
+    linkedinHref: https://www.linkedin.com/in/larisa-koroteeva-4056071b/
+    bookingHref: "[booking link Larisa]"
+    bookingLabel: Book a 30-minute call
+    photoSrc: /assets/img/photo-larisa-koroteeva.jpg
+  - name: Andrei Zaikin
+    role: Technical Fellow
+    email: "[email address Andrei]"
+    linkedinLabel: LinkedIn
+    linkedinHref: https://www.linkedin.com/in/zaikin/
+    bookingHref: "https://calendar.app.google/VHBi1iERgW19Nrtv9"
+    bookingLabel: Book a 30-minute call
+    photoSrc: /assets/img/photo-andrei-zaikin.jpg
 responsePromise: We reply within one business day — even when the answer is that we can't help.
 address:
   heading: Visiting address

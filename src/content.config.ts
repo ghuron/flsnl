@@ -22,6 +22,7 @@ const ctaBlock = z.object({
   bookingHref: z.string(),
   bookingLabel: z.string(),
   responsePromise: z.string(),
+  photoSrc: z.string().optional(),
 });
 
 const faqItem = z.object({ question: z.string(), answer: z.string() });
@@ -33,12 +34,7 @@ const common = defineCollection({
       contactLabel: z.string(),
       contactHref: z.string(),
       home: z.string(),
-      solutionsLabel: z.string(),
-      documentProcessing: z.string(),
-      dataIntegration: z.string(),
-      processAutomation: z.string(),
       offers: z.string(),
-      azureCheck: z.string(),
       cases: z.string(),
       trust: z.string(),
       about: z.string(),
@@ -61,6 +57,8 @@ const common = defineCollection({
       isoHref: z.string(),
       microsoftPartnerLabel: z.string(),
       microsoftPartnerHref: z.string(),
+      anthropicPartnerLabel: z.string(),
+      anthropicPartnerHref: z.string(),
     }),
     a11y: z.object({ newTab: z.string() }),
   }),
@@ -71,37 +69,27 @@ const home = defineCollection({
   schema: z.object({
     meta: z.object({ title: z.string(), description: z.string() }),
     hero: hero.extend({ ctaSecondary: cta }),
-    capabilities: z
-      .array(z.object({ heading: z.string(), body: z.string(), href: z.string(), label: z.string() }))
-      .length(3),
     howWeWork: z.object({
       heading: z.string(),
       steps: z.array(z.object({ heading: z.string(), body: z.string() })).length(3),
     }),
     proof: z.object({
-      metrics: z.array(z.object({ value: z.string(), label: z.string(), href: z.string().optional() })),
+      // imageSrc/imageAlt are for the two partner badges (Microsoft, Anthropic) — when present,
+      // the badge artwork replaces the plain-text value, since the logo is the verification.
+      metrics: z.array(
+        z.object({
+          value: z.string(),
+          label: z.string(),
+          href: z.string().optional(),
+          imageSrc: z.string().optional(),
+          imageAlt: z.string().optional(),
+        })
+      ),
     }),
     trackRecord: z.object({ text: z.string(), linkLabel: z.string() }),
     azureTeaser: z.object({ heading: z.string(), body: z.string(), linkLabel: z.string() }),
     cta: ctaBlock,
     footer: z.object({ text: z.string() }),
-  }),
-});
-
-// Spec §4.2-4.4: one shared template, three copy sets (documentverwerking/data-ontsluiting/
-// procesautomatisering). "cases" links out to /cases generically for now rather than pulling
-// specific case cards — the Cases collection doesn't exist until a later phase of this build.
-const capability = defineCollection({
-  loader: glob({ pattern: "*.yaml", base: "./src/content/capability" }),
-  schema: z.object({
-    meta: z.object({ title: z.string(), description: z.string() }),
-    hero,
-    whatItIs: z.object({ heading: z.string(), paragraphs: z.array(z.string()).min(2).max(3) }),
-    howItLooks: z.object({ heading: z.string(), paragraphs: z.array(z.string()).min(2).max(3) }),
-    howWeStart: z.object({ heading: z.string(), body: z.string(), linkLabel: z.string() }),
-    cases: z.object({ heading: z.string(), body: z.string(), linkLabel: z.string() }),
-    faq: z.object({ heading: z.string(), items: z.array(faqItem).min(3).max(5) }),
-    cta: ctaBlock,
   }),
 });
 
@@ -182,6 +170,10 @@ const offers = defineCollection({
         duration: z.string(),
         price: z.string(),
         afterNote: z.string(),
+        // Only the free-scan step needs a way in — it's the one card whose whole point is
+        // "go do this now," not "get in touch."
+        ctaHref: z.string().optional(),
+        ctaLabel: z.string().optional(),
       })
     ),
     guarantee: z.object({ heading: z.string(), body: z.string() }),
@@ -269,36 +261,55 @@ const about = defineCollection({
       items: z.array(z.object({ label: z.string(), value: z.string() })),
     }),
     history: z.object({ heading: z.string(), paragraphs: z.array(z.string()) }),
+    // Two NL contacts, not one: general/phone-capable and technical-depth. Order in the array
+    // is display order, not seniority.
     team: z.object({
       heading: z.string(),
-      name: z.string(),
-      role: z.string(),
-      bio: z.string(),
-      linkedinLabel: z.string(),
-      linkedinHref: z.string(),
-      bookingLabel: z.string(),
-      bookingHref: z.string(),
+      members: z
+        .array(
+          z.object({
+            name: z.string(),
+            role: z.string(),
+            bio: z.string(),
+            linkedinLabel: z.string(),
+            linkedinHref: z.string(),
+            bookingLabel: z.string(),
+            bookingHref: z.string(),
+            certImageSrc: z.string().optional(),
+            certImageAlt: z.string().optional(),
+            photoSrc: z.string().optional(),
+          })
+        )
+        .length(2),
     }),
-    careers: z.object({ body: z.string(), linkLabel: z.string(), href: z.string() }),
     cta: ctaBlock,
   }),
 });
 
-// Spec §4.10. Form-free by design — booking link + mailto, not a contact form.
+// Spec §4.10. Form-free by design — booking link + mailto, not a contact form. Two contacts:
+// phone rings through to the one who can actually take a Dutch-language call; the other is
+// reachable by email/LinkedIn/booking for the technical conversations that follow.
 const contact = defineCollection({
   loader: glob({ pattern: "*.yaml", base: "./src/content/contact" }),
   schema: z.object({
     meta: z.object({ title: z.string(), description: z.string() }),
     heading: z.string(),
     intro: z.string(),
-    name: z.string(),
-    role: z.string(),
-    email: z.string(),
-    phone: z.string(),
-    linkedinLabel: z.string(),
-    linkedinHref: z.string(),
-    bookingHref: z.string(),
-    bookingLabel: z.string(),
+    contacts: z
+      .array(
+        z.object({
+          name: z.string(),
+          role: z.string(),
+          email: z.string(),
+          phone: z.string().optional(),
+          linkedinLabel: z.string(),
+          linkedinHref: z.string(),
+          bookingHref: z.string(),
+          bookingLabel: z.string(),
+          photoSrc: z.string().optional(),
+        })
+      )
+      .length(2),
     responsePromise: z.string(),
     address: z.object({ heading: z.string(), lines: z.array(z.string()) }),
     procurement: z.object({ body: z.string(), linkLabel: z.string() }),
@@ -395,7 +406,6 @@ export const collections = {
   common,
   home,
   azure,
-  capability,
   offers,
   cases,
   trust,

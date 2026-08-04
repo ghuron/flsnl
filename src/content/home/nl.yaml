@@ -6,26 +6,13 @@ hero:
   headlinePre: "Werkende AI in "
   headlineEm: 4-6 weken
   headlinePost: ": documenten verwerken, data ontsluiten, processen automatiseren. Vaste prijs."
-  lede: First Line Software bouwt en beheert AI- en dataoplossingen — met 300 engineers in eigen Europese deliverycentra en één vast aanspreekpunt in Nederland.
+  lede: First Line Software bouwt en beheert AI- en dataoplossingen — met 300 engineers in eigen Europese deliverycentra en een vast Nederlands team dat je rechtstreeks aan de lijn krijgt.
   ctaPrimary:
-    label: Plan een gesprek met Andrei Zaikin
-    href: "[boekingslink]"
+    label: Plan een gesprek met Larisa Koroteeva
+    href: "[boekingslink Larisa]"
   ctaSecondary:
     label: Doe de Azure-check
     href: /azure/
-capabilities:
-  - heading: Documentverwerking
-    body: Facturen, orders en rapporten die zichzelf uitlezen — met gemeten nauwkeurigheid per documenttype.
-    href: /documentverwerking/
-    label: Bekijk documentverwerking
-  - heading: Data-ontsluiting
-    body: Verspreide systemen ontsloten tot bruikbare data voor rapportage, sturing en AI.
-    href: /data-ontsluiting/
-    label: Bekijk data-ontsluiting
-  - heading: Procesautomatisering
-    body: AI-agents voor repeterende workflows — orderinvoer, documentstromen, klantprocessen.
-    href: /procesautomatisering/
-    label: Bekijk procesautomatisering
 howWeWork:
   heading: Zo werken we
   steps:
@@ -47,9 +34,13 @@ proof:
     - value: Microsoft Solutions Partner
       label: Data & AI · Digital & App Innovation
       href: "[link naar live Microsoft-partnerprofiel]"
-    - value: "[Clutch-score]"
-      label: Clutch-beoordeling
-      href: "[Clutch-profiel, indien beschikbaar]"
+      imageSrc: /assets/img/badge-microsoft-partner.png
+      imageAlt: Microsoft Solutions Partner — Cloud & AI Platforms
+    - value: Anthropic Select Services Partner
+      label: Claude Partner Network
+      href: "[link naar live Anthropic-partnerprofiel]"
+      imageSrc: /assets/img/badge-anthropic-partner.svg
+      imageAlt: Anthropic Select Services Partner
 trackRecord:
   text: "Bewezen in de praktijk: EPD-ontsluiting en FHIR/OMOP-pipelines voor zorgorganisaties; catalogus-, order- en documentautomatisering voor commerce en logistiek."
   linkLabel: Bekijk cases
@@ -59,10 +50,11 @@ azureTeaser:
   linkLabel: Doe de Azure-check
 cta:
   heading: Praat over jouw use case
-  name: Andrei Zaikin
-  role: Contactpersoon Nederland
-  bookingHref: "[boekingslink]"
+  name: Larisa Koroteeva
+  role: Client Relations Manager
+  bookingHref: "[boekingslink Larisa]"
   bookingLabel: Plan een gesprek
   responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
+  photoSrc: /assets/img/photo-larisa-koroteeva.jpg
 footer:
   text: First Line Software — geen tracking, geen cookies, geen externe requests.

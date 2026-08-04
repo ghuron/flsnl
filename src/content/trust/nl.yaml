@@ -58,8 +58,9 @@ questionnaire:
   body: "Stuur 'm door. We sturen ingevuld terug binnen [x] werkdagen."
 cta:
   heading: Vragen over compliance?
-  name: Andrei Zaikin
-  role: Contactpersoon Nederland
-  bookingHref: "[boekingslink]"
+  name: Larisa Koroteeva
+  role: Client Relations Manager
+  bookingHref: "[boekingslink Larisa]"
   bookingLabel: Plan een gesprek
   responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
+  photoSrc: /assets/img/photo-larisa-koroteeva.jpg

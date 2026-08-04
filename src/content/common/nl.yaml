@@ -2,12 +2,7 @@ nav:
   contactLabel: Contact ons
   contactHref: https://firstlinesoftware.com/contact-us/
   home: Home
-  solutionsLabel: Oplossingen
-  documentProcessing: Documentverwerking
-  dataIntegration: Data-ontsluiting
-  processAutomation: Procesautomatisering
   offers: Aanbod
-  azureCheck: Azure-check
   cases: Cases
   trust: Vertrouwen
   about: Over ons
@@ -27,5 +22,7 @@ facts:
   isoHref: /vertrouwen/
   microsoftPartnerLabel: Microsoft Solutions Partner
   microsoftPartnerHref: "[link naar live Microsoft-partnerprofiel]"
+  anthropicPartnerLabel: Anthropic Select Services Partner
+  anthropicPartnerHref: "[link naar live Anthropic-partnerprofiel]"
 a11y:
   newTab: opent in een nieuw tabblad

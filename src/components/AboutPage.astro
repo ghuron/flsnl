@@ -3,6 +3,7 @@
 import { getEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import CtaBlock from "./CtaBlock.astro";
+import { withBase } from "../lib/url";
 import type { Locale } from "../lib/i18n";
 
 interface Props {
@@ -36,17 +37,37 @@ const about = (await getEntry("about", lang))!.data;
 
   <section class="content">
     <h2>{about.team.heading}</h2>
-    <p><strong>{about.team.name}</strong> — {about.team.role}</p>
-    <p>{about.team.bio}</p>
-    <p>
-      <a href={about.team.linkedinHref} target="_blank" rel="noopener noreferrer">{about.team.linkedinLabel}</a>
-      · <a href={about.team.bookingHref}>{about.team.bookingLabel}</a>
-    </p>
+    <div class="team-members">
+      {about.team.members.map((m) => {
+        const initials = m.name.split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase();
+        return (
+        <div class="team-member">
+          <!-- Face and certification badge sit side by side, sized to match: the badge is the
+               credential for the person next to it, so pairing them reads at a glance. The
+               portrait is the LinkedIn link — the "in" chip marks it as clickable, and the
+               accessible name carries the destination since the chip itself is decorative. -->
+          <div class="team-media">
+            <a class="team-photo-link" href={m.linkedinHref} target="_blank" rel="noopener noreferrer"
+               aria-label={`${m.name} — ${m.linkedinLabel}`}>
+              {m.photoSrc
+                ? <img class="cta-photo team-photo" src={withBase(m.photoSrc)} alt={m.name} width="110" height="110">
+                : <span class="cta-photo cta-photo-fallback team-photo" aria-hidden="true">{initials}</span>}
+              <span class="team-photo-in" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
+                  <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zm1.78 13.02H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/>
+                </svg>
+              </span>
+            </a>
+            {m.certImageSrc && <img class="team-cert-badge" src={withBase(m.certImageSrc)} alt={m.certImageAlt || ""} loading="lazy">}
+          </div>
+          <p>{m.bio}</p>
+          <a class="btn btn-ghost" href={m.bookingHref}>{m.bookingLabel}</a>
+        </div>
+        );
+      })}
+    </div>
   </section>
 
-  <section class="content">
-    <p>{about.careers.body} <a href={about.careers.href}>{about.careers.linkLabel}</a></p>
-  </section>
 </main>
 </div>
 
@@ -57,6 +78,7 @@ const about = (await getEntry("about", lang))!.data;
   bookingHref={about.cta.bookingHref}
   bookingLabel={about.cta.bookingLabel}
   responsePromise={about.cta.responsePromise}
+  photoSrc={about.cta.photoSrc}
 />
 
 </BaseLayout>

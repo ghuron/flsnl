@@ -6,8 +6,19 @@ intro:
   heading: Zo prijzen we
   body: Elk traject begint met een vaste-scope start — een vast bedrag voor een vaste periode, met een evaluatierapport met gemeten prestaties als resultaat. Daarna volgt beheer per verwerkte eenheid, soms aangevuld met een abonnement. Geen uurtje-factuurtje, geen open einde. AI die werk oplevert, geen slides.
 cards:
-  - name: "Azure Waste Audit: 2-Wk Assessment"
-    scope: Een grondige analyse van je Azure-uitgaven — wat je betaalt, waarom, en waar het anders kan.
+  - name: "Azure Waste Scan: Stap 1, Gratis Self-Scan"
+    scope: Draai 'm zelf, in je eigen browser — geen upload, geen aanmelding. Zie binnen enkele minuten waar je Azure-budget lekt.
+    deliverables:
+      - Een korte lijst aanknopingspunten die een nadere blik verdienen, elk met een bedrag erbij
+      - Een downloadbaar PDF-rapport
+      - Niets wordt verstuurd — de scan leest je bestanden lokaal en wij zien ze nooit
+    duration: 2 minuten, self-service
+    price: Gratis
+    afterNote: Zie je iets dat de moeite waard is om uit te zoeken? Stap 2 maakt er een gekwantificeerde besparingscase van.
+    ctaHref: /azure/
+    ctaLabel: Doe de gratis scan
+  - name: "Azure Waste Audit: Stap 2, 2-Wk Assessment"
+    scope: Een grondige, mensgeleide analyse van je Azure-uitgaven — wat je betaalt, waarom, en waar het anders kan.
     deliverables:
       - Gekwantificeerde besparingsinventaris, met een bedrag per bevinding
       - Ondertekende baseline- en meetmethodiek
@@ -49,8 +60,9 @@ marketplace:
   body: "Deze aanbiedingen zijn — of worden — ook zichtbaar en aan te schaffen via de Microsoft Marketplace [links volgen zodra live]."
 cta:
   heading: Praat over welk aanbod past
-  name: Andrei Zaikin
-  role: Contactpersoon Nederland
-  bookingHref: "[boekingslink]"
+  name: Larisa Koroteeva
+  role: Client Relations Manager
+  bookingHref: "[boekingslink Larisa]"
   bookingLabel: Plan een gesprek
   responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
+  photoSrc: /assets/img/photo-larisa-koroteeva.jpg

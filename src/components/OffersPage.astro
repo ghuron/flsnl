@@ -28,7 +28,7 @@ const offers = (await getEntry("offers", lang))!.data;
 
   <div class="offer-cards">
     {offers.cards.map((c) => (
-      <OfferCard name={c.name} scope={c.scope} deliverables={c.deliverables} duration={c.duration} price={c.price} afterNote={c.afterNote} />
+      <OfferCard name={c.name} scope={c.scope} deliverables={c.deliverables} duration={c.duration} price={c.price} afterNote={c.afterNote} ctaHref={c.ctaHref} ctaLabel={c.ctaLabel} />
     ))}
   </div>
 
@@ -51,6 +51,7 @@ const offers = (await getEntry("offers", lang))!.data;
   bookingHref={offers.cta.bookingHref}
   bookingLabel={offers.cta.bookingLabel}
   responsePromise={offers.cta.responsePromise}
+  photoSrc={offers.cta.photoSrc}
 />
 
 </BaseLayout>

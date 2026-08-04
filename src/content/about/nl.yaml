@@ -19,6 +19,8 @@ facts:
       value: ISO 27001 · 9001 · 14001 (Montenegro, Servië, Tsjechië)
     - label: Microsoft-designaties
       value: "Solutions Partner voor Data & AI en Digital & App Innovation — [link naar live Microsoft-partnerprofiel]"
+    - label: Anthropic-status
+      value: "Select Services Partner, Claude Partner Network — [link naar live Anthropic-partnerprofiel]"
 history:
   heading: Onze geschiedenis
   paragraphs:
@@ -27,21 +29,32 @@ history:
     - "[Deze paragraaf is door de eigenaar te controleren op exacte bewoording voordat publicatie.]"
 team:
   heading: Team Nederland
-  name: Andrei Zaikin
-  role: Contactpersoon Nederland
-  bio: "[Korte bio — in te vullen door de eigenaar]"
-  linkedinLabel: LinkedIn
-  linkedinHref: https://www.linkedin.com/in/zaikin/
-  bookingLabel: Plan een gesprek
-  bookingHref: "[boekingslink]"
-careers:
-  body: Op zoek naar een baan bij First Line Software? Vacatures lopen via ons wereldwijde systeem.
-  linkLabel: Bekijk vacatures
-  href: "[link naar wereldwijd vacaturesysteem]"
+  members:
+    - name: Larisa Koroteeva
+      role: Client Relations Manager
+      bio: "Larisa Koroteeva, Client Relations Manager, is het eerste aanspreekpunt van First Line Software in Nederland — bel, mail of plan een gesprek, en je krijgt haar rechtstreeks aan de lijn, geen wachtrij. Ze bouwde zeven jaar de marketing en pr op voor First Line Software, van multichannel-campagnes tot marktanalyse om de juiste doelgroepen en media te bereiken. Eerder in haar carrière organiseerde ze onderhandelingen op hoog niveau voor overheidsfunctionarissen en ontving ze diplomatieke delegaties — hetzelfde talent voor het samenbrengen van de juiste mensen dat ze nu inzet voor klanten."
+      linkedinLabel: LinkedIn
+      linkedinHref: https://www.linkedin.com/in/larisa-koroteeva-4056071b/
+      bookingLabel: Plan een gesprek
+      bookingHref: "[boekingslink Larisa]"
+      certImageSrc: /assets/img/cert-claude-associate.png
+      certImageAlt: Claude Certified Associate — Foundations
+      photoSrc: /assets/img/photo-larisa-koroteeva.jpg
+    - name: Andrei Zaikin
+      role: Technical Fellow
+      bio: "Andrei Zaikin, Technical Fellow, is verantwoordelijk voor de technische kant van First Line Software's Nederlandse praktijk — de persoon met wie je praat zodra een project van gesprek naar architectuur gaat. Met 25+ jaar ervaring in Microsoft-technologie bouwt en leidt hij agile engineeringteams en verhoogt hij de productiviteit van developers. Hij vertaalde complexe eisen naar werkende software voor klanten als Skattestyrelsen (de Deense Belastingdienst), DaimlerChrysler, Intel, S&P en Deutsche Bank, en staat bekend om het opzetten van technische taskforces en het bewaken van kwaliteit binnen agile projectmanagement."
+      linkedinLabel: LinkedIn
+      linkedinHref: https://www.linkedin.com/in/zaikin/
+      bookingLabel: Plan een gesprek
+      bookingHref: "https://calendar.app.google/VHBi1iERgW19Nrtv9"
+      certImageSrc: /assets/img/cert-claude-architect.png
+      certImageAlt: Claude Certified Architect — Foundations
+      photoSrc: /assets/img/photo-andrei-zaikin.jpg
 cta:
   heading: Praat met ons
-  name: Andrei Zaikin
-  role: Contactpersoon Nederland
-  bookingHref: "[boekingslink]"
+  name: Larisa Koroteeva
+  role: Client Relations Manager
+  bookingHref: "[boekingslink Larisa]"
   bookingLabel: Plan een gesprek
   responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
+  photoSrc: /assets/img/photo-larisa-koroteeva.jpg

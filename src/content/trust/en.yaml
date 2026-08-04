@@ -58,8 +58,9 @@ questionnaire:
   body: "Send it over. We'll return it completed within [x] business days."
 cta:
   heading: Questions about compliance?
-  name: Andrei Zaikin
-  role: Netherlands contact
-  bookingHref: "[booking link]"
+  name: Larisa Koroteeva
+  role: Client Relations Manager
+  bookingHref: "[booking link Larisa]"
   bookingLabel: Book a call
   responsePromise: We reply within one business day — even when the answer is that we can't help.
+  photoSrc: /assets/img/photo-larisa-koroteeva.jpg

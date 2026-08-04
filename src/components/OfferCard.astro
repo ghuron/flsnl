@@ -2,7 +2,10 @@
 // One productized offer on /aanbod (spec §4.5): Microsoft-title-format name, scope, deliverables,
 // duration, price (a band where the spec authorizes one, a bracketed placeholder otherwise —
 // the card doesn't care which, it just renders whatever string the content gives it), and what
-// happens after.
+// happens after. ctaHref/ctaLabel are optional: only the free-scan step is "go do this now"
+// rather than "get in touch," so it's the only card that needs its own link.
+import { withBase } from "../lib/url";
+
 interface Props {
   name: string;
   scope: string;
@@ -10,9 +13,11 @@ interface Props {
   duration: string;
   price: string;
   afterNote: string;
+  ctaHref?: string;
+  ctaLabel?: string;
 }
 
-const { name, scope, deliverables, duration, price, afterNote } = Astro.props;
+const { name, scope, deliverables, duration, price, afterNote, ctaHref, ctaLabel } = Astro.props;
 ---
 <article class="offer-card">
   <h3>{name}</h3>
@@ -25,4 +30,5 @@ const { name, scope, deliverables, duration, price, afterNote } = Astro.props;
     <span class="offer-price">{price}</span>
   </div>
   <p class="offer-after">{afterNote}</p>
+  {ctaHref && ctaLabel && <a class="btn btn-ghost" href={withBase(ctaHref)}>{ctaLabel}</a>}
 </article>

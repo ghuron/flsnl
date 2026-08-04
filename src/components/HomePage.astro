@@ -2,7 +2,6 @@
 import { getEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Hero from "./Hero.astro";
-import CapabilityCard from "./CapabilityCard.astro";
 import ProofStrip from "./ProofStrip.astro";
 import CtaBlock from "./CtaBlock.astro";
 import { withBase } from "../lib/url";
@@ -24,10 +23,6 @@ const home = (await getEntry("home", lang))!.data;
 </Hero>
 
 <div class="wrap">
-  <div class="capability-cards">
-    {home.capabilities.map((c) => <CapabilityCard heading={c.heading} body={c.body} href={c.href} label={c.label} />)}
-  </div>
-
   <section class="how-we-work">
     <h2>{home.howWeWork.heading}</h2>
     <ol class="how-we-work-steps">
@@ -58,6 +53,7 @@ const home = (await getEntry("home", lang))!.data;
   bookingHref={home.cta.bookingHref}
   bookingLabel={home.cta.bookingLabel}
   responsePromise={home.cta.responsePromise}
+  photoSrc={home.cta.photoSrc}
 />
 
 <Fragment slot="footer">{home.footer.text}</Fragment>

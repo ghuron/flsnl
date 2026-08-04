@@ -15,7 +15,8 @@ sections:
 cta:
   heading: Talk to Andrei directly
   name: Andrei Zaikin
-  role: Netherlands contact
-  bookingHref: "[booking link]"
+  role: Technical Fellow
+  bookingHref: "https://calendar.app.google/VHBi1iERgW19Nrtv9"
   bookingLabel: Book a call
   responsePromise: We reply within one business day — even when the answer is that we can't help.
+  photoSrc: /assets/img/photo-andrei-zaikin.jpg

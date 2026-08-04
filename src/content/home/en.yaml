@@ -6,26 +6,13 @@ hero:
   headlinePre: "Working AI in "
   headlineEm: 4-6 weeks
   headlinePost: ": process documents, unlock data, automate processes. Fixed price."
-  lede: First Line Software builds and operates AI and data solutions — with 300 engineers in our own European delivery centers and one fixed point of contact in the Netherlands.
+  lede: First Line Software builds and operates AI and data solutions — with 300 engineers in our own European delivery centers and a fixed Netherlands team you'll reach directly.
   ctaPrimary:
-    label: Book a call with Andrei Zaikin
-    href: "[booking link]"
+    label: Book a call with Larisa Koroteeva
+    href: "[booking link Larisa]"
   ctaSecondary:
     label: Run the Azure check
     href: /en/azure/
-capabilities:
-  - heading: Document processing
-    body: Invoices, orders and reports that read themselves out — with measured accuracy per document type.
-    href: /en/document-processing/
-    label: See document processing
-  - heading: Data integration
-    body: Scattered systems unlocked into usable data for reporting, steering and AI.
-    href: /en/data-integration/
-    label: See data integration
-  - heading: Process automation
-    body: AI agents for repetitive workflows — order entry, document flows, customer processes.
-    href: /en/process-automation/
-    label: See process automation
 howWeWork:
   heading: How we work
   steps:
@@ -47,9 +34,13 @@ proof:
     - value: Microsoft Solutions Partner
       label: Data & AI · Digital & App Innovation
       href: "[link to live Microsoft partner profile]"
-    - value: "[Clutch score]"
-      label: Clutch rating
-      href: "[Clutch profile, if available]"
+      imageSrc: /assets/img/badge-microsoft-partner.png
+      imageAlt: Microsoft Solutions Partner — Cloud & AI Platforms
+    - value: Anthropic Select Services Partner
+      label: Claude Partner Network
+      href: "[link to live Anthropic partner profile]"
+      imageSrc: /assets/img/badge-anthropic-partner.svg
+      imageAlt: Anthropic Select Services Partner
 trackRecord:
   text: "Proven in practice: EHR integration and FHIR/OMOP pipelines for healthcare organizations; catalog, order and document automation for commerce and logistics."
   linkLabel: See cases
@@ -59,10 +50,11 @@ azureTeaser:
   linkLabel: Run the Azure check
 cta:
   heading: Talk through your use case
-  name: Andrei Zaikin
-  role: Netherlands contact
-  bookingHref: "[booking link]"
+  name: Larisa Koroteeva
+  role: Client Relations Manager
+  bookingHref: "[booking link Larisa]"
   bookingLabel: Book a call
   responsePromise: We reply within one business day — even when the answer is that we can't help.
+  photoSrc: /assets/img/photo-larisa-koroteeva.jpg
 footer:
   text: First Line Software — no tracking, no cookies, no external requests.

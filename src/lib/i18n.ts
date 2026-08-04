@@ -28,9 +28,6 @@ export function localeHome(lang: Locale): string {
  */
 export const ROUTES = {
   home: { nl: "/", en: "/en/" },
-  documentProcessing: { nl: "/documentverwerking/", en: "/en/document-processing/" },
-  dataIntegration: { nl: "/data-ontsluiting/", en: "/en/data-integration/" },
-  processAutomation: { nl: "/procesautomatisering/", en: "/en/process-automation/" },
   offers: { nl: "/aanbod/", en: "/en/offers/" },
   // Already built and shipped this session as URL-prefixed routing (matching every other page
   // here), not the same-URL "bilingual UI" the spec's table annotates it with — see the

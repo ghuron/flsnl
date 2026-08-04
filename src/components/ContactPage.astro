@@ -13,7 +13,6 @@ const { lang } = Astro.props;
 
 const common = (await getEntry("common", lang))!.data;
 const contact = (await getEntry("contact", lang))!.data;
-const mailtoHref = contact.email.startsWith("[") ? undefined : `mailto:${contact.email}`;
 ---
 <BaseLayout lang={lang} page="contact" title={contact.meta.title} description={contact.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
 
@@ -22,16 +21,27 @@ const mailtoHref = contact.email.startsWith("[") ? undefined : `mailto:${contact
   <h1>{contact.heading}</h1>
   <p class="intro">{contact.intro}</p>
 
-  <section class="content contact-card">
-    <p class="contact-name"><strong>{contact.name}</strong> — {contact.role}</p>
-    <ul class="contact-details">
-      <li>{mailtoHref ? <a href={mailtoHref}>{contact.email}</a> : contact.email}</li>
-      <li>{contact.phone}</li>
-      <li><a href={contact.linkedinHref} target="_blank" rel="noopener noreferrer">{contact.linkedinLabel}</a></li>
-    </ul>
-    <a class="btn btn-primary" href={contact.bookingHref}>{contact.bookingLabel}</a>
-    <p class="cta-promise" style="margin-top: 1rem; color: var(--ink-dim);">{contact.responsePromise}</p>
-  </section>
+  <div class="contact-cards">
+    {contact.contacts.map((c) => {
+      const mailtoHref = c.email.startsWith("[") ? undefined : `mailto:${c.email}`;
+      const initials = c.name.split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase();
+      return (
+        <section class="content contact-card">
+          {c.photoSrc
+            ? <img class="cta-photo contact-photo" src={withBase(c.photoSrc)} alt={c.name} width="72" height="72">
+            : <span class="cta-photo cta-photo-fallback contact-photo" aria-hidden="true">{initials}</span>}
+          <p class="contact-name"><strong>{c.name}</strong> — {c.role}</p>
+          <ul class="contact-details">
+            <li>{mailtoHref ? <a href={mailtoHref}>{c.email}</a> : c.email}</li>
+            {c.phone && <li>{c.phone}</li>}
+            <li><a href={c.linkedinHref} target="_blank" rel="noopener noreferrer">{c.linkedinLabel}</a></li>
+          </ul>
+          <a class="btn btn-primary" href={c.bookingHref}>{c.bookingLabel}</a>
+        </section>
+      );
+    })}
+  </div>
+  <p class="cta-promise" style="margin: -1rem 0 1.5rem; color: var(--ink-dim);">{contact.responsePromise}</p>
 
   <section class="content">
     <h2>{contact.address.heading}</h2>

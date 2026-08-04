@@ -158,9 +158,9 @@ header.topbar .lang-switch:hover { color: #fff; }
    own behavior. No script anywhere here, so marketing pages keep script-src 'none'. */
 /* Resets the global `details`/`summary` box styling (border, panel background, +/− marker) —
    that styling is meant for the content-page collapsibles (FAQ, export notes), not the nav. */
-.nav-toggle, .nav-dropdown { border: none; background: none; padding: 0; margin: 0; }
-.nav-toggle-summary, .nav-dropdown summary { font-weight: 700; }
-.nav-toggle-summary::before, .nav-dropdown summary::before { content: none !important; }
+.nav-toggle { border: none; background: none; padding: 0; margin: 0; }
+.nav-toggle-summary { font-weight: 700; }
+.nav-toggle-summary::before { content: none !important; }
 
 .nav-toggle-summary {
   list-style: none;
@@ -183,7 +183,7 @@ header.topbar .lang-switch:hover { color: #fff; }
 .nav-toggle-icon::after { top: 7px; }
 
 .primary-nav { flex-direction: column; gap: 0.2rem; }
-.primary-nav > a, .nav-dropdown summary {
+.primary-nav > a {
   display: block;
   color: #fff;
   text-decoration: none;
@@ -193,11 +193,6 @@ header.topbar .lang-switch:hover { color: #fff; }
   list-style: none;
   cursor: pointer;
 }
-.nav-dropdown summary::-webkit-details-marker { display: none; }
-.nav-dropdown summary::after { content: " \25BE"; font-size: 0.75em; }
-.nav-dropdown-panel { display: flex; flex-direction: column; padding-left: 1rem; }
-.nav-dropdown-panel a { color: #cfd3e6; text-decoration: none; font-size: 0.9rem; padding: 0.45rem 0.5rem; }
-.nav-dropdown-panel a:hover { color: #fff; }
 
 .primary-nav-desktop { display: none; }
 .primary-nav-mobile {
@@ -217,19 +212,7 @@ header.topbar .lang-switch:hover { color: #fff; }
     align-items: center;
     gap: 0.3rem;
   }
-  .primary-nav-desktop > a, .primary-nav-desktop .nav-dropdown summary { padding: 0.5rem 0.7rem; }
-  .primary-nav-desktop .nav-dropdown { position: relative; }
-  .primary-nav-desktop .nav-dropdown-panel {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: var(--navy);
-    border: 1px solid #232842;
-    border-radius: 8px;
-    padding: 0.4rem;
-    min-width: 190px;
-    box-shadow: 0 12px 24px rgba(0,0,0,.25);
-  }
+  .primary-nav-desktop > a { padding: 0.5rem 0.7rem; }
 }
 header.topbar .bar { flex-wrap: wrap; }
 @media (min-width: 960px) { header.topbar .bar { flex-wrap: nowrap; } }
@@ -272,9 +255,44 @@ header.topbar .bar { flex-wrap: wrap; }
 .post-list h2 { font-size: 1.2rem; margin: 0 0 0.4rem; }
 
 /* ---- contact card ---- */
-.contact-card { background: var(--panel); border-radius: 16px; padding: 2rem; max-width: 480px; }
+.contact-cards { display: grid; gap: 1.5rem; margin: 0 0 1.5rem; }
+@media (min-width: 700px) { .contact-cards { grid-template-columns: 1fr 1fr; } }
+/* Column + auto-margin on the button so both cards' CTAs sit on one line even though only one
+   contact lists a phone number. */
+.contact-card { background: var(--panel); border-radius: 16px; padding: 2rem; margin: 0; display: flex; flex-direction: column; align-items: flex-start; }
+.contact-card .btn { margin-top: auto; }
+.contact-photo { margin-bottom: 1rem; }
 .contact-name { margin: 0 0 1rem; }
 .contact-details { list-style: none; padding: 0; margin: 0 0 1.5rem; display: grid; gap: 0.5rem; }
+
+/* ---- team members (over ons) ---- */
+.team-members { display: grid; gap: 2rem; margin: 1rem 0; align-items: stretch; }
+@media (min-width: 700px) { .team-members { grid-template-columns: 1fr 1fr; } }
+/* Column + auto-margin above the button so both members' CTAs land on one line regardless of
+   how long each bio runs. */
+.team-member { display: flex; flex-direction: column; align-items: flex-start; }
+.team-member .btn { margin-top: auto; }
+/* Photo and cert badge as a matched pair — same 110px box so the circle and the badge's
+   decagon read as one row of equal-weight marks rather than two unrelated images. */
+.team-media { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.team-cert-badge { width: 110px; height: auto; margin: 0; }
+/* Descendant selector, not a bare `.team-photo`: `.cta-photo` sets 72px further down this
+   stylesheet, and at equal specificity the later rule would win and shrink the face. */
+.team-media .team-photo { width: 110px; height: 110px; flex-shrink: 0; }
+.team-media .team-photo.cta-photo-fallback { font-size: 1.8rem; }
+/* line-height:0 keeps the anchor's box tight to the portrait so the chip pins to the actual
+   image corner rather than to a taller inline box. */
+.team-photo-link { position: relative; display: block; flex-shrink: 0; line-height: 0; border-radius: 50%; }
+.team-photo-in {
+  position: absolute; right: 0; bottom: 0;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #0a66c2; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid #fff;
+  transition: background-color .15s ease;
+}
+.team-photo-link:hover .team-photo-in { background: #004182; }
+.team-photo-link:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 
 /* ---- facts list (over ons) ---- */
 .facts-list { margin: 1rem 0 1.5rem; }
@@ -297,6 +315,9 @@ footer.site .facts { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px so
 footer.site .facts p { margin: 0 0 0.4rem; }
 footer.site .facts-links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
 footer.site .facts-links a { text-decoration: underline; text-underline-offset: 2px; }
+footer.site .facts-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 0.9rem; margin-top: 0.8rem; }
+footer.site .facts-badge { display: block; height: 48px; width: auto; border-radius: 4px; }
+footer.site .facts-badge-wide { height: 40px; }
 
 /* ---- connectivity indicator (azure page) ----
    Lives in the topbar's right-hand cluster, on the same baseline as the contact button.
@@ -486,6 +507,9 @@ ul.checks li { margin-bottom: 0.5rem; }
 ul.checks li::marker { color: var(--blue); }
 
 footer.site { background: var(--navy-deep); color: #8891a5; margin-top: 5rem; }
+/* The margin exists to separate the dark footer from white page content. When a page ends on
+   the (also dark) CTA block, that gap reads as a white stripe between two dark bands instead. */
+.cta-block + footer.site { margin-top: 0; }
 footer.site .wrap { padding: 2rem 1.75rem 2.5rem; font-size: 0.85rem; }
 footer.site a { color: #b9bac1; }
 footer.site .copyright { margin-top: 0.5rem; opacity: 0.75; }
@@ -569,17 +593,6 @@ section.app .intro { color: var(--ink-dim); font-size: 1.05rem; max-width: 700px
 .app-status { color: var(--ink-dim); font-size: 0.9rem; }
 .app-status.error { color: #c0392b; }
 
-/* ---- capability cards (home) ---- */
-.capability-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 3rem 0; }
-@media (max-width: 900px) { .capability-cards { grid-template-columns: 1fr; } }
-.capability-card {
-  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
-  padding: 1.75rem;
-}
-.capability-card h3 { font-size: 1.2rem; margin: 0 0 0.6rem; }
-.capability-card p { color: var(--ink-dim); margin: 0 0 1rem; }
-.capability-card-link { font-weight: 700; text-decoration: none; }
-
 /* ---- proof strip (home) ---- */
 .proof-strip {
   display: flex; flex-wrap: wrap; gap: 2rem 2.5rem; align-items: center;
@@ -587,8 +600,12 @@ section.app .intro { color: var(--ink-dim); font-size: 1.05rem; max-width: 700px
 }
 .proof-item { display: flex; flex-direction: column; text-decoration: none; color: inherit; }
 .proof-value { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+/* align-self stops the parent column's default `align-items: stretch` from pulling the badge
+   to the item's full width, which renders it at the wrong aspect ratio. */
+.proof-badge { height: 64px; width: auto; align-self: flex-start; margin-bottom: 0.3rem; }
 .proof-label { font-size: 0.8rem; color: var(--ink-dim); }
 a.proof-item:hover .proof-value { color: var(--blue); }
+a.proof-item:hover .proof-badge { opacity: 0.85; }
 
 /* ---- CTA block (every page) ---- */
 .cta-block { background: var(--navy); color: #fff; padding: 3.5rem 0; margin-top: 4rem; }
@@ -618,7 +635,8 @@ a.proof-item:hover .proof-value { color: var(--blue); }
 .offer-meta { display: flex; gap: 1.5rem; font-weight: 700; margin-bottom: 0.8rem; }
 .offer-duration { color: var(--ink-dim); font-weight: 400; }
 .offer-price { color: var(--blue-dark); }
-.offer-after { color: var(--ink-dim); font-size: 0.9rem; margin: 0; }
+.offer-after { color: var(--ink-dim); font-size: 0.9rem; margin: 0 0 1rem; }
+.offer-card .btn { padding: 0.6rem 1rem; font-size: 0.88rem; }
 
 /* ---- case cards (cases) ---- */
 .case-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin: 2.5rem 0; }

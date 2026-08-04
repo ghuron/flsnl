@@ -1,16 +1,26 @@
 meta:
   title: Contact — First Line Software
-  description: Plan direct een gesprek met Andrei Zaikin, of stuur een mail. We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
+  description: Plan direct een gesprek met Larisa Koroteeva of Andrei Zaikin, of stuur een mail. We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
 heading: Contact
-intro: Geen formulier — plan direct een gesprek, of mail. Je krijgt persoonlijk antwoord van Andrei Zaikin, geen wachtrij.
-name: Andrei Zaikin
-role: Contactpersoon Nederland
-email: "[e-mailadres]"
-phone: "+31 70 217 0112"
-linkedinLabel: LinkedIn
-linkedinHref: https://www.linkedin.com/in/zaikin/
-bookingHref: "[boekingslink]"
-bookingLabel: Plan een gesprek van 30 minuten
+intro: Geen formulier — bel, mail, of plan direct een gesprek. Larisa is je eerste aanspreekpunt voor algemene en telefonische vragen; Andrei voor technische verdieping. Beiden antwoorden persoonlijk, geen wachtrij.
+contacts:
+  - name: Larisa Koroteeva
+    role: Client Relations Manager
+    email: "[e-mailadres Larisa]"
+    phone: "+31 70 217 0112"
+    linkedinLabel: LinkedIn
+    linkedinHref: https://www.linkedin.com/in/larisa-koroteeva-4056071b/
+    bookingHref: "[boekingslink Larisa]"
+    bookingLabel: Plan een gesprek van 30 minuten
+    photoSrc: /assets/img/photo-larisa-koroteeva.jpg
+  - name: Andrei Zaikin
+    role: Technical Fellow
+    email: "[e-mailadres Andrei]"
+    linkedinLabel: LinkedIn
+    linkedinHref: https://www.linkedin.com/in/zaikin/
+    bookingHref: "https://calendar.app.google/VHBi1iERgW19Nrtv9"
+    bookingLabel: Plan een gesprek van 30 minuten
+    photoSrc: /assets/img/photo-andrei-zaikin.jpg
 responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
 address:
   heading: Bezoekadres
