@@ -54,6 +54,9 @@ cards:
     duration: Doorlopend
     price: "[€x/maand of % van run-volume]"
     afterNote: Loopt door zolang de AI-oplossing in productie draait.
+azureNote:
+  body: "De Azure Waste Scan en de Waste Audit horen bij elkaar: stap 1 laat zien of er iets te halen valt, stap 2 zet er bedragen bij die je kunt verdedigen."
+  linkLabel: Bekijk de Azure-aanpak
 guarantee:
   heading: Wat we garanderen — en wat niet
   body: Een evaluatierapport met gemeten prestaties is altijd onderdeel van elk traject. Geen resultaat? Dan zeggen we dat — we verkopen geen vervolgtraject op basis van een verhaal, alleen op basis van cijfers.

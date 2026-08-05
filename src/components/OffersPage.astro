@@ -4,7 +4,8 @@ import { getEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import OfferCard from "./OfferCard.astro";
 import CtaBlock from "./CtaBlock.astro";
-import type { Locale } from "../lib/i18n";
+import { withBase } from "../lib/url";
+import { routeFor, type Locale } from "../lib/i18n";
 
 interface Props {
   lang: Locale;
@@ -31,6 +32,11 @@ const offers = (await getEntry("offers", lang))!.data;
       <OfferCard name={c.name} scope={c.scope} deliverables={c.deliverables} duration={c.duration} price={c.price} afterNote={c.afterNote} ctaHref={c.ctaHref} ctaLabel={c.ctaLabel} />
     ))}
   </div>
+
+  <p class="azure-note">
+    {offers.azureNote.body}
+    <a href={withBase(routeFor("azure", lang))}>{offers.azureNote.linkLabel}</a>
+  </p>
 
   <section class="content">
     <h2>{offers.guarantee.heading}</h2>

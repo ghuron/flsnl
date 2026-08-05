@@ -228,6 +228,9 @@ const offers = defineCollection({
         ctaLabel: z.string().optional(),
       })
     ),
+    // Routes the two Azure cards back to their shared hub, which would otherwise have no
+    // inbound link anywhere on the site. Href comes from ROUTES, not content.
+    azureNote: z.object({ body: z.string(), linkLabel: z.string() }),
     guarantee: z.object({ heading: z.string(), body: z.string() }),
     marketplace: z.object({ heading: z.string(), body: z.string() }),
     cta: ctaBlock,

@@ -54,6 +54,9 @@ cards:
     duration: Ongoing
     price: "[€x/month or % of run volume]"
     afterNote: Runs for as long as the AI solution stays in production.
+azureNote:
+  body: "The Azure Waste Scan and the Waste Audit belong together: step 1 shows whether there is anything to recover, step 2 attaches amounts you can defend."
+  linkLabel: See how the Azure track works
 guarantee:
   heading: What we guarantee — and what we don't
   body: An evaluation report of measured performance is always part of every engagement. No result? We'll say so — we don't sell a follow-on engagement on a story, only on numbers.
