@@ -17,7 +17,7 @@ marketplace:
   href: "[link to live NL Marketplace business profile]"
 offers:
   heading: Consulting service offers
-  body: Productized offers, including the Azure Waste Audit, are listed with fixed scope and price bands.
+  body: Productized offers, including the Azure Re-Engineering Audit, are listed with fixed scope and a fixed price.
   linkLabel: See the offers
 architecture:
   heading: Reference architecture

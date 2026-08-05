@@ -1,12 +1,12 @@
 meta:
-  title: Azure Waste Audit — quantified savings in 2 weeks
-  description: Human-led analysis of your Azure costs. Two weeks, fixed price €7,500–€12,500, delivering a quantified savings inventory and a signed measurement methodology.
+  title: Azure Re-Engineering Audit — findings, architecture and a fixed price
+  description: Our engineers dig into your Azure infrastructure and propose re-engineering. Two weeks, fixed price €12,000 — all findings, a new architecture, and a fixed-price quote to build it.
 hero:
-  eyebrow: Azure Waste Audit
+  eyebrow: Azure Re-Engineering Audit
   headlinePre: "What you can actually save on Azure, "
   headlineEm: with the amounts attached
   headlinePost: " — in two weeks."
-  lede: Our engineers analyse your Azure usage and deliver a quantified savings inventory. Not directional advice, but an amount per finding and a measurement methodology you can sign off on.
+  lede: Our engineers, with AI, dig into your infrastructure and propose re-engineering. Not directional advice — every finding with an amount attached, a new architecture, and a fixed price to build it.
   ctaPrimary:
     label: Book a call
     href: "[booking link Larisa]"
@@ -25,7 +25,8 @@ deliverables:
     - A signed baseline and measurement methodology, so what counted as saved isn't disputed later
     - A split between "your own team can fix this" and "this needs engineering"
     - A list of AI use cases you could fund from the savings freed up
-    - A costed view of the next steps, including what they'd cost
+    - A new architecture for what the findings say is worth rebuilding
+    - A fixed-price quote to build it, so the next step needs no further scoping
 method:
   heading: How we run it
   steps:
@@ -37,9 +38,9 @@ method:
       body: You get the inventory, the methodology and the costed next steps, and we walk through them together. If there's little to recover, we say so — and the audit ends there.
 pricing:
   heading: Price and duration
-  price: €7,500 – €12,500
+  price: €12,000
   duration: 2 weeks, fixed price
-  body: Where you land in the band depends on the number of subscriptions and how complex your environment is. You know the exact figure before we start — there's no invoice trailing behind it.
+  body: One fixed price regardless of how many subscriptions you run or how complex the environment turns out to be. You know the figure before we start — there's no invoice trailing behind it.
   afterNote: "From there you choose: a fixed-price implementation, or gainshare — 50% of verified savings for 6 months (commercial levers such as reservations count for [15–20%]; a floor applies from [€80–100k]/month Azure spend). From month 7, a Cost Guardrail subscription [€x/month]."
 scanFirst:
   heading: Not there yet?

@@ -11,9 +11,9 @@ steps:
     linkLabel: Run the free scan
     target: azureScan
   - eyebrow: Step 2
-    heading: "Azure Waste Audit: human-led analysis"
+    heading: "Azure Re-Engineering Audit: human-led analysis"
     body: Our engineers dig into your usage, validate what's actually recoverable and deliver a quantified savings inventory with a signed measurement methodology — plus a list of AI use cases you could fund from those savings.
-    price: €7,500 – €12,500 · 2 weeks
+    price: €12,000 · 2 weeks
     linkLabel: See the audit
     target: azureAudit
 why:

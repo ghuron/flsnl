@@ -11,9 +11,9 @@ steps:
     linkLabel: Doe de gratis scan
     target: azureScan
   - eyebrow: Stap 2
-    heading: "Azure Waste Audit: mensgeleide analyse"
+    heading: "Azure Re-Engineering Audit: mensgeleide analyse"
     body: Onze engineers duiken in je verbruik, valideren wat er te halen valt en leveren een gekwantificeerde besparingsinventaris met een ondertekende meetmethodiek — plus een lijst AI-use-cases die je uit die besparing kunt financieren.
-    price: €7.500 – €12.500 · 2 weken
+    price: €12.000 · 2 weken
     linkLabel: Bekijk de audit
     target: azureAudit
 why:

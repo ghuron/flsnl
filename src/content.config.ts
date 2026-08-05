@@ -212,20 +212,22 @@ const offers = defineCollection({
   loader: glob({ pattern: "*.yaml", base: "./src/content/offers" }),
   schema: z.object({
     meta: z.object({ title: z.string(), description: z.string() }),
-    heading: z.string(),
-    /** Untitled on purpose — it reads as the page's lede, directly under the h1. */
-    intro: z.object({ body: z.string() }),
+    hero,
+    /** Heading + one-liner introducing the tile band, naming the family the two steps belong to. */
+    tilesIntro: z.object({ heading: z.string(), lede: z.string() }),
     // Two tiles, one per Azure step. Only offers we can actually price and deliver live here;
     // the earlier placeholder offers were removed rather than shipped as "[to be determined]".
     tiles: z
       .array(
         z.object({
+          step: z.string(),
           name: z.string(),
-          tagline: z.string(),
-          whatYouGetLabel: z.string(),
-          outcome: z.string(),
-          outcomeBody: z.string(),
+          /** Price and duration on one line, directly under the name — the first thing a
+           *  buyer looks for, so it sits above the description rather than below it. */
           price: z.string(),
+          description: z.string(),
+          whatYouGetLabel: z.string(),
+          whatYouGet: z.string(),
           ctaLabel: z.string(),
           /** ROUTES key, so the tile never hardcodes a path. */
           target: z.enum(["azureScan", "azureAudit"]),

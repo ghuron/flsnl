@@ -63,8 +63,8 @@ trust:
   vertrouwenLabel: More on trust & compliance
 bridge:
   heading: From waste to AI budget
-  body: Do the leads from this scan look economically worth it? The Azure Waste Audit turns them into a quantified savings inventory — and a list of AI use cases you could fund from that savings.
-  linkLabel: See the Azure Waste Audit
+  body: Do the leads from this scan look economically worth it? The Azure Re-Engineering Audit turns them into a quantified savings inventory — and a list of AI use cases you could fund from that savings.
+  linkLabel: See the Azure Re-Engineering Audit
 footer:
   text: First Line Software — source code and more on GitHub.
   backLink:

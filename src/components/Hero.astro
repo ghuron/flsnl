@@ -14,11 +14,19 @@ interface Props {
     lede: string;
     ctaPrimary: { label: string; href: string };
   };
+  /** Optional artwork, laid in as the section background with its subject weighted right, so
+   *  the copy still reads over the dark half. Replaces the CSS-drawn planes when set. Served
+   *  from our own origin — hotlinking it would break both img-src 'self' and the footer's
+   *  no-external-requests promise. */
+  imageSrc?: string;
 }
 
-const { hero } = Astro.props;
+const { hero, imageSrc } = Astro.props;
 ---
-<section class="hero">
+<section
+  class:list={["hero", imageSrc && "hero-artwork"]}
+  style={imageSrc ? `background-image: url('${withBase(imageSrc)}')` : undefined}
+>
   <div class="wrap hero-grid">
     <div class="hero-content">
       <span class="eyebrow">{hero.eyebrow}</span>

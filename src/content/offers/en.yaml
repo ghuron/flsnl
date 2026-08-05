@@ -1,28 +1,38 @@
 meta:
   title: Offers & pricing — First Line Software
-  description: Fixed-scope start, real prices, no billable hours. Two ways to lower your Azure costs — the free Waste Scan and the human-led Waste Audit.
+  description: Fixed-scope start, real prices, no billable hours. Two steps from unexplained Azure spend to a re-engineering plan with a fixed-price quote.
 heading: Offers & pricing
-intro:
-  body: "Every engagement starts with a fixed-scope start: a fixed amount for a fixed period. An evaluation report of measured performance is always part of it — and if it turns up nothing, we say so. We don't sell a follow-on engagement on a story, only on numbers. No billable hours, no open-ended scope. AI that delivers work, not slides."
+hero:
+  eyebrow: Offers & pricing
+  headlinePre: "Real prices, "
+  headlineEm: fixed scope
+  headlinePost: "."
+  lede: "Every engagement starts with a fixed amount for a fixed period. An evaluation report of measured performance is always part of it — and if it turns up nothing, we say so. We don't sell a follow-on engagement on a story, only on numbers. No billable hours, no open-ended scope. AI that delivers work, not slides."
+  ctaPrimary:
+    label: Talk through which step fits
+    href: "[booking link Larisa]"
+tilesIntro:
+  heading: Azure FinOps
+  lede: Two steps, and you can take the first one without talking to us
 tiles:
-  - name: Azure Waste Scan
-    tagline: Step 1 — run it yourself, right in your own browser. No upload, no sign-up.
+  - step: "Step 1"
+    name: Azure Waste Scan
+    price: €0 · 2 minutes
+    description: Run it yourself, right in your own browser. No upload, no sign-up.
     whatYouGetLabel: "What you get:"
-    outcome: Answers within minutes
-    outcomeBody: A short list of leads with an amount per finding, as a PDF. Your file never leaves your browser — we never see your numbers.
-    price: Free · 2 minutes
+    whatYouGet: A short list of leads that will help your IT cut Azure spending.
     ctaLabel: Run the free scan
     target: azureScan
-  - name: Azure Waste Audit
-    tagline: Step 2 — our engineers dig into your usage and validate what is genuinely recoverable.
+  - step: "Step 2"
+    name: Azure Re-Engineering Audit
+    price: €12,000 · 2 weeks
+    description: Our engineers, with AI, dig into your infrastructure and propose re-engineering.
     whatYouGetLabel: "What you get:"
-    outcome: A savings case that holds up
-    outcomeBody: A quantified savings inventory with a signed measurement methodology, plus a list of AI use cases you could fund from those savings.
-    price: €7,500 – €12,500 · 2 weeks
+    whatYouGet: All findings, a new architecture, and a fixed-price quote to build it.
     ctaLabel: See the audit
     target: azureAudit
 azureNote:
-  body: "The two belong together: step 1 shows whether there is anything to recover, step 2 attaches amounts you can defend."
+  body: "The two belong together: step 1 shows whether there is anything to recover, step 2 turns it into an architecture you can budget for."
   linkLabel: See how the Azure track works
 cta:
   heading: Talk through which offer fits

@@ -1,12 +1,12 @@
 meta:
-  title: Azure Waste Audit — gekwantificeerde besparing in 2 weken
-  description: Mensgeleide analyse van je Azure-kosten. Twee weken, vaste prijs €7.500–€12.500, met een gekwantificeerde besparingsinventaris en een ondertekende meetmethodiek als resultaat.
+  title: Azure Re-Engineering Audit — bevindingen, architectuur en een vaste prijs
+  description: Onze engineers duiken in je Azure-infrastructuur en stellen herbouw voor. Twee weken, vaste prijs €12.000 — alle bevindingen, een nieuwe architectuur, en een vaste prijs om die te bouwen.
 hero:
-  eyebrow: Azure Waste Audit
+  eyebrow: Azure Re-Engineering Audit
   headlinePre: "Wat je écht kunt besparen op Azure, "
   headlineEm: met bedragen erbij
   headlinePost: " — in twee weken."
-  lede: Onze engineers analyseren je Azure-verbruik en leveren een gekwantificeerde besparingsinventaris. Geen richtinggevend advies, maar bedragen per bevinding en een meetmethodiek die je kunt ondertekenen.
+  lede: Onze engineers duiken met AI in je infrastructuur en stellen herbouw voor. Geen richtinggevend advies — elke bevinding met een bedrag erbij, een nieuwe architectuur, en een vaste prijs om die te bouwen.
   ctaPrimary:
     label: Plan een gesprek
     href: "[boekingslink Larisa]"
@@ -25,7 +25,8 @@ deliverables:
     - Ondertekende baseline- en meetmethodiek, zodat later niet ter discussie staat wat de besparing was
     - Splitsing tussen "dit lost je eigen team op" en "dit vraagt engineering"
     - Een lijst met AI-use-cases die je uit de vrijgekomen besparing kunt financieren
-    - Een doorrekening van de vervolgstappen, inclusief wat ze kosten
+    - Een nieuwe architectuur voor wat volgens de bevindingen herbouw verdient
+    - Een vaste prijs om die te bouwen, zodat de vervolgstap geen nieuwe scoping vraagt
 method:
   heading: Hoe we het aanpakken
   steps:
@@ -37,9 +38,9 @@ method:
       body: Je krijgt de inventaris, de methodiek en de doorrekening, en we lopen ze samen door. Valt er weinig te halen, dan zeggen we dat — en is de audit klaar.
 pricing:
   heading: Prijs en doorlooptijd
-  price: €7.500 – €12.500
+  price: €12.000
   duration: 2 weken, vaste prijs
-  body: De bandbreedte hangt af van het aantal subscriptions en de complexiteit van je omgeving. Je weet het exacte bedrag voordat we beginnen — er komt geen nacalculatie achteraan.
+  body: Eén vaste prijs, ongeacht hoeveel subscriptions je draait of hoe complex de omgeving blijkt. Je weet het bedrag voordat we beginnen — er komt geen nacalculatie achteraan.
   afterNote: "Daarna kies je zelf: een vaste-prijs implementatie, of gainshare — 50% van de geverifieerde besparing gedurende 6 maanden (commerciële hefbomen zoals reserveringen tellen voor [15–20%]; ondergrens vanaf [€80–100k]/maand Azure-uitgaven). Vanaf maand 7 een Cost Guardrail-abonnement [€x/maand]."
 scanFirst:
   heading: Nog niet zover?

@@ -358,6 +358,17 @@ section.hero {
   padding: 5.5rem 0;
   overflow: hidden;
 }
+/* Artwork variant: the image carries its own dark gradient, so it replaces the tinted
+   background entirely and the CSS-drawn planes step aside. Anchored right because the subject
+   sits right of centre in the source file — the left half stays dark enough for the copy. */
+section.hero.hero-artwork {
+  background-color: var(--navy);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center right;
+}
+.hero-artwork .hero-visual { display: none; }
+
 .hero-grid {
   display: grid;
   grid-template-columns: 1.1fr 1fr;
@@ -655,7 +666,10 @@ a.proof-item:hover .proof-badge { opacity: 0.85; }
    Full-bleed dark band holding one tile per Azure step: centred text, the outcome called out
    under a small "what you get" label, price, then the CTA pinned to the bottom so both tiles'
    buttons line up regardless of copy length. */
-.offer-tiles-band { background: var(--navy); color: #fff; padding: 4rem 0 4.5rem; margin: 1rem 0 3rem; }
+.offer-tiles-band { background: var(--navy); color: #fff; padding: 4rem 0 4.5rem; margin: 0 0 3rem; }
+.offer-tiles-intro { text-align: center; margin-bottom: 2.75rem; }
+.offer-tiles-intro h2 { font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 0 0 0.6rem; }
+.offer-tiles-intro p { color: #cfd3e6; margin: 0; }
 .offer-tiles { display: grid; gap: 1.5rem; }
 @media (min-width: 820px) { .offer-tiles { grid-template-columns: 1fr 1fr; } }
 .offer-tile {
@@ -665,12 +679,12 @@ a.proof-item:hover .proof-badge { opacity: 0.85; }
   padding: 2.75rem 2rem 2.5rem;
   display: flex; flex-direction: column; align-items: center; text-align: center;
 }
-.offer-tile-name { font-size: 1.7rem; line-height: 1.2; color: var(--blue); margin: 0 0 0.9rem; }
-.offer-tile-tagline { color: #cfd3e6; margin: 0 0 2rem; max-width: 34ch; }
-.offer-tile-label { font-size: 0.8rem; color: #8891a5; margin: 0 0 0.35rem; }
-.offer-tile-outcome { font-weight: 800; font-size: 1.05rem; margin: 0 0 0.5rem; }
+.offer-tile-name { font-size: 1.6rem; line-height: 1.2; color: var(--blue); margin: 0 0 0.6rem; }
+.offer-tile-step { display: block; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #8891a5; margin-bottom: 0.3rem; }
+.offer-tile-price { font-size: 1.15rem; font-weight: 800; margin: 0 0 1.5rem; }
 .offer-tile-body { color: #cfd3e6; margin: 0 0 1.75rem; max-width: 38ch; }
-.offer-tile-price { font-weight: 700; margin: 0 0 1.75rem; }
+.offer-tile-label { font-size: 0.8rem; color: #8891a5; margin: 0 0 0.35rem; }
+.offer-tile-outcome { font-weight: 700; margin: 0 0 1.75rem; max-width: 38ch; }
 .offer-tile .btn { margin-top: auto; }
 /* The paid step carries the accent, so the two tiles don't read as interchangeable. */
 .offer-tile:nth-child(2) { border-color: rgba(124, 108, 255, 0.5); box-shadow: 0 0 48px rgba(124, 108, 255, 0.12); }
