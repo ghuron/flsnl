@@ -1,68 +1,29 @@
 meta:
   title: Aanbod & prijzen — First Line Software
-  description: Vaste-scope start, beheer per verwerkte eenheid, geen uurtje-factuurtje. Bekijk onze productized offers met echte prijzen — inclusief de Azure Waste Audit.
+  description: Vaste-scope start, echte prijzen, geen uurtje-factuurtje. Twee manieren om je Azure-kosten te verlagen — de gratis Waste Scan en de mensgeleide Waste Audit.
 heading: Aanbod & prijzen
 intro:
-  heading: Zo prijzen we
-  body: Elk traject begint met een vaste-scope start — een vast bedrag voor een vaste periode, met een evaluatierapport met gemeten prestaties als resultaat. Daarna volgt beheer per verwerkte eenheid, soms aangevuld met een abonnement. Geen uurtje-factuurtje, geen open einde. AI die werk oplevert, geen slides.
-cards:
-  - name: "Azure Waste Scan: Stap 1, Gratis Self-Scan"
-    scope: Draai 'm zelf, in je eigen browser — geen upload, geen aanmelding. Zie binnen enkele minuten waar je Azure-budget lekt.
-    deliverables:
-      - Een korte lijst aanknopingspunten die een nadere blik verdienen, elk met een bedrag erbij
-      - Een downloadbaar PDF-rapport
-      - Niets wordt verstuurd — de scan leest je bestanden lokaal en wij zien ze nooit
-    duration: 2 minuten, self-service
-    price: Gratis
-    afterNote: Zie je iets dat de moeite waard is om uit te zoeken? Stap 2 maakt er een gekwantificeerde besparingscase van.
-    ctaHref: /aanbod/azure/kostenscan/
+  body: "Elk traject begint met een vaste-scope start: een vast bedrag voor een vaste periode. Een evaluatierapport met gemeten prestaties hoort er altijd bij — en levert het niets op, dan zeggen we dat. We verkopen geen vervolgtraject op basis van een verhaal, alleen op basis van cijfers. Geen uurtje-factuurtje, geen open einde. AI die werk oplevert, geen slides."
+tiles:
+  - name: Azure Waste Scan
+    tagline: Stap 1 — draai 'm zelf, in je eigen browser. Geen upload, geen aanmelding.
+    whatYouGetLabel: "Wat je krijgt:"
+    outcome: Inzicht binnen minuten
+    outcomeBody: Een korte lijst aanknopingspunten met een bedrag per bevinding, als PDF. Je bestand verlaat je browser nooit — wij zien je cijfers niet.
+    price: Gratis · 2 minuten
     ctaLabel: Doe de gratis scan
-  - name: "Azure Waste Audit: Stap 2, 2-Wk Assessment"
-    scope: Een grondige, mensgeleide analyse van je Azure-uitgaven — wat je betaalt, waarom, en waar het anders kan.
-    deliverables:
-      - Gekwantificeerde besparingsinventaris, met een bedrag per bevinding
-      - Ondertekende baseline- en meetmethodiek
-      - Een lijst met AI-use-cases die je uit de besparing kunt financieren
-    duration: 2 weken
-    price: "€7.500 – €12.500, vaste prijs"
-    afterNote: "Daarna kies je: een vaste-prijs implementatie, of gainshare — 50% van de geverifieerde besparing gedurende 6 maanden (commerciële hefbomen zoals reserveringen tellen voor [15–20%]; ondergrens vanaf [€80–100k]/maand Azure-uitgaven). Vanaf maand 7 een Cost Guardrail-abonnement [€x/maand]."
-    ctaHref: /aanbod/azure/kostenaudit/
+    target: azureScan
+  - name: Azure Waste Audit
+    tagline: Stap 2 — onze engineers duiken in je verbruik en valideren wat er echt te halen valt.
+    whatYouGetLabel: "Wat je krijgt:"
+    outcome: Een besparingscase die standhoudt
+    outcomeBody: Gekwantificeerde besparingsinventaris met een ondertekende meetmethodiek, plus een lijst AI-use-cases die je uit die besparing kunt financieren.
+    price: €7.500 – €12.500 · 2 weken
     ctaLabel: Bekijk de audit
-  - name: "[PoC-aanbod documentverwerking]: 4-6-Wk Proof of Concept"
-    scope: Een werkende documentverwerkings-oplossing in jouw eigen Azure-omgeving, met gemeten nauwkeurigheid per documenttype.
-    deliverables:
-      - Werkende oplossing in je eigen tenant
-      - Evaluatierapport met gemeten prestaties
-      - Duidelijkheid over de vervolgkosten per verwerkte eenheid
-    duration: 4-6 weken
-    price: "[€x], vaste prijs"
-    afterNote: "Daarna beheer per verwerkte eenheid, [€x per document/order]."
-  - name: "[AI-offer 3 — naam en scope nog te bepalen]"
-    scope: "[Scope nog te bepalen door de eigenaar]"
-    deliverables:
-      - "[Op te stellen]"
-    duration: "[x]"
-    price: "[x]"
-    afterNote: "[x]"
-  - name: AI Operations
-    scope: "Beheerabonnement voor AI in productie: monitoring, evaluaties, kostenbeheersing en doorontwikkeling."
-    deliverables:
-      - Continue monitoring van modelprestaties
-      - Periodieke evaluaties
-      - Kostenbeheersing op AI-uitgaven
-      - Doorontwikkeling waar nodig
-    duration: Doorlopend
-    price: "[€x/maand of % van run-volume]"
-    afterNote: Loopt door zolang de AI-oplossing in productie draait.
+    target: azureAudit
 azureNote:
-  body: "De Azure Waste Scan en de Waste Audit horen bij elkaar: stap 1 laat zien of er iets te halen valt, stap 2 zet er bedragen bij die je kunt verdedigen."
+  body: "De twee horen bij elkaar: stap 1 laat zien of er iets te halen valt, stap 2 zet er bedragen bij die je kunt verdedigen."
   linkLabel: Bekijk de Azure-aanpak
-guarantee:
-  heading: Wat we garanderen — en wat niet
-  body: Een evaluatierapport met gemeten prestaties is altijd onderdeel van elk traject. Geen resultaat? Dan zeggen we dat — we verkopen geen vervolgtraject op basis van een verhaal, alleen op basis van cijfers.
-marketplace:
-  heading: Ook via Microsoft Marketplace
-  body: "Deze aanbiedingen zijn — of worden — ook zichtbaar en aan te schaffen via de Microsoft Marketplace [links volgen zodra live]."
 cta:
   heading: Praat over welk aanbod past
   name: Larisa Koroteeva

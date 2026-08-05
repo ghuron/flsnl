@@ -1,8 +1,9 @@
 ---
-// Spec §4.5 — the anti-body-shop statement: productized offers with real prices.
+// Spec §4.5 — the anti-body-shop statement: productized offers with real prices. Only offers
+// with a price and a delivery date we can stand behind are listed; the earlier placeholder
+// offers were removed rather than published as "[to be determined]".
 import { getEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import OfferCard from "./OfferCard.astro";
 import CtaBlock from "./CtaBlock.astro";
 import { withBase } from "../lib/url";
 import { routeFor, type Locale } from "../lib/i18n";
@@ -19,34 +20,38 @@ const offers = (await getEntry("offers", lang))!.data;
 <BaseLayout lang={lang} page="offers" title={offers.meta.title} description={offers.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
 
 <div class="wrap">
-<main class="prose" style="max-width: 900px;">
+<main class="prose">
   <h1>{offers.heading}</h1>
+  <p class="intro">{offers.intro.body}</p>
+</main>
+</div>
 
-  <section class="content">
-    <h2>{offers.intro.heading}</h2>
-    <p>{offers.intro.body}</p>
-  </section>
-
-  <div class="offer-cards">
-    {offers.cards.map((c) => (
-      <OfferCard name={c.name} scope={c.scope} deliverables={c.deliverables} duration={c.duration} price={c.price} afterNote={c.afterNote} ctaHref={c.ctaHref} ctaLabel={c.ctaLabel} />
-    ))}
+<!-- Dark tile band, deliberately breaking out of the reading column: this is the choice the
+     page exists to present, so it gets its own full-bleed section rather than sitting inline. -->
+<section class="offer-tiles-band">
+  <div class="wrap">
+    <div class="offer-tiles">
+      {offers.tiles.map((t) => (
+        <article class="offer-tile">
+          <h2 class="offer-tile-name">{t.name}</h2>
+          <p class="offer-tile-tagline">{t.tagline}</p>
+          <p class="offer-tile-label">{t.whatYouGetLabel}</p>
+          <p class="offer-tile-outcome">{t.outcome}</p>
+          <p class="offer-tile-body">{t.outcomeBody}</p>
+          <p class="offer-tile-price">{t.price}</p>
+          <a class="btn btn-primary" href={withBase(routeFor(t.target, lang))}>{t.ctaLabel}</a>
+        </article>
+      ))}
+    </div>
   </div>
+</section>
 
+<div class="wrap">
+<main class="prose">
   <p class="azure-note">
     {offers.azureNote.body}
     <a href={withBase(routeFor("azure", lang))}>{offers.azureNote.linkLabel}</a>
   </p>
-
-  <section class="content">
-    <h2>{offers.guarantee.heading}</h2>
-    <p>{offers.guarantee.body}</p>
-  </section>
-
-  <section class="content">
-    <h2>{offers.marketplace.heading}</h2>
-    <p>{offers.marketplace.body}</p>
-  </section>
 </main>
 </div>
 

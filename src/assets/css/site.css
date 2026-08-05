@@ -648,18 +648,33 @@ a.proof-item:hover .proof-badge { opacity: 0.85; }
 .audit-price { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; color: var(--blue-dark); margin: 0; }
 .audit-duration { color: var(--ink-dim); margin: 0 0 1rem; }
 
-/* ---- offer cards (aanbod) ---- */
-.offer-cards { display: grid; gap: 1.5rem; margin: 2.5rem 0; }
-.offer-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.75rem; }
-.offer-card h3 { margin: 0 0 0.5rem; font-size: 1.25rem; }
-.offer-scope { color: var(--ink-dim); margin: 0 0 1rem; }
-.offer-deliverables { margin: 0 0 1rem; padding-left: 1.2rem; }
-.offer-deliverables li { margin-bottom: 0.4rem; }
-.offer-meta { display: flex; gap: 1.5rem; font-weight: 700; margin-bottom: 0.8rem; }
-.offer-duration { color: var(--ink-dim); font-weight: 400; }
-.offer-price { color: var(--blue-dark); }
+/* Still used by the audit page's "what happens after" note. */
 .offer-after { color: var(--ink-dim); font-size: 0.9rem; margin: 0 0 1rem; }
-.offer-card .btn { padding: 0.6rem 1rem; font-size: 0.88rem; }
+
+/* ---- offer tiles (aanbod) ----
+   Full-bleed dark band holding one tile per Azure step: centred text, the outcome called out
+   under a small "what you get" label, price, then the CTA pinned to the bottom so both tiles'
+   buttons line up regardless of copy length. */
+.offer-tiles-band { background: var(--navy); color: #fff; padding: 4rem 0 4.5rem; margin: 1rem 0 3rem; }
+.offer-tiles { display: grid; gap: 1.5rem; }
+@media (min-width: 820px) { .offer-tiles { grid-template-columns: 1fr 1fr; } }
+.offer-tile {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  padding: 2.75rem 2rem 2.5rem;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.offer-tile-name { font-size: 1.7rem; line-height: 1.2; color: var(--blue); margin: 0 0 0.9rem; }
+.offer-tile-tagline { color: #cfd3e6; margin: 0 0 2rem; max-width: 34ch; }
+.offer-tile-label { font-size: 0.8rem; color: #8891a5; margin: 0 0 0.35rem; }
+.offer-tile-outcome { font-weight: 800; font-size: 1.05rem; margin: 0 0 0.5rem; }
+.offer-tile-body { color: #cfd3e6; margin: 0 0 1.75rem; max-width: 38ch; }
+.offer-tile-price { font-weight: 700; margin: 0 0 1.75rem; }
+.offer-tile .btn { margin-top: auto; }
+/* The paid step carries the accent, so the two tiles don't read as interchangeable. */
+.offer-tile:nth-child(2) { border-color: rgba(124, 108, 255, 0.5); box-shadow: 0 0 48px rgba(124, 108, 255, 0.12); }
+.offer-tile:nth-child(2) .offer-tile-name { color: #9b8dff; }
 
 /* ---- case cards (cases) ---- */
 .case-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin: 2.5rem 0; }

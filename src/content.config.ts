@@ -213,26 +213,28 @@ const offers = defineCollection({
   schema: z.object({
     meta: z.object({ title: z.string(), description: z.string() }),
     heading: z.string(),
-    intro: z.object({ heading: z.string(), body: z.string() }),
-    cards: z.array(
-      z.object({
-        name: z.string(),
-        scope: z.string(),
-        deliverables: z.array(z.string()),
-        duration: z.string(),
-        price: z.string(),
-        afterNote: z.string(),
-        // Only the free-scan step needs a way in — it's the one card whose whole point is
-        // "go do this now," not "get in touch."
-        ctaHref: z.string().optional(),
-        ctaLabel: z.string().optional(),
-      })
-    ),
-    // Routes the two Azure cards back to their shared hub, which would otherwise have no
+    /** Untitled on purpose — it reads as the page's lede, directly under the h1. */
+    intro: z.object({ body: z.string() }),
+    // Two tiles, one per Azure step. Only offers we can actually price and deliver live here;
+    // the earlier placeholder offers were removed rather than shipped as "[to be determined]".
+    tiles: z
+      .array(
+        z.object({
+          name: z.string(),
+          tagline: z.string(),
+          whatYouGetLabel: z.string(),
+          outcome: z.string(),
+          outcomeBody: z.string(),
+          price: z.string(),
+          ctaLabel: z.string(),
+          /** ROUTES key, so the tile never hardcodes a path. */
+          target: z.enum(["azureScan", "azureAudit"]),
+        })
+      )
+      .length(2),
+    // Routes the two Azure tiles back to their shared hub, which would otherwise have no
     // inbound link anywhere on the site. Href comes from ROUTES, not content.
     azureNote: z.object({ body: z.string(), linkLabel: z.string() }),
-    guarantee: z.object({ heading: z.string(), body: z.string() }),
-    marketplace: z.object({ heading: z.string(), body: z.string() }),
     cta: ctaBlock,
   }),
 });
