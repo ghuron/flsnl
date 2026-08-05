@@ -31,9 +31,6 @@ tiles:
     whatYouGet: Alle bevindingen, een nieuwe architectuur, en een vaste prijs om die te bouwen.
     ctaLabel: Bekijk de audit
     target: azureAudit
-azureNote:
-  body: "De twee horen bij elkaar: stap 1 laat zien of er iets te halen valt, stap 2 maakt er een architectuur van waar je een budget op kunt zetten."
-  linkLabel: Bekijk de Azure-aanpak
 cta:
   heading: Praat over welk aanbod past
   name: Larisa Koroteeva

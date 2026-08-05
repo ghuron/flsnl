@@ -45,15 +45,6 @@ const offers = (await getEntry("offers", lang))!.data;
   </div>
 </section>
 
-<div class="wrap">
-<main class="prose">
-  <p class="azure-note">
-    {offers.azureNote.body}
-    <a href={withBase(routeFor("azure", lang))}>{offers.azureNote.linkLabel}</a>
-  </p>
-</main>
-</div>
-
 <CtaBlock
   heading={offers.cta.heading}
   name={offers.cta.name}

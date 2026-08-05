@@ -31,9 +31,6 @@ tiles:
     whatYouGet: All findings, a new architecture, and a fixed-price quote to build it.
     ctaLabel: See the audit
     target: azureAudit
-azureNote:
-  body: "The two belong together: step 1 shows whether there is anything to recover, step 2 turns it into an architecture you can budget for."
-  linkLabel: See how the Azure track works
 cta:
   heading: Talk through which offer fits
   name: Larisa Koroteeva

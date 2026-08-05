@@ -12,7 +12,7 @@ hero:
     href: "[booking link Larisa]"
   ctaSecondary:
     label: Run the Azure check
-    href: /en/aanbod/azure/kostenscan/
+    href: /en/aanbod/azure-kostenscan/
 howWeWork:
   heading: How we work
   steps:

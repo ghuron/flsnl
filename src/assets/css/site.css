@@ -636,9 +636,6 @@ a.proof-item:hover .proof-badge { opacity: 0.85; }
 .cta-block-text h2 { margin: 0 0 0.4rem; font-size: 1.3rem; }
 .cta-promise { margin: 0; color: #cfd3e6; font-size: 0.92rem; }
 
-.azure-note { color: var(--ink-dim); margin: -1rem 0 2.5rem; }
-.azure-note a { font-weight: 700; white-space: nowrap; }
-
 /* ---- azure hub (aanbod/azure) ---- */
 .azure-steps { display: grid; gap: 1.5rem; margin: 2.5rem 0; }
 @media (min-width: 760px) { .azure-steps { grid-template-columns: 1fr 1fr; } }
@@ -666,7 +663,10 @@ a.proof-item:hover .proof-badge { opacity: 0.85; }
    Full-bleed dark band holding one tile per Azure step: centred text, the outcome called out
    under a small "what you get" label, price, then the CTA pinned to the bottom so both tiles'
    buttons line up regardless of copy length. */
-.offer-tiles-band { background: var(--navy); color: #fff; padding: 4rem 0 4.5rem; margin: 0 0 3rem; }
+.offer-tiles-band { background: var(--navy); color: #fff; padding: 4rem 0 4.5rem; margin: 0; }
+/* Two dark bands meeting: without this the collapsed margin between them shows a strip of the
+   white page background. Marked with a hairline instead so the seam still reads. */
+.offer-tiles-band + .cta-block { margin-top: 0; border-top: 1px solid rgba(255, 255, 255, 0.08); }
 .offer-tiles-intro { text-align: center; margin-bottom: 2.75rem; }
 .offer-tiles-intro h2 { font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 0 0 0.6rem; }
 .offer-tiles-intro p { color: #cfd3e6; margin: 0; }

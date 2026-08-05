@@ -93,32 +93,6 @@ const home = defineCollection({
   }),
 });
 
-// The /aanbod/azure hub: introduces the two-step funnel and hands off to either step. Exists
-// so the parent path of the scan/audit URLs is a real page rather than a 404.
-const azureHub = defineCollection({
-  loader: glob({ pattern: "*.yaml", base: "./src/content/azure-hub" }),
-  schema: z.object({
-    meta: z.object({ title: z.string(), description: z.string() }),
-    heading: z.string(),
-    intro: z.string(),
-    steps: z
-      .array(
-        z.object({
-          eyebrow: z.string(),
-          heading: z.string(),
-          body: z.string(),
-          price: z.string(),
-          linkLabel: z.string(),
-          /** Which ROUTES key this step points at — the hub never hardcodes a path. */
-          target: z.enum(["azureScan", "azureAudit"]),
-        })
-      )
-      .length(2),
-    why: z.object({ heading: z.string(), paragraphs: z.array(z.string()) }),
-    cta: ctaBlock,
-  }),
-});
-
 // The paid, human-led counterpart to the self-serve scan (spec §4.5's Waste Audit offer,
 // promoted from a card on /aanbod to its own page).
 const azureAudit = defineCollection({
@@ -234,9 +208,6 @@ const offers = defineCollection({
         })
       )
       .length(2),
-    // Routes the two Azure tiles back to their shared hub, which would otherwise have no
-    // inbound link anywhere on the site. Href comes from ROUTES, not content.
-    azureNote: z.object({ body: z.string(), linkLabel: z.string() }),
     cta: ctaBlock,
   }),
 });
@@ -465,7 +436,6 @@ export const collections = {
   common,
   home,
   azure,
-  azureHub,
   azureAudit,
   offers,
   cases,

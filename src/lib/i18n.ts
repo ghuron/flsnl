@@ -33,13 +33,13 @@ export function localeHome(lang: Locale): string {
 export const ROUTES = {
   home: { path: "/", locales: ["nl", "en"] },
   offers: { path: "/aanbod/", locales: ["nl", "en"] },
-  // The Azure funnel: hub -> free self-scan -> paid human-led audit. The slugs use "kosten"
-  // rather than a literal translation of the product name ("verspilling"/waste), because
-  // "azure kosten besparen" is what Dutch buyers actually search. The products keep their
-  // Waste Scan / Waste Audit names on the page itself.
-  azure: { path: "/aanbod/azure/", locales: ["nl", "en"] },
-  azureScan: { path: "/aanbod/azure/kostenscan/", locales: ["nl", "en"] },
-  azureAudit: { path: "/aanbod/azure/kostenaudit/", locales: ["nl", "en"] },
+  // The two Azure steps: free self-scan, then the paid human-led audit. Flat under /aanbod/
+  // rather than nested under an /aanbod/azure/ hub — the offer tiles on /aanbod already do the
+  // choosing the hub was built for, and keeping both meant two near-identical pages competing
+  // for the same term. The slugs use "kosten" rather than a literal translation of the product
+  // name, because "azure kosten besparen" is what Dutch buyers actually search.
+  azureScan: { path: "/aanbod/azure-kostenscan/", locales: ["nl", "en"] },
+  azureAudit: { path: "/aanbod/azure-kostenaudit/", locales: ["nl", "en"] },
   cases: { path: "/cases/", locales: ["nl", "en"] },
   trust: { path: "/vertrouwen/", locales: ["nl", "en"] },
   about: { path: "/over-ons/", locales: ["nl", "en"] },
