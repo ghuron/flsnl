@@ -19,49 +19,59 @@ export function localeHome(lang: Locale): string {
 }
 
 /**
- * Every page's URL in every locale it exists in, one row per page from the site spec's §3
- * sitemap table (src/docs/firstlinesoftware-nl-site-spec.md). `null` means that page doesn't
- * exist in that locale (Microsoft/Portfolio are English-only at an unprefixed path; Odoo is
- * Dutch-only). This is the single source both the nav and each page's hreflang alternate read
- * from — a URL written twice (once in nav, once in the page it links to) is exactly the kind of
- * two-source drift that broke month labels earlier in this project.
+ * One canonical path per page, shared by every locale.
+ *
+ * This is a Dutch-native site, so the Dutch slug *is* the path — English serves the same page
+ * at the same path under the /en prefix (/aanbod/ and /en/aanbod/). Keeping one slug set instead
+ * of a per-locale pair means a URL can't drift between languages, the Dutch keywords the site
+ * ranks on are the ones in every URL, and adding a page is one line rather than two.
+ *
+ * `locales` lists the languages a page actually exists in; three pages are single-locale and
+ * simply live in that language's namespace (Microsoft and Portfolio are English-only, Odoo
+ * Dutch-only), which is why this is a list rather than a boolean.
  */
 export const ROUTES = {
-  home: { nl: "/", en: "/en/" },
-  offers: { nl: "/aanbod/", en: "/en/offers/" },
-  // The Azure funnel lives under the offers path in both locales: hub -> free self-scan ->
-  // paid human-led audit. Dutch slugs use "kosten" rather than a literal translation of the
-  // product name ("verspilling"/waste), because "azure kosten besparen" is what Dutch buyers
-  // actually search; EN mirrors that with "cost-*". The products keep their Waste Scan /
-  // Waste Audit names on the page itself.
-  azure: { nl: "/aanbod/azure/", en: "/en/offers/azure/" },
-  azureScan: { nl: "/aanbod/azure/kostenscan/", en: "/en/offers/azure/cost-scan/" },
-  azureAudit: { nl: "/aanbod/azure/kostenaudit/", en: "/en/offers/azure/cost-audit/" },
-  cases: { nl: "/cases/", en: "/en/cases/" },
-  trust: { nl: "/vertrouwen/", en: "/en/trust/" },
-  about: { nl: "/over-ons/", en: "/en/about/" },
-  contact: { nl: "/contact/", en: "/en/contact/" },
-  microsoft: { nl: null, en: "/microsoft/" },
-  kennis: { nl: "/kennis/", en: "/en/notes/" },
-  privacy: { nl: "/privacy/", en: "/en/privacy/" },
-  thanks: { nl: "/bedankt/", en: "/en/thanks/" },
-  portfolio: { nl: null, en: "/portfolio/" },
-  odoo: { nl: "/odoo/", en: null },
-} as const satisfies Record<string, Record<Locale, string | null>>;
+  home: { path: "/", locales: ["nl", "en"] },
+  offers: { path: "/aanbod/", locales: ["nl", "en"] },
+  // The Azure funnel: hub -> free self-scan -> paid human-led audit. The slugs use "kosten"
+  // rather than a literal translation of the product name ("verspilling"/waste), because
+  // "azure kosten besparen" is what Dutch buyers actually search. The products keep their
+  // Waste Scan / Waste Audit names on the page itself.
+  azure: { path: "/aanbod/azure/", locales: ["nl", "en"] },
+  azureScan: { path: "/aanbod/azure/kostenscan/", locales: ["nl", "en"] },
+  azureAudit: { path: "/aanbod/azure/kostenaudit/", locales: ["nl", "en"] },
+  cases: { path: "/cases/", locales: ["nl", "en"] },
+  trust: { path: "/vertrouwen/", locales: ["nl", "en"] },
+  about: { path: "/over-ons/", locales: ["nl", "en"] },
+  contact: { path: "/contact/", locales: ["nl", "en"] },
+  kennis: { path: "/kennis/", locales: ["nl", "en"] },
+  privacy: { path: "/privacy/", locales: ["nl", "en"] },
+  thanks: { path: "/bedankt/", locales: ["nl", "en"] },
+  microsoft: { path: "/microsoft/", locales: ["en"] },
+  portfolio: { path: "/portfolio/", locales: ["en"] },
+  odoo: { path: "/odoo/", locales: ["nl"] },
+} as const satisfies Record<string, { path: string; locales: readonly Locale[] }>;
 
 export type PageKey = keyof typeof ROUTES;
+
+/** The default locale sits at the site root; every other one under its own prefix. */
+function localize(path: string, lang: Locale): string {
+  return lang === DEFAULT_LOCALE ? path : `/${lang}${path}`;
+}
+
+const existsIn = (page: PageKey, lang: Locale): boolean =>
+  (ROUTES[page].locales as readonly Locale[]).includes(lang);
 
 /** This page's URL in `lang` — throws if that page doesn't exist in that locale, since a caller
  *  asking for a route that isn't there is a bug (a broken link), not something to paper over. */
 export function routeFor(page: PageKey, lang: Locale): string {
-  const path = ROUTES[page][lang];
-  if (!path) throw new Error(`No ${lang} route for "${page}"`);
-  return path;
+  if (!existsIn(page, lang)) throw new Error(`No ${lang} route for "${page}"`);
+  return localize(ROUTES[page].path, lang);
 }
 
-/** This page's other-locale URL, or null if it has none (unprefixed/single-locale pages don't
- *  get an EN/NL switch link). */
+/** This page's other-locale URL, or null if it has none (single-locale pages don't get an
+ *  EN/NL switch link). */
 export function altRouteFor(page: PageKey, lang: Locale): string | null {
-  const other = lang === "nl" ? "en" : "nl";
-  return ROUTES[page][other];
+  const other: Locale = lang === "nl" ? "en" : "nl";
+  return existsIn(page, other) ? localize(ROUTES[page].path, other) : null;
 }
