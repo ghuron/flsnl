@@ -1,0 +1,81 @@
+---
+// /aanbod/azure/kostenaudit — the paid, human-led counterpart to the free self-scan. Promoted
+// out of the offer card on /aanbod so the offer has room to answer the questions a buyer
+// actually has before booking a call.
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "./Hero.astro";
+import FaqAccordion from "./FaqAccordion.astro";
+import CtaBlock from "./CtaBlock.astro";
+import { withBase } from "../lib/url";
+import { routeFor, type Locale } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const common = (await getEntry("common", lang))!.data;
+const audit = (await getEntry("azureAudit", lang))!.data;
+---
+<BaseLayout lang={lang} page="azureAudit" title={audit.meta.title} description={audit.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<Hero hero={audit.hero} />
+
+<div class="wrap">
+<main class="prose">
+
+  <section class="content">
+    <h2>{audit.forWhom.heading}</h2>
+    <p class="intro">{audit.forWhom.intro}</p>
+    <ul>{audit.forWhom.items.map((i) => <li>{i}</li>)}</ul>
+  </section>
+
+  <section class="content">
+    <h2>{audit.deliverables.heading}</h2>
+    <ul>{audit.deliverables.items.map((i) => <li>{i}</li>)}</ul>
+  </section>
+
+  <section class="content">
+    <h2>{audit.method.heading}</h2>
+    <ol class="how-we-work-steps">
+      {audit.method.steps.map((s) => (
+        <li><strong>{s.heading}</strong><p>{s.body}</p></li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="content">
+    <h2>{audit.pricing.heading}</h2>
+    <p class="audit-price">{audit.pricing.price}</p>
+    <p class="audit-duration">{audit.pricing.duration}</p>
+    <p>{audit.pricing.body}</p>
+    <p class="offer-after">{audit.pricing.afterNote}</p>
+  </section>
+
+  <section class="content bridge">
+    <h2>{audit.scanFirst.heading}</h2>
+    <p>{audit.scanFirst.body}</p>
+    <a class="btn btn-ghost" href={withBase(routeFor("azureScan", lang))}>{audit.scanFirst.linkLabel}</a>
+  </section>
+
+  <section class="content">
+    <h2>{audit.faq.heading}</h2>
+    <FaqAccordion items={audit.faq.items} />
+  </section>
+
+</main>
+</div>
+
+<CtaBlock
+  heading={audit.cta.heading}
+  name={audit.cta.name}
+  role={audit.cta.role}
+  bookingHref={audit.cta.bookingHref}
+  bookingLabel={audit.cta.bookingLabel}
+  responsePromise={audit.cta.responsePromise}
+  photoSrc={audit.cta.photoSrc}
+/>
+
+</BaseLayout>

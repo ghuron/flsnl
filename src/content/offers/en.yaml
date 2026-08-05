@@ -15,7 +15,7 @@ cards:
     duration: 2 minutes, self-service
     price: Free
     afterNote: See something worth investigating? Step 2 turns it into a quantified savings case.
-    ctaHref: /en/azure/
+    ctaHref: /en/offers/azure/cost-scan/
     ctaLabel: Run the free scan
   - name: "Azure Waste Audit: Step 2, 2-Wk Assessment"
     scope: A thorough, human-led analysis of your Azure spend — what you're paying, why, and where it could be different.
@@ -26,6 +26,8 @@ cards:
     duration: 2 weeks
     price: "€7,500 – €12,500, fixed price"
     afterNote: "From there you choose: a fixed-price implementation, or gainshare — 50% of verified savings for 6 months (commercial levers such as reservations count for [15–20%]; a floor applies from [€80–100k]/month Azure spend). From month 7, a Cost Guardrail subscription [€x/month]."
+    ctaHref: /en/offers/azure/cost-audit/
+    ctaLabel: See the audit
   - name: "[Document processing PoC offer]: 4-6-Wk Proof of Concept"
     scope: A working document processing solution in your own Azure environment, with measured accuracy per document type.
     deliverables:

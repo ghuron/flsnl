@@ -15,7 +15,7 @@ cards:
     duration: 2 minuten, self-service
     price: Gratis
     afterNote: Zie je iets dat de moeite waard is om uit te zoeken? Stap 2 maakt er een gekwantificeerde besparingscase van.
-    ctaHref: /azure/
+    ctaHref: /aanbod/azure/kostenscan/
     ctaLabel: Doe de gratis scan
   - name: "Azure Waste Audit: Stap 2, 2-Wk Assessment"
     scope: Een grondige, mensgeleide analyse van je Azure-uitgaven — wat je betaalt, waarom, en waar het anders kan.
@@ -26,6 +26,8 @@ cards:
     duration: 2 weken
     price: "€7.500 – €12.500, vaste prijs"
     afterNote: "Daarna kies je: een vaste-prijs implementatie, of gainshare — 50% van de geverifieerde besparing gedurende 6 maanden (commerciële hefbomen zoals reserveringen tellen voor [15–20%]; ondergrens vanaf [€80–100k]/maand Azure-uitgaven). Vanaf maand 7 een Cost Guardrail-abonnement [€x/maand]."
+    ctaHref: /aanbod/azure/kostenaudit/
+    ctaLabel: Bekijk de audit
   - name: "[PoC-aanbod documentverwerking]: 4-6-Wk Proof of Concept"
     scope: Een werkende documentverwerkings-oplossing in jouw eigen Azure-omgeving, met gemeten nauwkeurigheid per documenttype.
     deliverables:

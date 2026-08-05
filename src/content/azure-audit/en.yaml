@@ -1,0 +1,68 @@
+meta:
+  title: Azure Waste Audit — quantified savings in 2 weeks
+  description: Human-led analysis of your Azure costs. Two weeks, fixed price €7,500–€12,500, delivering a quantified savings inventory and a signed measurement methodology.
+hero:
+  eyebrow: Azure Waste Audit
+  headlinePre: "What you can actually save on Azure, "
+  headlineEm: with the amounts attached
+  headlinePost: " — in two weeks."
+  lede: Our engineers analyse your Azure usage and deliver a quantified savings inventory. Not directional advice, but an amount per finding and a measurement methodology you can sign off on.
+  ctaPrimary:
+    label: Book a call
+    href: "[booking link Larisa]"
+forWhom:
+  heading: Who this is for
+  intro: "The audit only pays for itself above a certain size. This is the engagement if you recognise yourself in the following:"
+  items:
+    - Your monthly Azure spend is large enough that a few percent genuinely matters
+    - You've run the free scan and the leads looked worth pursuing
+    - You need a defensible number for finance or the board, not a gut feeling
+    - You want to know which part your own team can fix and which part needs engineering
+deliverables:
+  heading: What you get
+  items:
+    - A quantified savings inventory — an amount per finding, not one lump total
+    - A signed baseline and measurement methodology, so what counted as saved isn't disputed later
+    - A split between "your own team can fix this" and "this needs engineering"
+    - A list of AI use cases you could fund from the savings freed up
+    - A costed view of the next steps, including what they'd cost
+method:
+  heading: How we run it
+  steps:
+    - heading: Week 1 — usage and baseline
+      body: We work through your usage and billing data, fix the baseline and agree the measurement methodology with you. You don't need to grant production access — only the billing side.
+    - heading: Week 1-2 — analysis
+      body: We quantify what's recoverable per finding and test it against how your applications actually run. Architecture conversations with your team are part of it.
+    - heading: Week 2 — delivery
+      body: You get the inventory, the methodology and the costed next steps, and we walk through them together. If there's little to recover, we say so — and the audit ends there.
+pricing:
+  heading: Price and duration
+  price: €7,500 – €12,500
+  duration: 2 weeks, fixed price
+  body: Where you land in the band depends on the number of subscriptions and how complex your environment is. You know the exact figure before we start — there's no invoice trailing behind it.
+  afterNote: "From there you choose: a fixed-price implementation, or gainshare — 50% of verified savings for 6 months (commercial levers such as reservations count for [15–20%]; a floor applies from [€80–100k]/month Azure spend). From month 7, a Cost Guardrail subscription [€x/month]."
+scanFirst:
+  heading: Not there yet?
+  body: Start with the free self-scan. It runs entirely in your own browser, takes two minutes, and shows whether there's enough on the table to justify this audit.
+  linkLabel: Run the free scan first
+faq:
+  heading: Frequently asked
+  items:
+    - question: What access do you need?
+      answer: Only the billing side — the Cost Management Reader role is enough, and it's read-only. For the architecture conversations we talk to your team; we don't need to be in production ourselves.
+    - question: What if there's little to save?
+      answer: Then we say so, and you get it evidenced on paper. We don't sell a follow-on engagement on a story, only on numbers. That's exactly why the measurement methodology is fixed upfront.
+    - question: How does this differ from the free scan?
+      answer: The scan flags patterns worth a closer look — it reads your export file and knows nothing about your applications. The audit validates those leads against how your environment actually runs, and attaches amounts you can defend.
+    - question: Do you implement the savings too?
+      answer: If you want us to. After the audit you choose between a fixed-price implementation or gainshare on the verified savings. You're not committed either way — the audit stands on its own.
+    - question: Does our data stay in the EU?
+      answer: Yes. Processing takes place within the EEA, and the exact data locations are set out in the data processing agreement.
+cta:
+  heading: Talk through an audit
+  name: Larisa Koroteeva
+  role: Client Relations Manager
+  bookingHref: "[booking link Larisa]"
+  bookingLabel: Book a call
+  responsePromise: We reply within one business day — even when the answer is that we can't help.
+  photoSrc: /assets/img/photo-larisa-koroteeva.jpg

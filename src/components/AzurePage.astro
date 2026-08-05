@@ -15,7 +15,7 @@ const { lang } = Astro.props;
 const common = (await getEntry("common", lang))!.data;
 const azure = (await getEntry("azure", lang))!.data;
 ---
-<BaseLayout lang={lang} page="azure" title={azure.meta.title} description={azure.meta.description} scriptSrc="'self'" nav={common.nav} facts={common.facts}>
+<BaseLayout lang={lang} page="azureScan" title={azure.meta.title} description={azure.meta.description} scriptSrc="'self'" nav={common.nav} facts={common.facts}>
 
 <!-- 0. Connectivity indicator — sits in the sticky topbar next to the contact button, so it
      stays visible while the reader scrolls through the export steps and into the scan. Labels
@@ -140,7 +140,9 @@ const azure = (await getEntry("azure", lang))!.data;
 <section class="bridge">
   <h2>{azure.bridge.heading}</h2>
   <p>{azure.bridge.body}</p>
-  <a class="btn btn-primary" href={withBase(routeFor("offers", lang))}>{azure.bridge.linkLabel}</a>
+  <!-- Straight to the paid audit now that it has its own page, rather than back to the
+       offers index where the reader would have to find the right card. -->
+  <a class="btn btn-primary" href={withBase(routeFor("azureAudit", lang))}>{azure.bridge.linkLabel}</a>
 </section>
 </div>
 

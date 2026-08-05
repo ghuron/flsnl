@@ -1,0 +1,68 @@
+meta:
+  title: Azure Waste Audit — gekwantificeerde besparing in 2 weken
+  description: Mensgeleide analyse van je Azure-kosten. Twee weken, vaste prijs €7.500–€12.500, met een gekwantificeerde besparingsinventaris en een ondertekende meetmethodiek als resultaat.
+hero:
+  eyebrow: Azure Waste Audit
+  headlinePre: "Wat je écht kunt besparen op Azure, "
+  headlineEm: met bedragen erbij
+  headlinePost: " — in twee weken."
+  lede: Onze engineers analyseren je Azure-verbruik en leveren een gekwantificeerde besparingsinventaris. Geen richtinggevend advies, maar bedragen per bevinding en een meetmethodiek die je kunt ondertekenen.
+  ctaPrimary:
+    label: Plan een gesprek
+    href: "[boekingslink Larisa]"
+forWhom:
+  heading: Voor wie dit bedoeld is
+  intro: "De audit verdient zich pas terug boven een bepaalde omvang. Dit is het traject als je je herkent in het volgende:"
+  items:
+    - Je maandelijkse Azure-uitgaven zijn substantieel genoeg dat een paar procent besparing er echt toe doet
+    - Je hebt de gratis scan gedraaid en de aanknopingspunten zagen er de moeite waard uit
+    - Je hebt een onderbouwd bedrag nodig richting finance of directie, niet een onderbuikgevoel
+    - Je wilt weten welk deel je eigen team kan oplossen en welk deel engineering vraagt
+deliverables:
+  heading: Wat je krijgt
+  items:
+    - Gekwantificeerde besparingsinventaris — een bedrag per bevinding, niet één totaal
+    - Ondertekende baseline- en meetmethodiek, zodat later niet ter discussie staat wat de besparing was
+    - Splitsing tussen "dit lost je eigen team op" en "dit vraagt engineering"
+    - Een lijst met AI-use-cases die je uit de vrijgekomen besparing kunt financieren
+    - Een doorrekening van de vervolgstappen, inclusief wat ze kosten
+method:
+  heading: Hoe we het aanpakken
+  steps:
+    - heading: Week 1 — verbruik en baseline
+      body: We nemen je verbruiks- en facturatiedata door, leggen de baseline vast en bepalen samen de meetmethodiek. Je hebt geen productietoegang nodig — alleen de facturatiekant.
+    - heading: Week 1-2 — analyse
+      body: We kwantificeerden per bevinding wat er te halen valt, en toetsen dat aan hoe je applicaties daadwerkelijk draaien. Architectuurgesprekken met je team horen erbij.
+    - heading: Week 2 — oplevering
+      body: Je krijgt de inventaris, de methodiek en de doorrekening, en we lopen ze samen door. Valt er weinig te halen, dan zeggen we dat — en is de audit klaar.
+pricing:
+  heading: Prijs en doorlooptijd
+  price: €7.500 – €12.500
+  duration: 2 weken, vaste prijs
+  body: De bandbreedte hangt af van het aantal subscriptions en de complexiteit van je omgeving. Je weet het exacte bedrag voordat we beginnen — er komt geen nacalculatie achteraan.
+  afterNote: "Daarna kies je zelf: een vaste-prijs implementatie, of gainshare — 50% van de geverifieerde besparing gedurende 6 maanden (commerciële hefbomen zoals reserveringen tellen voor [15–20%]; ondergrens vanaf [€80–100k]/maand Azure-uitgaven). Vanaf maand 7 een Cost Guardrail-abonnement [€x/maand]."
+scanFirst:
+  heading: Nog niet zover?
+  body: Begin met de gratis self-scan. Die draait volledig in je eigen browser, kost je twee minuten, en laat zien of er genoeg te halen valt om deze audit te rechtvaardigen.
+  linkLabel: Doe eerst de gratis scan
+faq:
+  heading: Veelgestelde vragen
+  items:
+    - question: Welke toegang hebben jullie nodig?
+      answer: Alleen tot de facturatiekant — de rol Cost Management Reader is genoeg. Die is alleen-lezen. Voor de architectuurgesprekken praten we met je team; we hoeven zelf niet in productie.
+    - question: Wat als er weinig te besparen valt?
+      answer: Dan zeggen we dat, en je krijgt het onderbouwd op papier. We verkopen geen vervolgtraject op basis van een verhaal, alleen op basis van cijfers. Dat is precies waarom de meetmethodiek vooraf wordt vastgelegd.
+    - question: Hoe verhoudt dit zich tot de gratis scan?
+      answer: De scan wijst patronen aan die een nadere blik verdienen — hij draait op je exportbestand en kent je applicaties niet. De audit valideert die aanknopingspunten tegen hoe je omgeving werkelijk draait, en zet er bedragen bij die je kunt verdedigen.
+    - question: Voeren jullie de besparingen ook door?
+      answer: Als je dat wilt. Na de audit kies je tussen een vaste-prijs implementatie of gainshare op de geverifieerde besparing. Je zit nergens aan vast — de audit is een op zichzelf staand traject.
+    - question: Blijft onze data binnen de EU?
+      answer: Ja. Verwerking vindt plaats binnen de EER, en de exacte datalocaties staan in de verwerkersovereenkomst.
+cta:
+  heading: Praat over een audit
+  name: Larisa Koroteeva
+  role: Client Relations Manager
+  bookingHref: "[boekingslink Larisa]"
+  bookingLabel: Plan een gesprek
+  responsePromise: We reageren binnen één werkdag — ook als het antwoord is dat we je niet kunnen helpen.
+  photoSrc: /assets/img/photo-larisa-koroteeva.jpg

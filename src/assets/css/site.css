@@ -625,6 +625,26 @@ a.proof-item:hover .proof-badge { opacity: 0.85; }
 .cta-block-text h2 { margin: 0 0 0.4rem; font-size: 1.3rem; }
 .cta-promise { margin: 0; color: #cfd3e6; font-size: 0.92rem; }
 
+/* ---- azure hub (aanbod/azure) ---- */
+.azure-steps { display: grid; gap: 1.5rem; margin: 2.5rem 0; }
+@media (min-width: 760px) { .azure-steps { grid-template-columns: 1fr 1fr; } }
+.azure-step {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.75rem;
+  display: flex; flex-direction: column; align-items: flex-start;
+}
+.azure-step-eyebrow {
+  font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--blue-dark); margin: 0 0 0.4rem;
+}
+.azure-step h2 { font-size: 1.15rem; margin: 0 0 0.6rem; }
+.azure-step p { margin: 0 0 0.9rem; }
+.azure-step-price { font-weight: 700; color: var(--blue-dark); }
+.azure-step .btn { margin-top: auto; }
+
+/* ---- azure audit page ---- */
+.audit-price { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; color: var(--blue-dark); margin: 0; }
+.audit-duration { color: var(--ink-dim); margin: 0 0 1rem; }
+
 /* ---- offer cards (aanbod) ---- */
 .offer-cards { display: grid; gap: 1.5rem; margin: 2.5rem 0; }
 .offer-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.75rem; }

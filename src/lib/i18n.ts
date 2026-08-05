@@ -29,10 +29,14 @@ export function localeHome(lang: Locale): string {
 export const ROUTES = {
   home: { nl: "/", en: "/en/" },
   offers: { nl: "/aanbod/", en: "/en/offers/" },
-  // Already built and shipped this session as URL-prefixed routing (matching every other page
-  // here), not the same-URL "bilingual UI" the spec's table annotates it with — see the
-  // handoff-plan note for why that reading was kept.
-  azure: { nl: "/azure/", en: "/en/azure/" },
+  // The Azure funnel lives under the offers path in both locales: hub -> free self-scan ->
+  // paid human-led audit. Dutch slugs use "kosten" rather than a literal translation of the
+  // product name ("verspilling"/waste), because "azure kosten besparen" is what Dutch buyers
+  // actually search; EN mirrors that with "cost-*". The products keep their Waste Scan /
+  // Waste Audit names on the page itself.
+  azure: { nl: "/aanbod/azure/", en: "/en/offers/azure/" },
+  azureScan: { nl: "/aanbod/azure/kostenscan/", en: "/en/offers/azure/cost-scan/" },
+  azureAudit: { nl: "/aanbod/azure/kostenaudit/", en: "/en/offers/azure/cost-audit/" },
   cases: { nl: "/cases/", en: "/en/cases/" },
   trust: { nl: "/vertrouwen/", en: "/en/trust/" },
   about: { nl: "/over-ons/", en: "/en/about/" },

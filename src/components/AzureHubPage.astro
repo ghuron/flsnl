@@ -1,0 +1,57 @@
+---
+// /aanbod/azure — the parent of the scan and audit URLs, so the path a reader can guess by
+// truncating resolves to a real page instead of a 404. Sends them to whichever step fits.
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CtaBlock from "./CtaBlock.astro";
+import { withBase } from "../lib/url";
+import { routeFor, type Locale } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const common = (await getEntry("common", lang))!.data;
+const hub = (await getEntry("azureHub", lang))!.data;
+---
+<BaseLayout lang={lang} page="azure" title={hub.meta.title} description={hub.meta.description} scriptSrc="'none'" nav={common.nav} facts={common.facts}>
+
+<div class="wrap">
+<!-- Wider than the 700px reading measure: this page is a two-card chooser, not prose. Matches
+     the offers index, which does the same for its card grid. -->
+<main class="prose" style="max-width: 900px;">
+  <h1>{hub.heading}</h1>
+  <p class="intro">{hub.intro}</p>
+
+  <div class="azure-steps">
+    {hub.steps.map((s) => (
+      <article class="azure-step">
+        <p class="azure-step-eyebrow">{s.eyebrow}</p>
+        <h2>{s.heading}</h2>
+        <p>{s.body}</p>
+        <p class="azure-step-price">{s.price}</p>
+        <a class="btn btn-primary" href={withBase(routeFor(s.target, lang))}>{s.linkLabel}</a>
+      </article>
+    ))}
+  </div>
+
+  <section class="content">
+    <h2>{hub.why.heading}</h2>
+    {hub.why.paragraphs.map((p) => <p>{p}</p>)}
+  </section>
+</main>
+</div>
+
+<CtaBlock
+  heading={hub.cta.heading}
+  name={hub.cta.name}
+  role={hub.cta.role}
+  bookingHref={hub.cta.bookingHref}
+  bookingLabel={hub.cta.bookingLabel}
+  responsePromise={hub.cta.responsePromise}
+  photoSrc={hub.cta.photoSrc}
+/>
+
+</BaseLayout>

@@ -1,0 +1,31 @@
+meta:
+  title: Cut your Azure costs — First Line Software
+  description: "Two ways to lower your Azure bill: a free self-service scan that runs in your own browser, and a human-led audit that turns the findings into a quantified savings case."
+heading: Cut your Azure costs
+intro: Two steps, and you can start with step 1 without talking to us at all. The free scan runs entirely in your own browser and shows where your budget is leaking. If you then want certainty about the numbers and a plan to capture them, the audit is the next step.
+steps:
+  - eyebrow: Step 1
+    heading: "Azure Waste Scan: free self-scan"
+    body: Upload your Azure cost export and see within minutes where your budget is draining away. Your file never leaves your browser — nothing is sent, so we never see your numbers and don't even know you ran it.
+    price: Free · 2 minutes
+    linkLabel: Run the free scan
+    target: azureScan
+  - eyebrow: Step 2
+    heading: "Azure Waste Audit: human-led analysis"
+    body: Our engineers dig into your usage, validate what's actually recoverable and deliver a quantified savings inventory with a signed measurement methodology — plus a list of AI use cases you could fund from those savings.
+    price: €7,500 – €12,500 · 2 weeks
+    linkLabel: See the audit
+    target: azureAudit
+why:
+  heading: Why we look at this at all
+  paragraphs:
+    - "First Line Software is a software company, not a cost-consulting firm. We're looking for software worth rebuilding: applications running at full size around the clock when they could scale with demand instead."
+    - "Some of what we find is simple — resources to switch off, a configuration to change. Your own team can do that, and we say so. But when the waste is built into how the application works, that's engineering: our kind of work."
+cta:
+  heading: Talk through your Azure bill
+  name: Larisa Koroteeva
+  role: Client Relations Manager
+  bookingHref: "[booking link Larisa]"
+  bookingLabel: Book a call
+  responsePromise: We reply within one business day — even when the answer is that we can't help.
+  photoSrc: /assets/img/photo-larisa-koroteeva.jpg

@@ -42,7 +42,7 @@ const home = (await getEntry("home", lang))!.data;
   <section class="azure-teaser">
     <h2>{home.azureTeaser.heading}</h2>
     <p>{home.azureTeaser.body}</p>
-    <a class="btn btn-primary" href={withBase(routeFor("azure", lang))}>{home.azureTeaser.linkLabel}</a>
+    <a class="btn btn-primary" href={withBase(routeFor("azureScan", lang))}>{home.azureTeaser.linkLabel}</a>
   </section>
 </div>
 
